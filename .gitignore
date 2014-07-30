@@ -90,9 +90,8 @@ Session.vim
 *.o
 __*__/
 
-### Project specific stuff ###
-## Qt Hasher ##
-moc_hasher*
+## Qt ##
+moc_*
 
 ## Eolach ##
 *.ep
