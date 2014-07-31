@@ -7,24 +7,8 @@
 #include <QStringList>
 #include <QVBoxLayout>
 #include <QTableWidget>
+#include "Book.h"
 
-
-struct book
-{
-  QString title;
-  QString blurb;
-  QString author;
-  bool available;
-  QDate publication_date;
-
-  book() {};
-  book(QString t, QString a, unsigned int pd)
-  {
-    title = t;
-    publication_date = QDate(pd, 1, 1);
-    author = a;
-  }
-};
 
 class KeysWidget : public QWidget
 {

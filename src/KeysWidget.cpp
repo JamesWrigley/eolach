@@ -1,6 +1,7 @@
 #include <QtGui>
 #include "KeysWidget.h"
 
+
 KeysWidget::KeysWidget(QWidget *parent) : QWidget(parent)
 {
   // Initialize test keys
