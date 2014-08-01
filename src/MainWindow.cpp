@@ -1,7 +1,7 @@
 #include <QtGui>
 #include "MainWindow.h"
 #include "KeysWidget.h"
-
+#include "InfoWidget.h"
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 {
@@ -16,10 +16,15 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 void MainWindow::initialize_ui()
 {
   keys_tabwidget = new QTabWidget(this);
+  splitter = new QSplitter(this);
+
   keys_tabwidget->addTab(new KeysWidget(), "Books");
 
+  splitter->addWidget(keys_tabwidget);
+  splitter->addWidget(new InfoWidget());
+
   main_vbox = new QVBoxLayout(this);
-  main_vbox->addWidget(keys_tabwidget);
+  main_vbox->addWidget(splitter);
   this->setLayout(main_vbox);
 }
 

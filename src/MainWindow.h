@@ -3,6 +3,7 @@
 
 #include <QDate>
 #include <QWidget>
+#include <QSplitter>
 #include <QTabWidget>
 #include <QStringList>
 #include <QVBoxLayout>
@@ -21,8 +22,7 @@ class MainWindow : public QWidget
   void center_window();
 
   QTabWidget *keys_tabwidget;
-
-  QTableWidget *keys_tablewidget;
+  QSplitter *splitter;
 
   QVBoxLayout *main_vbox;
 };

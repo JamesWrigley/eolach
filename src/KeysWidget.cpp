@@ -4,6 +4,8 @@
 
 KeysWidget::KeysWidget(QWidget *parent) : QWidget(parent)
 {
+  main_vbox = new QVBoxLayout(this);
+
   // Initialize test keys
   test_keys.append(book("The Mysterious Island", "Jules Verne", 1874));
   test_keys.append(book("The Count of Monte Cristo", "Alexandre Dumas", 1844));
@@ -30,7 +32,6 @@ KeysWidget::KeysWidget(QWidget *parent) : QWidget(parent)
       keys_tablewidget->setItem(keys_tablewidget->rowCount() - 1, 1, author);
     }
 
-  main_vbox = new QVBoxLayout(this);
   main_vbox->addWidget(keys_tablewidget);
   this->setLayout(main_vbox);
 }

@@ -28,9 +28,9 @@ class InfoWidget : public QWidget
   QLabel *synopsis;
   QLabel *available;
 
-  QHBoxLayout *labels_holder;
-  QVBoxLayout *labels;
-  QVBoxLayout *data;
+  QHBoxLayout *labels_holder_hbox;
+  QVBoxLayout *labels_vbox;
+  QVBoxLayout *data_vbox;
   QVBoxLayout *main_vbox;
 };
 
