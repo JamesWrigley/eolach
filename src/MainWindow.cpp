@@ -21,11 +21,13 @@ void MainWindow::initialize_ui()
   keys_tabwidget->addTab(new KeysWidget(), "Books");
 
   splitter->addWidget(keys_tabwidget);
-  splitter->addWidget(new InfoWidget());
+  splitter->addWidget(new InfoWidget(Book("War and Peace", "Leo Tolstoy", 1869)));
 
   main_vbox = new QVBoxLayout(this);
   main_vbox->addWidget(splitter);
+
   this->setLayout(main_vbox);
+  this->setWindowState(Qt::WindowMaximized);
 }
 
 void MainWindow::center_window()

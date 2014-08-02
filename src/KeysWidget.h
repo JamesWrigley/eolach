@@ -20,7 +20,7 @@ class KeysWidget : public QWidget
  private:
   QTableWidget *keys_tablewidget;
 
-  QVector<book> test_keys;
+  QVector<Book> test_keys;
   QStringList headers;
 
   QVBoxLayout *main_vbox;

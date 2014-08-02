@@ -7,11 +7,11 @@ KeysWidget::KeysWidget(QWidget *parent) : QWidget(parent)
   main_vbox = new QVBoxLayout(this);
 
   // Initialize test keys
-  test_keys.append(book("The Mysterious Island", "Jules Verne", 1874));
-  test_keys.append(book("The Count of Monte Cristo", "Alexandre Dumas", 1844));
-  test_keys.append(book("Emma", "Jane Austen", 1815));
-  test_keys.append(book("The Invisible Man", "H.G.Wells", 1897));
-  test_keys.append(book("War and Peace", "Leo Tolstoy", 1869));
+  test_keys.append(Book("The Mysterious Island", "Jules Verne", 1874));
+  test_keys.append(Book("The Count of Monte Cristo", "Alexandre Dumas", 1844));
+  test_keys.append(Book("Emma", "Jane Austen", 1815));
+  test_keys.append(Book("The Invisible Man", "H.G.Wells", 1897));
+  test_keys.append(Book("War and Peace", "Leo Tolstoy", 1869));
 
   keys_tablewidget = new QTableWidget(0, 2, this);
 

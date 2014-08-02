@@ -1,6 +1,7 @@
 #ifndef INFOWIDGET_H
 #define INFOWIDGET_H
 
+#include <QFrame>
 #include <QLabel>
 #include <QWidget>
 #include <QVBoxLayout>
@@ -8,12 +9,12 @@
 #include "Book.h"
 
 
-class InfoWidget : public QWidget
+class InfoWidget : public QFrame
 {
   Q_OBJECT
 
  public:
-  InfoWidget(QWidget *parent = 0);
+  InfoWidget(Book b, QWidget *parent = 0);
 
  private:
   QLabel *title_label;

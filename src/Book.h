@@ -5,7 +5,7 @@
 #include <QString>
 
 // The datatype for a book
-struct book
+struct Book
 {
   QString title;
   QString synopsis;
@@ -13,8 +13,8 @@ struct book
   bool available;
   QDate publication_date;
 
-  book() {};
-  book(QString t, QString a, unsigned int pd)
+  Book() {};
+  Book(QString t, QString a, unsigned int pd)
   {
     title = t;
     publication_date = QDate(pd, 1, 1);
