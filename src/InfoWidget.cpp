@@ -35,4 +35,6 @@ InfoWidget::InfoWidget(Book book, QWidget *parent) : QFrame(parent)
   main_vbox->addLayout(labels_holder_hbox);
   this->setLayout(main_vbox);
   this->setFrameShape(QFrame::StyledPanel);
+  this->setObjectName("MainQFrame");
+  this->setStyleSheet("QFrame#MainQFrame {border: 8px solid #494949; border-radius: 7px;}");
 }
