@@ -17,9 +17,8 @@ KeysWidget::KeysWidget(QWidget *parent) : QWidget(parent)
 
   headers << "Title" << "Author";
   keys_tablewidget->setHorizontalHeaderLabels(headers);
-  keys_tablewidget->horizontalHeader()->setResizeMode(0, QHeaderView::Interactive);
+  keys_tablewidget->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
   keys_tablewidget->horizontalHeader()->setResizeMode(1, QHeaderView::Stretch);
-  keys_tablewidget->horizontalHeader()->resizeSection(0, keys_tablewidget->horizontalHeader()->width() * 5);
 
   for (int n = 0; n < test_keys.size(); ++n)
     {
@@ -32,6 +31,15 @@ KeysWidget::KeysWidget(QWidget *parent) : QWidget(parent)
       keys_tablewidget->setItem(keys_tablewidget->rowCount() - 1, 1, author);
     }
 
+  QObject::connect(keys_tablewidget, SIGNAL(cellClicked(int, int)),
+                   keys_tablewidget, SLOT(selectTableRow()));
+
   main_vbox->addWidget(keys_tablewidget);
+
   this->setLayout(main_vbox);
+}
+
+void KeysWidget::selectTableRow()
+{
+  keys_tablewidget->selectRow(keys_tablewidget->selectedIndexes()[0]->row());
 }

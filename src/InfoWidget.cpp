@@ -3,6 +3,16 @@
 
 InfoWidget::InfoWidget(Book book, QWidget *parent) : QFrame(parent)
 {
+  initialize_ui();
+
+  // Set data
+  title->setText(book.title);
+  author->setText(book.author);
+  publication_date->setText(QString::number(book.publication_date.year()));
+}
+
+void InfoWidget::initialize_ui()
+{
   labels_holder_hbox = new QHBoxLayout();
   labels_vbox = new QVBoxLayout();
   data_vbox = new QVBoxLayout();
@@ -14,9 +24,9 @@ InfoWidget::InfoWidget(Book book, QWidget *parent) : QFrame(parent)
   // synopsis_label = new QLabel("Synopsis:", this);
   // available_label = new QLabel("Available:", this);
 
-  title = new QLabel(book.title, this);
-  author = new QLabel(book.author, this);
-  publication_date = new QLabel(QString::number(book.publication_date.year()), this);
+  title = new QLabel(this);
+  author = new QLabel(this);
+  publication_date = new QLabel(this);
 
   // Packing
   labels_vbox->addWidget(title_label);
@@ -33,8 +43,9 @@ InfoWidget::InfoWidget(Book book, QWidget *parent) : QFrame(parent)
   labels_holder_hbox->addLayout(data_vbox);
 
   main_vbox->addLayout(labels_holder_hbox);
+
   this->setLayout(main_vbox);
   this->setFrameShape(QFrame::StyledPanel);
   this->setObjectName("MainQFrame");
-  this->setStyleSheet("QFrame#MainQFrame {border: 8px solid #494949; border-radius: 7px;}");
+  this->setStyleSheet("QFrame#MainQFrame {border: 8px solid #909090; border-radius: 7px;}");
 }

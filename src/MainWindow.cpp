@@ -3,14 +3,12 @@
 #include "KeysWidget.h"
 #include "InfoWidget.h"
 
-MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
+MainWindow::MainWindow()
 {
   initialize_ui();
 
-  this->setLayout(main_vbox);
   this->center_window();
   this->setWindowTitle("Eolach");
-  this->resize(800, 600);
 }
 
 void MainWindow::initialize_ui()
@@ -23,10 +21,11 @@ void MainWindow::initialize_ui()
   splitter->addWidget(keys_tabwidget);
   splitter->addWidget(new InfoWidget(Book("War and Peace", "Leo Tolstoy", 1869)));
 
-  main_vbox = new QVBoxLayout(this);
-  main_vbox->addWidget(splitter);
+  file_menu = menuBar()->addMenu("File");
 
-  this->setLayout(main_vbox);
+  this->statusBar()->showMessage("Ready");
+
+  this->setCentralWidget(splitter);
   this->setWindowState(Qt::WindowMaximized);
 }
 

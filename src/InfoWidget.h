@@ -17,6 +17,8 @@ class InfoWidget : public QFrame
   InfoWidget(Book b, QWidget *parent = 0);
 
  private:
+  void initialize_ui();
+
   QLabel *title_label;
   QLabel *author_label;
   QLabel *publication_date_label;

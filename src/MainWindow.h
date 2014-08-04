@@ -2,20 +2,20 @@
 #define MAINWINDOW_H
 
 #include <QDate>
-#include <QWidget>
+#include <QMenu>
 #include <QSplitter>
 #include <QTabWidget>
+#include <QMainWindow>
 #include <QStringList>
-#include <QVBoxLayout>
 #include <QTableWidget>
 
 
-class MainWindow : public QWidget
+class MainWindow : public QMainWindow
 {
   Q_OBJECT
 
  public:
-  MainWindow(QWidget *parent = 0);
+  MainWindow();
 
  private:
   void initialize_ui();
@@ -23,8 +23,7 @@ class MainWindow : public QWidget
 
   QTabWidget *keys_tabwidget;
   QSplitter *splitter;
-
-  QVBoxLayout *main_vbox;
+  QMenu *file_menu;
 };
 
 #endif // MAINWINDOW_H
