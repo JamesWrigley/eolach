@@ -18,7 +18,7 @@ class KeysWidget : public QWidget
   KeysWidget(QWidget *parent = 0);
 
   private slots:
-    void selectTableRow();
+    void selectTableRow(int);
 
  private:
   QTableWidget *keys_tablewidget;

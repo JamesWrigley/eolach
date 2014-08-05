@@ -14,6 +14,8 @@ KeysWidget::KeysWidget(QWidget *parent) : QWidget(parent)
   test_keys.append(Book("War and Peace", "Leo Tolstoy", 1869));
 
   keys_tablewidget = new QTableWidget(0, 2, this);
+  QObject::connect(keys_tablewidget, SIGNAL(cellClicked(int, int)),
+                   this, SLOT(selectTableRow(int)));
 
   headers << "Title" << "Author";
   keys_tablewidget->setHorizontalHeaderLabels(headers);
@@ -31,15 +33,12 @@ KeysWidget::KeysWidget(QWidget *parent) : QWidget(parent)
       keys_tablewidget->setItem(keys_tablewidget->rowCount() - 1, 1, author);
     }
 
-  QObject::connect(keys_tablewidget, SIGNAL(cellClicked(int, int)),
-                   keys_tablewidget, SLOT(selectTableRow()));
-
   main_vbox->addWidget(keys_tablewidget);
 
   this->setLayout(main_vbox);
 }
 
-void KeysWidget::selectTableRow()
+void KeysWidget::selectTableRow(int r)
 {
-  keys_tablewidget->selectRow(keys_tablewidget->selectedIndexes()[0]->row());
+  keys_tablewidget->selectRow(r);
 }
