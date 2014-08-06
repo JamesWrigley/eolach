@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QDate>
+#include <QHash>
 #include <QMenu>
 #include <QSplitter>
 #include <QTabWidget>
@@ -24,6 +25,7 @@ class MainWindow : public QMainWindow
   QTabWidget *keys_tabwidget;
   QSplitter *splitter;
   QMenu *file_menu;
+  QHash<QString, int> books_map;
 };
 
 #endif // MAINWINDOW_H

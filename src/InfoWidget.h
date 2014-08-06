@@ -14,10 +14,11 @@ class InfoWidget : public QFrame
   Q_OBJECT
 
  public:
-  InfoWidget(Book b, QWidget *parent = 0);
+  InfoWidget(Book, QWidget *parent = 0);
 
  private:
   void initialize_ui();
+  void set_book(Book);
 
   QLabel *title_label;
   QLabel *author_label;

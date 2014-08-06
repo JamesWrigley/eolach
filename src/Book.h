@@ -8,8 +8,9 @@
 struct Book
 {
   QString title;
-  QString synopsis;
+  QString genre;
   QString author;
+  QString synopsis;
   bool available;
   QDate publication_date;
 

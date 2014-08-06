@@ -4,8 +4,11 @@
 InfoWidget::InfoWidget(Book book, QWidget *parent) : QFrame(parent)
 {
   initialize_ui();
+  set_book(book);
+}
 
-  // Set data
+void InfoWidget::set_book(Book book)
+{
   title->setText(book.title);
   author->setText(book.author);
   publication_date->setText(QString::number(book.publication_date.year()));
