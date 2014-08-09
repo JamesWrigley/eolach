@@ -18,6 +18,8 @@ class InfoWidget : public QFrame
 
  private:
   void initialize_ui();
+
+ public:
   void set_book(Book);
 
   QLabel *title_label;

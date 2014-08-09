@@ -6,13 +6,6 @@ KeysWidget::KeysWidget(QWidget *parent) : QWidget(parent)
 {
   initialize_ui();
 
-  // Initialize test keys
-  test_keys.append(Book("The Mysterious Island", "Jules Verne", 1874));
-  test_keys.append(Book("The Count of Monte Cristo", "Alexandre Dumas", 1844));
-  test_keys.append(Book("Emma", "Jane Austen", 1815));
-  test_keys.append(Book("The Invisible Man", "H.G.Wells", 1897));
-  test_keys.append(Book("War and Peace", "Leo Tolstoy", 1869));
-
   for (int n = 0; n < test_keys.size(); ++n)
     {
       add_book(test_keys[n]);

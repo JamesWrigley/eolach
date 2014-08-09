@@ -9,6 +9,8 @@
 #include <QMainWindow>
 #include <QStringList>
 #include <QTableWidget>
+#include "KeysWidget.h"
+#include "InfoWidget.h"
 
 
 class MainWindow : public QMainWindow
@@ -20,7 +22,11 @@ class MainWindow : public QMainWindow
 
  private:
   void initialize_ui();
+  void populate_keys();
   void center_window();
+
+  KeysWidget *keys_widget;
+  InfoWidget* info_widget;
 
   QTabWidget *keys_tabwidget;
   QSplitter *splitter;

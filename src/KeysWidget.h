@@ -22,12 +22,14 @@ class KeysWidget : public QWidget
 
  private:
     void initialize_ui();
-    void add_book(Book);
 
     QTableWidget *keys_tablewidget;
     QVector<Book> test_keys;
     QStringList headers;
     QVBoxLayout *main_vbox;
+
+ public:
+    void add_book(Book);
 };
 
 #endif // KEYSWIDGET_H
