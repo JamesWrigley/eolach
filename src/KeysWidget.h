@@ -1,16 +1,12 @@
 #ifndef KEYSWIDGET_H
 #define KEYSWIDGET_H
 
-#include <QDate>
-#include <QWidget>
-#include <QVector>
 #include <QStringList>
-#include <QVBoxLayout>
 #include <QTableWidget>
 #include "Book.h"
 
 
-class KeysWidget : public QWidget
+class KeysWidget : public QTableWidget
 {
   Q_OBJECT
 
@@ -24,12 +20,9 @@ class KeysWidget : public QWidget
     void initialize_ui();
 
     QStringList headers;
-    QVBoxLayout *main_vbox;
 
  public:
     void add_book(Book);
-
-    QTableWidget *table_widget;
 };
 
 #endif // KEYSWIDGET_H

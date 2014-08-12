@@ -8,8 +8,8 @@ MainWindow::MainWindow()
   initialize_ui();
   populate_keys();
 
-  keys_widget->table_widget->selectRow(0);
-  info_widget->set_book(books_map[keys_widget->table_widget->model()->data(keys_widget->table_widget->model()->index(0,0)).toString()]);
+  keys_widget->selectRow(0);
+  info_widget->set_book(books_map[keys_widget->model()->data(keys_widget->model()->index(0,0)).toString()]);
 
   this->center_window();
   this->setWindowTitle("Eolach");

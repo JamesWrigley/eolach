@@ -1,16 +1,12 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QDate>
 #include <QHash>
 #include <QMenu>
 #include <QSplitter>
 #include <QTabWidget>
 #include <QMainWindow>
-#include <QStringList>
-#include <QTableWidget>
 
-#include "Book.h"
 #include "KeysWidget.h"
 #include "InfoWidget.h"
 
