@@ -14,7 +14,7 @@ class InfoWidget : public QFrame
   Q_OBJECT
 
  public:
-  InfoWidget(Book, QWidget *parent = 0);
+  InfoWidget(QWidget *parent = 0);
 
  private:
   void initialize_ui();

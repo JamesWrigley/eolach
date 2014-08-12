@@ -9,6 +9,8 @@
 #include <QMainWindow>
 #include <QStringList>
 #include <QTableWidget>
+
+#include "Book.h"
 #include "KeysWidget.h"
 #include "InfoWidget.h"
 
@@ -31,7 +33,7 @@ class MainWindow : public QMainWindow
   QTabWidget *keys_tabwidget;
   QSplitter *splitter;
   QMenu *file_menu;
-  QHash<QString, int> books_map;
+  QHash<QString, Book> books_map;
 };
 
 #endif // MAINWINDOW_H

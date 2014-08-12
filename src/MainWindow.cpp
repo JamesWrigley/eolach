@@ -6,6 +6,10 @@
 MainWindow::MainWindow()
 {
   initialize_ui();
+  populate_keys();
+
+  keys_widget->table_widget->selectRow(0);
+  info_widget->set_book(books_map[keys_widget->table_widget->model()->data(keys_widget->table_widget->model()->index(0,0)).toString()]);
 
   this->center_window();
   this->setWindowTitle("Eolach");
@@ -13,19 +17,30 @@ MainWindow::MainWindow()
 
 void MainWindow::populate_keys()
 {
-  // Initialize test keys
-  // books_map.insert("The Mysterious Island", "Jules Verne", 1874);
-  // books_map.insert("The Count of Monte Cristo", "Alexandre Dumas", 1844);
-  // books_map.insert("Emma", "Jane Austen", 1815);
-  // books_map.insert("The Invisible Man", "H.G.Wells", 1897);
-  // books_map.insert("War and Peace", "Leo Tolstoy", 1869);
+  // Initialize test books
+  Book TMI = Book("The Mysterious Island", "Jules Verne", 1874);
+  Book TCOMC = Book("The Count of Monte Cristo", "Alexandre Dumas", 1844);
+  Book E = Book("Emma", "Jane Austen", 1815);
+  Book TIM = Book("The Invisible Man", "H.G.Wells", 1897);
+  Book WAP = Book("War and Peace", "Leo Tolstoy", 1869);
+  books_map[TMI.title] = TMI;
+  books_map[TCOMC.title] = TCOMC;
+  books_map[E.title] = E;
+  books_map[TIM.title] = TIM;
+  books_map[WAP.title] = WAP;
+
+  for (QHash<QString, Book>::iterator i = books_map.begin(); i != books_map.end(); ++i)
+    {
+      keys_widget->add_book(i.value());
+    }
 }
+
 void MainWindow::initialize_ui()
 {
   keys_tabwidget = new QTabWidget(this);
   splitter = new QSplitter(this);
   keys_widget = new KeysWidget();
-  info_widget = new InfoWidget(Book("War and Peace", "Leo Tolstoy", 1869));
+  info_widget = new InfoWidget();
 
   keys_tabwidget->addTab(keys_widget, "Books");
 

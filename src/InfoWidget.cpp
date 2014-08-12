@@ -1,10 +1,9 @@
 #include "InfoWidget.h"
 
 
-InfoWidget::InfoWidget(Book book, QWidget *parent) : QFrame(parent)
+InfoWidget::InfoWidget(QWidget *parent) : QFrame(parent)
 {
   initialize_ui();
-  set_book(book);
 }
 
 void InfoWidget::set_book(Book book)
