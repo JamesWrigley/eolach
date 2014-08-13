@@ -8,11 +8,21 @@ MainWindow::MainWindow()
   initialize_ui();
   populate_keys();
 
+  // Set the info_widget to display the books info when a key is clicked
+  QObject::connect(keys_widget, SIGNAL(cellClicked(int, int)),
+                   this, SLOT(change_book_on_click(int)));
+
+  // We need to this after the table is populated, otherwise weird stuff happens
   keys_widget->selectRow(0);
-  info_widget->set_book(books_map[keys_widget->model()->data(keys_widget->model()->index(0,0)).toString()]);
+  info_widget->set_book(books_map[keys_widget->model()->data(keys_widget->model()->index(0, 0)).toString()]);
 
   this->center_window();
   this->setWindowTitle("Eolach");
+}
+
+void MainWindow::change_book_on_click(int r)
+{
+  info_widget->set_book(books_map[keys_widget->model()->data(keys_widget->model()->index(r, 0)).toString()]);
 }
 
 void MainWindow::populate_keys()

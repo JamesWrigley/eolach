@@ -5,11 +5,8 @@
 KeysWidget::KeysWidget(QWidget *parent) : QTableWidget(parent)
 {
   initialize_ui();
-}
-
-void KeysWidget::selectTableRow(int r)
-{
-  selectRow(r);
+  setSelectionMode(QAbstractItemView::SingleSelection);
+  setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
 void KeysWidget::add_book(Book book)
@@ -27,9 +24,6 @@ void KeysWidget::initialize_ui()
 {
   insertColumn(0);
   insertColumn(1);
-
-  QObject::connect(this, SIGNAL(cellPressed(int, int)),
-                   this, SLOT(selectTableRow(int)));
 
   headers << "Title" << "Author";
   setHorizontalHeaderLabels(headers);
