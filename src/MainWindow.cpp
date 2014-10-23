@@ -1,20 +1,45 @@
+/*************************** Copyrights and License ******************************
+*                                                                                *
+* This file is part of Eolach. http://github.com/JamesWrigley/eolach/            *
+*                                                                                *
+* Eolach is free software: you can redistribute it and/or modify it under        *
+* the terms of the GNU General Public License as published by the Free Software  *
+* Foundation, either version 3 of the License, or (at your option) any later     *
+* version.                                                                       *
+*                                                                                *
+* Eolach is distributed in the hope that it will be useful, but WITHOUT ANY      *
+* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS      *
+* FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. *
+*                                                                                *
+* You should have received a copy of the GNU General Public License along with   *
+* Eolach. If not, see <http://www.gnu.org/licenses/>.                            *
+*                                                                                *
+*********************************************************************************/
+
 #include <QtGui>
+#include <QFile>
+#include <iostream>
+#include <QCoreApplication>
+#include <QCryptographicHash>
 #include "MainWindow.h"
 #include "KeysWidget.h"
 #include "InfoWidget.h"
 
 MainWindow::MainWindow()
 {
-  initialize_ui();
+  initialize();
   populate_keys();
 
-  // Set the info_widget to display the books info when a key is clicked
+  // Set the info_widget to display the books info when a key is clicked,
+  // and to change the info of a book when its key data is changed.
   QObject::connect(keys_widget, SIGNAL(cellClicked(int, int)),
                    this, SLOT(change_book_on_click(int)));
+  //  QObject::connect(keys_widget, SIGNAL(itemChanged(QTableWidgetItem *)),
+  //                   this, SLOT(on_cell_changed(QTableWidgetItem *)));
 
-  // We need to this after the table is populated, otherwise weird stuff happens
+  // We need to do this after the table is populated, otherwise weird stuff happens
   keys_widget->selectRow(0);
-  info_widget->set_book(books_map[keys_widget->model()->data(keys_widget->model()->index(0, 0)).toString()]);
+  info_widget->set_book(key_table->value(keys_widget->currentRow()));
 
   this->center_window();
   this->setWindowTitle("Eolach");
@@ -22,31 +47,96 @@ MainWindow::MainWindow()
 
 void MainWindow::change_book_on_click(int r)
 {
-  info_widget->set_book(books_map[keys_widget->model()->data(keys_widget->model()->index(r, 0)).toString()]);
+  info_widget->set_book(key_table->value(r));
 }
+
+/*
+void MainWindow::on_cell_changed(QTableWidgetItem *item)
+{
+  QString new_data = item->text();
+  Book *current_book = &key_table[keys_widget->model()->data(keys_widget->model()->index(item->row(), 0)).toString()];
+
+  if (item->column() == 0)
+    {
+      current_book->title = new_data;
+    }
+  else if (item->column() == 1)
+    {
+      current_book->author = new_data;
+    }
+
+  info_widget->set_book(key_table[current_book->title]);
+}
+*/
 
 void MainWindow::populate_keys()
 {
   // Initialize test books
-  Book TMI = Book("The Mysterious Island", "Jules Verne", 1874);
-  Book TCOMC = Book("The Count of Monte Cristo", "Alexandre Dumas", 1844);
-  Book E = Book("Emma", "Jane Austen", 1815);
-  Book TIM = Book("The Invisible Man", "H.G.Wells", 1897);
-  Book WAP = Book("War and Peace", "Leo Tolstoy", 1869);
-  books_map[TMI.title] = TMI;
-  books_map[TCOMC.title] = TCOMC;
-  books_map[E.title] = E;
-  books_map[TIM.title] = TIM;
-  books_map[WAP.title] = WAP;
+  Book TMI = Book("9780760714898" "The Mysterious Island", "Jules Verne", 1874, "Science Fiction", true);
+  Book TCOMC = Book("9780895263469", "The Count of Monte Cristo", "Alexandre Dumas", 1844, "Fiction", false);
+  Book E = Book("9780573698996", "Emma", "Jane Austen", 1815, "Fiction", true);
+  Book TIM = Book("9781598898316", "The Invisible Man", "H.G.Wells", 1897, "Fiction");
+  Book WAP = Book("9780143039990", "War and Peace", "Leo Tolstoy", 1869, "War Novel", false);
 
-  for (QHash<QString, Book>::iterator i = books_map.begin(); i != books_map.end(); ++i)
-    {
-      keys_widget->add_book(i.value());
-    }
+  insert_book(TMI);
+  insert_book(TCOMC);
+  insert_book(E);
+  insert_book(TIM);
+  insert_book(WAP);
 }
 
-void MainWindow::initialize_ui()
+void MainWindow::insert_book(Book book)
 {
+  char *error_msg = 0;
+
+  // Generate hash of book data to be used as a key
+  QString book_data = book.isbn + book.title + book.author + book.publication_date + book.genre;
+  QCryptographicHash sha1Hasher(QCryptographicHash::Sha1);
+  sha1Hasher.addData(book_data.toUtf8());
+  QString book_key = QString(sha1Hasher.result().toHex());
+
+  std::string insert_statement = "INSERT INTO bookstore (key, isbn, title, author, publication_date, genre, available)"
+    "VALUES (" + book_key.toStdString() + "," + book.isbn + "," + book.title + "," + book.author +
+    "," + book.publication_date + "," + book.genre + "," + book.synopsis + "," +
+    book.available + ")";
+
+  sqlite3_exec(bookstore, insert_statement.c_str(), NULL, 0, error_msg);
+  key_table->insert(keys_widget->rowCount(), book_key);
+}
+
+void MainWindow::initialize()
+{
+  // Set up DB connection
+  QString config_dir_path = QDir().homePath() + "/.eolach/";
+  QString db_path = config_dir_path + "bookstore.db";
+
+  if (QFile(db_path).exists())
+    {
+      sqlite3_open_v2((db_path).toStdString().c_str(),
+                      &bookstore, SQLITE_OPEN_READWRITE, NULL);
+    }
+  else
+    {
+      // Note: the key is defined as the SHA1 hash of the book data
+      std::string initialize_db = "CREATE TABLE bookstore ("
+        "key TEXT PRIMARY KEY,"
+        "isbn TEXT,"
+        "title TEXT,"
+        "author TEXT,"
+        "publication_date TEXT,"
+        "genre TEXT,"
+        "synopsis TEXT,"
+        "available BOOLEAN"
+        "isbn TEXT);";
+      char *error_msg;
+
+      QDir().mkdir(config_dir_path);
+      sqlite3_open_v2((db_path).toStdString().c_str(),
+                      &bookstore, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
+      sqlite3_exec(bookstore, initialize_db.c_str(), NULL, 0, error_msg);
+    }
+
+  // Set up GUI
   keys_tabwidget = new QTabWidget(this);
   splitter = new QSplitter(this);
   keys_widget = new KeysWidget();
@@ -57,11 +147,21 @@ void MainWindow::initialize_ui()
   splitter->addWidget(keys_tabwidget);
   splitter->addWidget(info_widget);
 
+  QAction *exit_action = new QAction("Exit", this);
+  exit_action->setShortcut(QKeySequence("Ctrl+Q"));
+  connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
+
   file_menu = menuBar()->addMenu("File");
+  file_menu->addAction(exit_action);
 
   this->statusBar()->showMessage("Ready");
   this->setCentralWidget(splitter);
   this->setWindowState(Qt::WindowMaximized);
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+  sqlite3_close(bookstore);
 }
 
 void MainWindow::center_window()

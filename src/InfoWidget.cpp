@@ -1,19 +1,24 @@
+/*************************** Copyrights and License ******************************
+*                                                                                *
+* This file is part of Eolach. http://github.com/JamesWrigley/eolach/            *
+*                                                                                *
+* Eolach is free software: you can redistribute it and/or modify it under        *
+* the terms of the GNU General Public License as published by the Free Software  *
+* Foundation, either version 3 of the License, or (at your option) any later     *
+* version.                                                                       *
+*                                                                                *
+* Eolach is distributed in the hope that it will be useful, but WITHOUT ANY      *
+* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS      *
+* FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. *
+*                                                                                *
+* You should have received a copy of the GNU General Public License along with   *
+* Eolach. If not, see <http://www.gnu.org/licenses/>.                            *
+*                                                                                *
+*********************************************************************************/
+
 #include "InfoWidget.h"
 
-
 InfoWidget::InfoWidget(QWidget *parent) : QFrame(parent)
-{
-  initialize_ui();
-}
-
-void InfoWidget::set_book(Book book)
-{
-  title->setText(book.title);
-  author->setText(book.author);
-  publication_date->setText(QString::number(book.publication_date.year()));
-}
-
-void InfoWidget::initialize_ui()
 {
   labels_holder_hbox = new QHBoxLayout();
   labels_vbox = new QVBoxLayout();
@@ -50,4 +55,11 @@ void InfoWidget::initialize_ui()
   this->setFrameShape(QFrame::StyledPanel);
   this->setObjectName("MainQFrame");
   this->setStyleSheet("QFrame#MainQFrame {border: 8px solid #909090; border-radius: 7px;}");
+}
+
+void InfoWidget::set_book(QString book_key)
+{
+  title->setText(book.title);
+  author->setText(book.author);
+  publication_date->setText((book.publication_date));
 }
