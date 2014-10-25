@@ -24,6 +24,7 @@
 #include <QString>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QSqlDatabase>
 #include "Book.h"
 
 

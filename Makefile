@@ -12,13 +12,13 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
+DEFINES       = -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_SQL_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches -m64 -mtune=generic -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES)
 CXXFLAGS      = -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches -m64 -mtune=generic -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES)
-INCPATH       = -I/usr/lib64/qt5/mkspecs/linux-g++-64 -I. -I. -Isrc -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtWidgets -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -I.
+INCPATH       = -I/usr/lib64/qt5/mkspecs/linux-g++-64 -I. -I. -Isrc -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtWidgets -isystem /usr/include/qt5/QtSql -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -I.
 LINK          = g++
 LFLAGS        = -m64 -Wl,-O1 -Wl,-z,relro
-LIBS          = $(SUBLIBS) -L/usr/X11R6/lib64 -lQt5Widgets -lQt5Gui -lQt5Core -lGL -lpthread 
+LIBS          = $(SUBLIBS) -L/usr/X11R6/lib64 -lQt5Widgets -lQt5Sql -lQt5Gui -lQt5Core -lGL -lpthread 
 AR            = ar cqs
 RANLIB        = 
 QMAKE         = /usr/bin/qmake-qt5
@@ -236,6 +236,7 @@ Makefile: eolach.pro /usr/lib64/qt5/mkspecs/linux-g++-64/qmake.conf /usr/lib64/q
 		/usr/lib64/qt5/mkspecs/features/lex.prf \
 		eolach.pro \
 		/usr/lib64/libQt5Widgets.prl \
+		/usr/lib64/libQt5Sql.prl \
 		/usr/lib64/libQt5Gui.prl \
 		/usr/lib64/libQt5Core.prl
 	$(QMAKE) -o Makefile eolach.pro
@@ -311,6 +312,7 @@ Makefile: eolach.pro /usr/lib64/qt5/mkspecs/linux-g++-64/qmake.conf /usr/lib64/q
 /usr/lib64/qt5/mkspecs/features/lex.prf:
 eolach.pro:
 /usr/lib64/libQt5Widgets.prl:
+/usr/lib64/libQt5Sql.prl:
 /usr/lib64/libQt5Gui.prl:
 /usr/lib64/libQt5Core.prl:
 qmake: FORCE
@@ -348,17 +350,17 @@ compiler_moc_header_clean:
 	-$(DEL_FILE) moc_InfoWidget.cpp moc_KeysWidget.cpp moc_MainWindow.cpp
 moc_InfoWidget.cpp: src/Book.h \
 		src/InfoWidget.h
-	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++-64 -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/InfoWidget.h -o moc_InfoWidget.cpp
+	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++-64 -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtSql -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/InfoWidget.h -o moc_InfoWidget.cpp
 
 moc_KeysWidget.cpp: src/Book.h \
 		src/KeysWidget.h
-	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++-64 -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/KeysWidget.h -o moc_KeysWidget.cpp
+	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++-64 -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtSql -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/KeysWidget.h -o moc_KeysWidget.cpp
 
 moc_MainWindow.cpp: src/KeysWidget.h \
 		src/Book.h \
 		src/InfoWidget.h \
 		src/MainWindow.h
-	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++-64 -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/MainWindow.h -o moc_MainWindow.cpp
+	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++-64 -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtSql -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/MainWindow.h -o moc_MainWindow.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:

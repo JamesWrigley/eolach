@@ -17,6 +17,7 @@
 *********************************************************************************/
 
 #include <QtGui>
+#include <QHeaderView>
 #include "KeysWidget.h"
 
 KeysWidget::KeysWidget(QWidget *parent) : QTableWidget(parent)
@@ -45,6 +46,6 @@ void KeysWidget::initialize_ui()
 
   headers << "Title" << "Author";
   setHorizontalHeaderLabels(headers);
-  horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
-  horizontalHeader()->setResizeMode(1, QHeaderView::Stretch);
+  horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+  //  horizontalHeader()->setResizeMode(1, QHeaderView::Stretch);
 }

@@ -22,7 +22,6 @@
 #include <QMenu>
 #include <QHash>
 #include <QString>
-#include <sqlite3.h>
 #include <QSplitter>
 #include <QTabWidget>
 #include <QMainWindow>
@@ -38,19 +37,20 @@ class MainWindow : public QMainWindow
 
   private slots:
     void change_book_on_click(int);
-    void on_cell_changed(QTableWidgetItem*);
+    //    void on_cell_changed(QTableWidgetItem*);
 
  private:
   void initialize();
   void closeEvent(QCloseEvent*);
   void populate_keys();
   void center_window();
+  void insert_book(Book);
 
-  sqlite3 *bookstore;
+  QSqlDatabase bookstore;
   KeysWidget *keys_widget;
   InfoWidget *info_widget;
 
-  QHash<int, QString> *key_table;
+  QHash<int, QString> key_table;
   QMenu *file_menu;
   QSplitter *splitter;
   QTabWidget *keys_tabwidget;

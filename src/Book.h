@@ -31,14 +31,14 @@ struct Book
   QString publication_date;
 
   Book() {};
-  Book(QString i, QString t, QString g, QString a, QString s, bool avlble, QString pd)
+  Book(QString i, QString t, QString a, QString pd, QString g)
   {
     isbn = i;
     title = t;
     genre = g;
     author = a;
-    synopsis = s;
-    available = avlble;
+    synopsis = "";
+    available = true;
     publication_date = pd;
   };
 };
