@@ -31,12 +31,12 @@ class KeysWidget : public QTableWidget
   KeysWidget(QWidget *parent = 0);
 
  private:
-    void initialize_ui();
+    void initialize();
 
     QStringList headers;
 
  public:
-    void add_book(Book);
+    void add_book(QString);
 };
 
 #endif // KEYSWIDGET_H

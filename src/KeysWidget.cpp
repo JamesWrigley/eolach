@@ -17,29 +17,36 @@
 *********************************************************************************/
 
 #include <QtGui>
+#include <QVariant>
+#include <QSqlQuery>
 #include <QHeaderView>
 #include "KeysWidget.h"
 
 KeysWidget::KeysWidget(QWidget *parent) : QTableWidget(parent)
 {
-  initialize_ui();
+  initialize();
 
   setSelectionMode(QAbstractItemView::SingleSelection);
   setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
-void KeysWidget::add_book(Book book)
+void KeysWidget::add_book(QString book_key)
 {
+  QSqlDatabase db = QSqlDatabase::database();
+  QSqlQuery get_book_info(db);
+  get_book_info.exec("SELECT title, author FROM bookstore WHERE key='" + book_key + "';");
+  get_book_info.next();
+
   insertRow(rowCount());
 
-  QTableWidgetItem *title = new QTableWidgetItem(book.title);
-  QTableWidgetItem *author = new QTableWidgetItem(book.author);
+  QTableWidgetItem *title = new QTableWidgetItem(get_book_info.value(0).toString());
+  QTableWidgetItem *author = new QTableWidgetItem(get_book_info.value(1).toString());
 
   setItem(rowCount() - 1, 0, title);
   setItem(rowCount() - 1, 1, author);
 }
 
-void KeysWidget::initialize_ui()
+void KeysWidget::initialize()
 {
   insertColumn(0);
   insertColumn(1);
@@ -47,5 +54,4 @@ void KeysWidget::initialize_ui()
   headers << "Title" << "Author";
   setHorizontalHeaderLabels(headers);
   horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-  //  horizontalHeader()->setResizeMode(1, QHeaderView::Stretch);
 }

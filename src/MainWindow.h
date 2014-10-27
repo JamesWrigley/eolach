@@ -21,6 +21,7 @@
 
 #include <QMenu>
 #include <QHash>
+#include <QAction>
 #include <QString>
 #include <QSplitter>
 #include <QTabWidget>
@@ -44,16 +45,18 @@ class MainWindow : public QMainWindow
   void closeEvent(QCloseEvent*);
   void populate_keys();
   void center_window();
-  void insert_book(Book);
+  void add_book(QString, QString, QString, QString, QString);
 
+  QHash<int, QString> key_table;
   QSqlDatabase bookstore;
   KeysWidget *keys_widget;
   InfoWidget *info_widget;
 
-  QHash<int, QString> key_table;
   QMenu *file_menu;
   QSplitter *splitter;
   QTabWidget *keys_tabwidget;
+
+  QAction *exit_action;
 };
 
 #endif // MAINWINDOW_H

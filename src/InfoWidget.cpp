@@ -16,8 +16,10 @@
 *                                                                                *
 *********************************************************************************/
 
+#include <iostream>
 #include <QVariant>
 #include <QSqlQuery>
+#include <QSqlDatabase>
 #include "InfoWidget.h"
 
 InfoWidget::InfoWidget(QWidget *parent) : QFrame(parent)
@@ -61,8 +63,9 @@ InfoWidget::InfoWidget(QWidget *parent) : QFrame(parent)
 
 void InfoWidget::set_book(QString book_key)
 {
-  QSqlQuery get_book_info;
-  get_book_info.exec("SELECT title, author, publication_date FROM bookstore WHERE key = '" + book_key + "'");
+  QSqlDatabase db = QSqlDatabase::database();
+  QSqlQuery get_book_info(db);
+  get_book_info.exec("SELECT title, author, publication_date FROM bookstore WHERE key='" + book_key + "'");
   get_book_info.next();
 
   title->setText(get_book_info.value(0).toString());

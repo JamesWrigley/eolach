@@ -21,6 +21,7 @@
 #include <QMenuBar>
 #include <iostream>
 #include <QSqlQuery>
+#include <QSqlError>
 #include <QStatusBar>
 #include <QApplication>
 #include <QDesktopWidget>
@@ -32,7 +33,6 @@
 MainWindow::MainWindow()
 {
   initialize();
-  populate_keys();
 
   // Set the info_widget to display the books info when a key is clicked,
   // and to change the info of a book when its key data is changed.
@@ -76,73 +76,39 @@ void MainWindow::on_cell_changed(QTableWidgetItem *item)
 void MainWindow::populate_keys()
 {
   // Initialize test books
-  Book TMI = Book("9780760714898", "The Mysterious Island", "Jules Verne", "1874", "Science Fiction");
-  Book TCOMC = Book("9780895263469", "The Count of Monte Cristo", "Alexandre Dumas", "1844", "Fiction");
-  Book E = Book("9780573698996", "Emma", "Jane Austen", "1815", "Fiction");
-  Book TIM = Book("9781598898316", "The Invisible Man", "H.G.Wells", "1897", "Fiction");
-  Book WAP = Book("9780143039990", "War and Peace", "Leo Tolstoy", "1869", "War Novel");
-
-  insert_book(TMI);
-  insert_book(TCOMC);
-  insert_book(E);
-  insert_book(TIM);
-  insert_book(WAP);
+  add_book("9780760714898", "The Mysterious Island", "Jules Verne", "1874", "Science Fiction");
+  add_book("9780895263469", "The Count of Monte Cristo", "Alexandre Dumas", "1844", "Fiction");
+  add_book("9780573698996", "Emma", "Jane Austen", "1815", "Fiction");
+  add_book("9781598898316", "The Invisible Man", "H.G.Wells", "1897", "Fiction");
+  add_book("9780143039990", "War and Peace", "Leo Tolstoy", "1869", "War Novel");
 }
 
-void MainWindow::insert_book(Book book)
+void MainWindow::add_book(QString isbn, QString title, QString author, QString publication_date, QString genre)
 {
   // Generate hash of book data to be used as a key
-  QString book_data = book.isbn + book.title + book.author + book.publication_date + book.genre;
+  QString book_data = isbn + title + author + publication_date + genre;
   QCryptographicHash sha1Hasher(QCryptographicHash::Sha1);
   sha1Hasher.addData(book_data.toUtf8());
   QString book_key = QString(sha1Hasher.result().toHex());
 
-  QString insert_sql = "INSERT INTO bookstore (key, isbn, title, author, publication_date, genre, available)"
-    "VALUES (" + book_key + "," + book.isbn + "," + book.title + "," + book.author +
-    "," + book.publication_date + "," + book.genre + "," + book.synopsis + "," +
-    book.available + ")";
+  QString insert_sql = "INSERT INTO bookstore (key, isbn, title, author, publication_date, genre) "
+    "VALUES ('" + book_key + "', '" + isbn + "', '" + title + "', '" + author +
+    "', '" + publication_date + "', '" + genre + "');";
 
-  QSqlQuery insert;
-  insert.exec(insert_sql);
+  QSqlQuery insert(bookstore);
+  bool success = insert.exec(insert_sql);
+  if (!success)
+    {
+      std::cout << insert_sql.toStdString() << std::endl;
+      std::cout << insert.lastError().text().toStdString() << std::endl;
+    }
 
   key_table.insert(keys_widget->rowCount(), book_key);
+  keys_widget->add_book(book_key);
 }
 
 void MainWindow::initialize()
 {
-  // Set up DB connection
-  QString config_dir_path = QDir().homePath() + "/.eolach/";
-  QString db_path = config_dir_path + "bookstore.db";
-
-  if (QFile(db_path).exists())
-    {
-      bookstore = QSqlDatabase::addDatabase("QSQLITE");
-      bookstore.open();
-    }
-  else
-    {
-      // Note: the key is defined as the SHA1 hash of the book data
-      QString initialize_db_sql = "CREATE TABLE bookstore ("
-        "key TEXT PRIMARY KEY,"
-        "isbn TEXT,"
-        "title TEXT,"
-        "author TEXT,"
-        "publication_date TEXT,"
-        "genre TEXT,"
-        "synopsis TEXT,"
-        "available BOOLEAN"
-        "isbn TEXT);";
-
-      QDir().mkdir(config_dir_path);
-
-      bookstore = QSqlDatabase::addDatabase("QSQLITE");
-      bookstore.setDatabaseName(db_path);
-      bookstore.open();
-
-      QSqlQuery initialize_db;
-      initialize_db.exec(initialize_db_sql);
-    }
-
   // Set up GUI
   keys_tabwidget = new QTabWidget(this);
   splitter = new QSplitter(this);
@@ -154,7 +120,7 @@ void MainWindow::initialize()
   splitter->addWidget(keys_tabwidget);
   splitter->addWidget(info_widget);
 
-  QAction *exit_action = new QAction("Exit", this);
+  exit_action = new QAction("Exit", this);
   exit_action->setShortcut(QKeySequence("Ctrl+Q"));
   connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
 
@@ -164,6 +130,49 @@ void MainWindow::initialize()
   this->statusBar()->showMessage("Ready");
   this->setCentralWidget(splitter);
   this->setWindowState(Qt::WindowMaximized);
+  
+  // Set up DB connection
+  QString config_dir_path = QDir().homePath() + "/.eolach/";
+  QString db_path = config_dir_path + "bookstore.db";
+
+  if (QFile(db_path).exists())
+    {
+      bookstore = QSqlDatabase::addDatabase("QSQLITE");
+      bookstore.setDatabaseName(db_path);
+      bookstore.open();
+
+      // Load existing books from the DB
+      QSqlQuery get_book_keys(bookstore);
+      get_book_keys.exec("SELECT key FROM bookstore;");
+
+      while (get_book_keys.next())
+        {
+          QString book_key = get_book_keys.value(0).toString();
+          key_table.insert(keys_widget->rowCount(), book_key);
+          keys_widget->add_book(book_key);
+        }
+    }
+  else
+    {
+      // Note: the key is defined as the SHA1 hash of the book data
+      QString initialize_db_sql = "CREATE TABLE bookstore ("
+        "key TEXT PRIMARY KEY, "
+        "isbn TEXT, "
+        "title TEXT, "
+        "author TEXT, "
+        "publication_date TEXT, "
+        "genre TEXT);";
+
+      QDir().mkdir(config_dir_path);
+      bookstore = QSqlDatabase::addDatabase("QSQLITE");
+      bookstore.setDatabaseName(db_path);
+      bookstore.open();
+
+      QSqlQuery initialize_db(bookstore);
+      initialize_db.exec(initialize_db_sql);
+
+      populate_keys();
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

@@ -27,7 +27,7 @@ struct Book
   QString genre;
   QString author;
   QString synopsis;
-  bool available;
+  int available;
   QString publication_date;
 
   Book() {};
