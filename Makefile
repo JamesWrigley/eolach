@@ -322,7 +322,7 @@ qmake_all: FORCE
 
 dist: 
 	@test -d .tmp/eolach1.0.0 || mkdir -p .tmp/eolach1.0.0
-	$(COPY_FILE) --parents $(DIST) .tmp/eolach1.0.0/ && $(COPY_FILE) --parents src/Book.h src/InfoWidget.h src/KeysWidget.h src/MainWindow.h .tmp/eolach1.0.0/ && $(COPY_FILE) --parents src/InfoWidget.cpp src/KeysWidget.cpp src/main.cpp src/MainWindow.cpp .tmp/eolach1.0.0/ && (cd `dirname .tmp/eolach1.0.0` && $(TAR) eolach1.0.0.tar eolach1.0.0 && $(COMPRESS) eolach1.0.0.tar) && $(MOVE) `dirname .tmp/eolach1.0.0`/eolach1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/eolach1.0.0
+	$(COPY_FILE) --parents $(DIST) .tmp/eolach1.0.0/ && $(COPY_FILE) --parents src/InfoWidget.h src/KeysWidget.h src/MainWindow.h .tmp/eolach1.0.0/ && $(COPY_FILE) --parents src/InfoWidget.cpp src/KeysWidget.cpp src/main.cpp src/MainWindow.cpp .tmp/eolach1.0.0/ && (cd `dirname .tmp/eolach1.0.0` && $(TAR) eolach1.0.0.tar eolach1.0.0 && $(COMPRESS) eolach1.0.0.tar) && $(MOVE) `dirname .tmp/eolach1.0.0`/eolach1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/eolach1.0.0
 
 
 clean:compiler_clean 
@@ -348,16 +348,13 @@ compiler_rcc_clean:
 compiler_moc_header_make_all: moc_InfoWidget.cpp moc_KeysWidget.cpp moc_MainWindow.cpp
 compiler_moc_header_clean:
 	-$(DEL_FILE) moc_InfoWidget.cpp moc_KeysWidget.cpp moc_MainWindow.cpp
-moc_InfoWidget.cpp: src/Book.h \
-		src/InfoWidget.h
+moc_InfoWidget.cpp: src/InfoWidget.h
 	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++-64 -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtSql -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/InfoWidget.h -o moc_InfoWidget.cpp
 
-moc_KeysWidget.cpp: src/Book.h \
-		src/KeysWidget.h
+moc_KeysWidget.cpp: src/KeysWidget.h
 	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++-64 -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtSql -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/KeysWidget.h -o moc_KeysWidget.cpp
 
 moc_MainWindow.cpp: src/KeysWidget.h \
-		src/Book.h \
 		src/InfoWidget.h \
 		src/MainWindow.h
 	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++-64 -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtSql -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/MainWindow.h -o moc_MainWindow.cpp
@@ -376,23 +373,19 @@ compiler_clean: compiler_moc_header_clean
 
 ####### Compile
 
-InfoWidget.o: src/InfoWidget.cpp src/InfoWidget.h \
-		src/Book.h
+InfoWidget.o: src/InfoWidget.cpp src/InfoWidget.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o InfoWidget.o src/InfoWidget.cpp
 
-KeysWidget.o: src/KeysWidget.cpp src/KeysWidget.h \
-		src/Book.h
+KeysWidget.o: src/KeysWidget.cpp src/KeysWidget.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o KeysWidget.o src/KeysWidget.cpp
 
 main.o: src/main.cpp src/MainWindow.h \
 		src/KeysWidget.h \
-		src/Book.h \
 		src/InfoWidget.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o src/main.cpp
 
 MainWindow.o: src/MainWindow.cpp src/MainWindow.h \
 		src/KeysWidget.h \
-		src/Book.h \
 		src/InfoWidget.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MainWindow.o src/MainWindow.cpp
 

@@ -35,10 +35,10 @@ MainWindow::MainWindow()
   // Set up GUI
   keys_tabwidget = new QTabWidget(this);
   splitter = new QSplitter(this);
-  keys_widget = new KeysWidget();
+  books_widget = new KeysWidget();
   info_widget = new InfoWidget();
 
-  keys_tabwidget->addTab(keys_widget, "Books");
+  keys_tabwidget->addTab(books_widget, "Books");
 
   splitter->addWidget(keys_tabwidget);
   splitter->addWidget(info_widget);
@@ -70,8 +70,8 @@ MainWindow::MainWindow()
       while (get_book_keys.next())
         {
           QString book_key = get_book_keys.value(0).toString();
-          key_table.insert(keys_widget->rowCount(), book_key);
-          keys_widget->add_book(book_key);
+          key_table.insert(books_widget->rowCount(), book_key);
+          books_widget->add_book(book_key);
         }
     }
   else
@@ -98,20 +98,25 @@ MainWindow::MainWindow()
 
   // Set the info_widget to display book info when one is clicked, and to change
   // the info of a book when it's edited.
-  QObject::connect(keys_widget, SIGNAL(cellClicked(int, int)),
+  QObject::connect(books_widget, SIGNAL(cellClicked(int, int)),
                    this, SLOT(change_book_on_click(int)));
-  QObject::connect(keys_widget, SIGNAL(itemChanged(QTableWidgetItem *)),
+  QObject::connect(books_widget, SIGNAL(itemChanged(QTableWidgetItem *)),
                    this, SLOT(on_cell_changed(QTableWidgetItem *)));
 
-  if (keys_widget->rowCount() > 0)
+  if (books_widget->rowCount() > 0)
     {
-      keys_widget->selectRow(0);
-      info_widget->set_book(key_table.value(keys_widget->currentRow()));
+      books_widget->selectRow(0);
+      info_widget->set_book(key_table.value(books_widget->currentRow()));
     }
 
   update_statusbar();
   this->center_window();
   this->setWindowTitle("Eolach");
+}
+
+MainWindow::~MainWindow()
+{
+  bookstore.close();
 }
 
 void MainWindow::change_book_on_click(int r)
@@ -161,21 +166,16 @@ void MainWindow::add_book(QString isbn, QString title, QString author, QString p
       std::cout << insert.lastError().text().toStdString() << std::endl;
     }
 
-  // Insert the book hash into key_table, add the book to keys_widget,
+  // Insert the book hash into key_table, add the book to books_widget,
   // and update the statusbar.
-  key_table.insert(keys_widget->rowCount(), book_key);
-  keys_widget->add_book(book_key);
+  key_table.insert(books_widget->rowCount(), book_key);
+  books_widget->add_book(book_key);
   update_statusbar();
 }
 
 void MainWindow::update_statusbar()
 {
   this->statusBar()->showMessage(QString::number(key_table.size()) + " books.");
-}
-
-void MainWindow::closeEvent(QCloseEvent *event)
-{
-  bookstore.close();
 }
 
 void MainWindow::center_window()

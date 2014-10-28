@@ -35,6 +35,7 @@ class MainWindow : public QMainWindow
 
  public:
   MainWindow();
+  ~MainWindow();
 
   private slots:
     void change_book_on_click(int);
@@ -43,13 +44,12 @@ class MainWindow : public QMainWindow
  private:
     void add_book(QString, QString, QString, QString, QString);
     void center_window();
-    void closeEvent(QCloseEvent*);
     void populate_keys();
     void update_statusbar();
 
     QSqlDatabase bookstore;
     InfoWidget *info_widget;
-    KeysWidget *keys_widget;
+    KeysWidget *books_widget;
     QHash<int, QString> key_table;
 
     QMenu *file_menu;
