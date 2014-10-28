@@ -16,8 +16,6 @@
  *                                                                                *
  *********************************************************************************/
 
-#include <QDir>
-#include <QString>
 #include <QApplication>
 #include "MainWindow.h"
 
