@@ -16,7 +16,6 @@
  *                                                                                *
  *********************************************************************************/
 
-#include <iostream>
 #include <QVariant>
 #include <QSqlQuery>
 #include <QSqlDatabase>
