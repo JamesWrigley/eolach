@@ -38,7 +38,7 @@ class MainWindow : public QMainWindow
   ~MainWindow();
 
   private slots:
-    void change_book_on_click(int);
+    void change_book(int);
     void on_cell_changed(QTableWidgetItem*);
 
  private:

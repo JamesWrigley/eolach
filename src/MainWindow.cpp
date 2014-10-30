@@ -98,8 +98,8 @@ MainWindow::MainWindow()
 
   // Set the info_widget to display book info when one is clicked, and to change
   // the info of a book when it's edited.
-  QObject::connect(books_widget, SIGNAL(cellClicked(int, int)),
-                   this, SLOT(change_book_on_click(int)));
+  QObject::connect(books_widget, SIGNAL(currentCellChanged(int, int, int, int)),
+                   this, SLOT(change_book(int)));
   QObject::connect(books_widget, SIGNAL(itemChanged(QTableWidgetItem *)),
                    this, SLOT(on_cell_changed(QTableWidgetItem *)));
 
@@ -119,7 +119,7 @@ MainWindow::~MainWindow()
   bookstore.close();
 }
 
-void MainWindow::change_book_on_click(int r)
+void MainWindow::change_book(int r)
 {
   info_widget->set_book(key_table.value(r));
 }
