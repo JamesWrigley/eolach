@@ -33,6 +33,8 @@ KeysWidget::KeysWidget(QWidget *parent) : QTableWidget(parent)
 
   setSelectionMode(QAbstractItemView::SingleSelection);
   setSelectionBehavior(QAbstractItemView::SelectRows);
+
+  this->setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
 
 void KeysWidget::add_book(QString book_key)

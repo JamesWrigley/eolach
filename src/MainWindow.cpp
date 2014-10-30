@@ -50,9 +50,6 @@ MainWindow::MainWindow()
   file_menu = menuBar()->addMenu("File");
   file_menu->addAction(exit_action);
 
-  this->setCentralWidget(splitter);
-  this->setWindowState(Qt::WindowMaximized);
-
   // Set up DB connection
   QString config_dir_path = QDir().homePath() + "/.eolach/";
   QString db_path = config_dir_path + "bookstore.db";
@@ -110,6 +107,9 @@ MainWindow::MainWindow()
     }
 
   update_statusbar();
+
+  this->setCentralWidget(splitter);
+  this->setWindowState(Qt::WindowMaximized);
   this->center_window();
   this->setWindowTitle("Eolach");
 }
