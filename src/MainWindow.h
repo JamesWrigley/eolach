@@ -26,6 +26,7 @@
 #include <QSplitter>
 #include <QTabWidget>
 #include <QMainWindow>
+#include <QSqlDatabase>
 #include "KeysWidget.h"
 #include "InfoWidget.h"
 
@@ -37,26 +38,27 @@ class MainWindow : public QMainWindow
   MainWindow();
   ~MainWindow();
 
+ private:
+  void add_book(QString, QString, QString, QString, QString);
+  void center_window();
+  void populate_keys();
+  void update_statusbar();
+
+  QSqlDatabase bookstore;
+  InfoWidget *info_widget;
+  KeysWidget *books_widget;
+  QHash<int, QString> key_table;
+
+  QMenu *file_menu;
+  QSplitter *splitter;
+  QTabWidget *keys_tabwidget;
+
+  QAction *exit_action;
+
   private slots:
     void change_book(int);
-    void on_cell_changed(QTableWidgetItem*);
+    void onFieldChanged(QString, QString);
 
- private:
-    void add_book(QString, QString, QString, QString, QString);
-    void center_window();
-    void populate_keys();
-    void update_statusbar();
-
-    QSqlDatabase bookstore;
-    InfoWidget *info_widget;
-    KeysWidget *books_widget;
-    QHash<int, QString> key_table;
-
-    QMenu *file_menu;
-    QSplitter *splitter;
-    QTabWidget *keys_tabwidget;
-
-    QAction *exit_action;
 };
 
 #endif // MAINWINDOW_H

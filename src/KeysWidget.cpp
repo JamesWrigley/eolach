@@ -52,3 +52,14 @@ void KeysWidget::add_book(QString book_key)
   setItem(rowCount() - 1, 0, title);
   setItem(rowCount() - 1, 1, author);
 }
+
+void KeysWidget::update_book(int row, QString book_key)
+{
+  QSqlDatabase db = QSqlDatabase::database();
+  QSqlQuery get_book_info(db);
+  get_book_info.exec("SELECT title, author FROM bookstore WHERE key='" + book_key + "';");
+  get_book_info.next();
+
+  item(row, 0)->setText(get_book_info.value(0).toString());
+  item(row, 1)->setText(get_book_info.value(1).toString());
+}

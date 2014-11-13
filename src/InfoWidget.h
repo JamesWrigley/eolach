@@ -22,37 +22,36 @@
 #include <QFrame>
 #include <QLabel>
 #include <QString>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QGridLayout>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QSqlDatabase>
+#include "TextField.h"
 
 class InfoWidget : public QFrame
 {
   Q_OBJECT
 
  public:
-  InfoWidget(QWidget *parent = 0);
+  InfoWidget();
+  void set_book(QString);
+
+ signals:
+  void fieldChanged(QString, QString);
 
  private:
+  QString current_book;
+
   QLabel *title_label;
   QLabel *author_label;
   QLabel *publication_date_label;
-  QLabel *synopsis__label;
-  QLabel *available_label;
 
-  QLabel *title;
-  QLabel *author;
-  QLabel *publication_date;
-  QLabel *synopsis;
-  QLabel *available;
+  TextField* title;
+  TextField* author;
+  TextField* publication_date;
 
-  QHBoxLayout *labels_holder_hbox;
-  QVBoxLayout *labels_vbox;
-  QVBoxLayout *data_vbox;
   QVBoxLayout *main_vbox;
-
- public:
-  void set_book(QString);
+  QGridLayout *info_grid;
 };
 
 #endif // INFOWIDGET_H

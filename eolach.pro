@@ -9,5 +9,5 @@ QT += widgets
 QT += sql
 
 # Input
-HEADERS += src/InfoWidget.h src/KeysWidget.h src/MainWindow.h
-SOURCES += src/InfoWidget.cpp src/KeysWidget.cpp src/main.cpp src/MainWindow.cpp
+HEADERS += src/InfoWidget.h src/KeysWidget.h src/MainWindow.h src/TextField.h src/CLineEdit.h
+SOURCES += src/InfoWidget.cpp src/KeysWidget.cpp src/main.cpp src/MainWindow.cpp src/TextField.cpp src/CLineEdit.cpp

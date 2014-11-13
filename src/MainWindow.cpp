@@ -33,7 +33,7 @@
 MainWindow::MainWindow()
 {
   // Set up GUI
-  keys_tabwidget = new QTabWidget(this);
+  keys_tabwidget = new QTabWidget();
   splitter = new QSplitter(this);
   books_widget = new KeysWidget();
   info_widget = new InfoWidget();
@@ -42,10 +42,12 @@ MainWindow::MainWindow()
 
   splitter->addWidget(keys_tabwidget);
   splitter->addWidget(info_widget);
+  splitter->setStretchFactor(0, 2);
+  splitter->setStretchFactor(1, 1);
 
   exit_action = new QAction("Exit", this);
   exit_action->setShortcut(QKeySequence("Ctrl+Q"));
-  connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
+  QObject::connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
 
   file_menu = menuBar()->addMenu("File");
   file_menu->addAction(exit_action);
@@ -97,8 +99,7 @@ MainWindow::MainWindow()
   // the info of a book when it's edited.
   QObject::connect(books_widget, SIGNAL(currentCellChanged(int, int, int, int)),
                    this, SLOT(change_book(int)));
-  QObject::connect(books_widget, SIGNAL(itemChanged(QTableWidgetItem *)),
-                   this, SLOT(on_cell_changed(QTableWidgetItem *)));
+  QObject::connect(info_widget, SIGNAL(fieldChanged(QString, QString)), this, SLOT(onFieldChanged(QString, QString)));
 
   if (books_widget->rowCount() > 0)
     {
@@ -117,33 +118,6 @@ MainWindow::MainWindow()
 MainWindow::~MainWindow()
 {
   bookstore.close();
-}
-
-void MainWindow::change_book(int r)
-{
-  info_widget->set_book(key_table.value(r));
-}
-
-void MainWindow::on_cell_changed(QTableWidgetItem *item)
-{
-  QString field;
-  QString book_key = key_table.value(item->row());
-
-  if (item->column() == 0)
-    {
-      field = "title";
-    }
-  else if (item->column() == 1)
-    {
-      field = "author";
-    }
-
-  // Update DB
-  QSqlQuery update_book_info(bookstore);
-  update_book_info.exec("UPDATE bookstore SET " + field + "='" + item->text() +
-                        "' WHERE key='" + book_key + "';");
-
-  info_widget->set_book(book_key);
 }
 
 void MainWindow::add_book(QString isbn, QString title, QString author, QString publication_date, QString genre)
@@ -171,6 +145,23 @@ void MainWindow::add_book(QString isbn, QString title, QString author, QString p
   key_table.insert(books_widget->rowCount(), book_key);
   books_widget->add_book(book_key);
   update_statusbar();
+}
+
+void MainWindow::change_book(int r)
+{
+  info_widget->set_book(key_table.value(r));
+}
+
+void MainWindow::onFieldChanged(QString field_name, QString text)
+{
+  QString book_key = key_table.value(books_widget->currentRow());
+
+  QSqlQuery update_book_info(bookstore);
+  update_book_info.exec("UPDATE bookstore SET " + field_name + "='" + text +
+                        "' WHERE key='" + book_key + "';");
+
+  info_widget->set_book(book_key);
+  books_widget->update_book(books_widget->currentRow(), book_key);
 }
 
 void MainWindow::update_statusbar()

@@ -16,38 +16,29 @@
  *                                                                                *
  *********************************************************************************/
 
-#ifndef TEXTFIELD_H
-#define TEXTFIELD_H
+#ifndef CLINEEDIT_H
+#define CLINEEDIT_H
 
-#include <QLabel>
-#include <QAction>
-#include <QString>
 #include <QLineEdit>
-#include <QHBoxLayout>
-#include "CLineEdit.h"
 
-// A class that will represent each field displayed in the info widget
-class TextField : public QHBoxLayout
+class CLineEdit : public QLineEdit
 {
   Q_OBJECT
 
  public:
-  // First argument: the SQL field name, second argument: the text to display in edit_box
-  TextField(QString, QString, QWidget *parent = 0);
-  void set_text(QString);
-
- signals:
-  // First argument: the SQL field name, second argument: the changed text (from edit_box)
-  void textChanged(QString, QString);
-
- private:
-  QLabel *label;
-  QString field_name;
-  QAction *edit_text;
-  CLineEdit *edit_box;
+  CLineEdit(QWidget* parent = 0);
 
   private slots:
-    void onTextChanged(QString);
+    void onEditingFinished();
+
+ private:
+    void mouseDoubleClickEvent(QMouseEvent *event);
+
+    QString tooltip;
+    QString background_color;
+
+ signals:
+    void fieldChanged(QString);
 };
 
-#endif // TEXTFIELD_H
+#endif // CLINEEDIT_H

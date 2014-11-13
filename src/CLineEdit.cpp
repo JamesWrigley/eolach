@@ -16,38 +16,42 @@
  *                                                                                *
  *********************************************************************************/
 
-#ifndef TEXTFIELD_H
-#define TEXTFIELD_H
-
-#include <QLabel>
-#include <QAction>
-#include <QString>
-#include <QLineEdit>
-#include <QHBoxLayout>
+#include <QMouseEvent>
 #include "CLineEdit.h"
 
-// A class that will represent each field displayed in the info widget
-class TextField : public QHBoxLayout
+CLineEdit::CLineEdit(QWidget* parent)
 {
-  Q_OBJECT
+  QObject::connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
+  // We set this now to use in onEditingFinished since the window color will
+  // have then been changed by mouseDoubleClickEvent().
+  background_color = this->palette().color(QPalette::Window).name();
+  tooltip = "Double-click to edit";
 
- public:
-  // First argument: the SQL field name, second argument: the text to display in edit_box
-  TextField(QString, QString, QWidget *parent = 0);
-  void set_text(QString);
+  this->setReadOnly(true);
+  this->setFrame(false);
+  this->setStyleSheet("QLineEdit { background: " + background_color + " }");
+  this->setToolTip(tooltip);
+  this->setToolTipDuration(3000);
+}
 
- signals:
-  // First argument: the SQL field name, second argument: the changed text (from edit_box)
-  void textChanged(QString, QString);
+void CLineEdit::mouseDoubleClickEvent(QMouseEvent *event)
+{
+  if (event->button() == Qt::LeftButton)
+    {
+      this->setReadOnly(false);
+      this->setFrame(true);
+      this->setStyleSheet("QLineEdit { background: #F7F7F7 }");
+      this->setToolTip("");
+      this->selectAll();
+    }
+}
 
- private:
-  QLabel *label;
-  QString field_name;
-  QAction *edit_text;
-  CLineEdit *edit_box;
+void CLineEdit::onEditingFinished()
+{
+  this->setReadOnly(true);
+  this->setFrame(false);
+  this->setStyleSheet("QLineEdit { background: " + background_color + " }");
+  this->setToolTip(tooltip);
 
-  private slots:
-    void onTextChanged(QString);
-};
-
-#endif // TEXTFIELD_H
+  emit fieldChanged(this->text()); 
+}

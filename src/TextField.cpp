@@ -16,38 +16,27 @@
  *                                                                                *
  *********************************************************************************/
 
-#ifndef TEXTFIELD_H
-#define TEXTFIELD_H
+#include "TextField.h"
 
-#include <QLabel>
-#include <QAction>
-#include <QString>
-#include <QLineEdit>
-#include <QHBoxLayout>
-#include "CLineEdit.h"
-
-// A class that will represent each field displayed in the info widget
-class TextField : public QHBoxLayout
+TextField::TextField(QString sql_field, QString label_name, QWidget *parent)
 {
-  Q_OBJECT
+  field_name = sql_field;
+  label = new QLabel(label_name);
+  edit_box = new CLineEdit();
 
- public:
-  // First argument: the SQL field name, second argument: the text to display in edit_box
-  TextField(QString, QString, QWidget *parent = 0);
-  void set_text(QString);
+  QObject::connect(edit_box, SIGNAL(fieldChanged(QString)), this, SLOT(onTextChanged(QString)));
+  label->setMinimumWidth(120);
 
- signals:
-  // First argument: the SQL field name, second argument: the changed text (from edit_box)
-  void textChanged(QString, QString);
+  this->addWidget(label);
+  this->addWidget(edit_box);
+}
 
- private:
-  QLabel *label;
-  QString field_name;
-  QAction *edit_text;
-  CLineEdit *edit_box;
+void TextField::onTextChanged(QString new_text)
+{
+  emit textChanged(field_name, new_text);
+}
 
-  private slots:
-    void onTextChanged(QString);
-};
-
-#endif // TEXTFIELD_H
+void TextField::set_text(QString text)
+{
+  edit_box->setText(text);
+}

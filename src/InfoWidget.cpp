@@ -16,43 +16,31 @@
  *                                                                                *
  *********************************************************************************/
 
+#include <iostream>
 #include <QVariant>
 #include <QSqlQuery>
 #include <QSqlDatabase>
 #include "InfoWidget.h"
 
-InfoWidget::InfoWidget(QWidget *parent) : QFrame(parent)
+InfoWidget::InfoWidget()
 {
-  labels_holder_hbox = new QHBoxLayout();
-  labels_vbox = new QVBoxLayout();
-  data_vbox = new QVBoxLayout();
-  main_vbox = new QVBoxLayout();
+  main_vbox = new QVBoxLayout(this);
 
-  title_label = new QLabel("Title:", this);
-  author_label = new QLabel("Author:", this);
-  publication_date_label = new QLabel("Publication Date:", this);
-  // synopsis_label = new QLabel("Synopsis:", this);
-  // available_label = new QLabel("Available:", this);
-
-  title = new QLabel(this);
-  author = new QLabel(this);
-  publication_date = new QLabel(this);
+  title = new TextField("title", "Title:");
+  author = new TextField("author", "Author:");
+  publication_date = new TextField("publication_date", "Publication Date:");
+  QObject::connect(title, SIGNAL(textChanged(QString, QString)),
+                   this, SIGNAL(fieldChanged(QString, QString)));
+  QObject::connect(author, SIGNAL(textChanged(QString, QString)),
+                   this, SIGNAL(fieldChanged(QString, QString)));
+  QObject::connect(publication_date, SIGNAL(textChanged(QString, QString)),
+                   this, SIGNAL(fieldChanged(QString, QString)));
 
   // Packing
-  labels_vbox->addWidget(title_label);
-  labels_vbox->addWidget(author_label);
-  labels_vbox->addWidget(publication_date_label);
-  labels_vbox->addStretch();
-
-  data_vbox->addWidget(title);
-  data_vbox->addWidget(author);
-  data_vbox->addWidget(publication_date);
-  data_vbox->addStretch();
-
-  labels_holder_hbox->addLayout(labels_vbox);
-  labels_holder_hbox->addLayout(data_vbox);
-
-  main_vbox->addLayout(labels_holder_hbox);
+  main_vbox->addLayout(title);
+  main_vbox->addLayout(author);
+  main_vbox->addLayout(publication_date);
+  main_vbox->addStretch();
 
   this->setLayout(main_vbox);
   this->setFrameShape(QFrame::StyledPanel);
@@ -67,7 +55,7 @@ void InfoWidget::set_book(QString book_key)
   get_book_info.exec("SELECT title, author, publication_date FROM bookstore WHERE key='" + book_key + "'");
   get_book_info.next();
 
-  title->setText(get_book_info.value(0).toString());
-  author->setText(get_book_info.value(1).toString());
-  publication_date->setText(get_book_info.value(2).toString());
+  title->set_text(get_book_info.value(0).toString());
+  author->set_text(get_book_info.value(1).toString());
+  publication_date->set_text(get_book_info.value(2).toString());
 }
