@@ -29,12 +29,12 @@ InfoWidget::InfoWidget()
   title = new TextField("title", "Title:");
   author = new TextField("author", "Author:");
   publication_date = new TextField("publication_date", "Publication Date:");
-  QObject::connect(title, SIGNAL(textChanged(QString, QString)),
-                   this, SIGNAL(fieldChanged(QString, QString)));
-  QObject::connect(author, SIGNAL(textChanged(QString, QString)),
-                   this, SIGNAL(fieldChanged(QString, QString)));
-  QObject::connect(publication_date, SIGNAL(textChanged(QString, QString)),
-                   this, SIGNAL(fieldChanged(QString, QString)));
+  connect(title, SIGNAL(textChanged(QString, QString)),
+          this, SIGNAL(fieldChanged(QString, QString)));
+  connect(author, SIGNAL(textChanged(QString, QString)),
+          this, SIGNAL(fieldChanged(QString, QString)));
+  connect(publication_date, SIGNAL(textChanged(QString, QString)),
+          this, SIGNAL(fieldChanged(QString, QString)));
 
   // Packing
   main_vbox->addLayout(title);
@@ -42,10 +42,10 @@ InfoWidget::InfoWidget()
   main_vbox->addLayout(publication_date);
   main_vbox->addStretch();
 
-  this->setLayout(main_vbox);
-  this->setFrameShape(QFrame::StyledPanel);
-  this->setObjectName("MainQFrame");
-  this->setStyleSheet("QFrame#MainQFrame {border: 8px solid #909090; border-radius: 7px;}");
+  setLayout(main_vbox);
+  setFrameShape(QFrame::StyledPanel);
+  setObjectName("MainQFrame");
+  setStyleSheet("QFrame#MainQFrame {border: 8px solid #909090; border-radius: 7px;}");
 }
 
 void InfoWidget::set_book(QString book_key)

@@ -21,37 +21,44 @@
 
 CLineEdit::CLineEdit(QWidget* parent)
 {
-  QObject::connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
+  connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
   // We set this now to use in onEditingFinished since the window color will
   // have then been changed by mouseDoubleClickEvent().
-  background_color = this->palette().color(QPalette::Window).name();
+  background_color = palette().color(QPalette::Window).name();
   tooltip = "Double-click to edit";
 
-  this->setReadOnly(true);
-  this->setFrame(false);
-  this->setStyleSheet("QLineEdit { background: " + background_color + " }");
-  this->setToolTip(tooltip);
-  this->setToolTipDuration(3000);
+  setReadOnly(true);
+  setFrame(false);
+  setStyleSheet("QLineEdit { background: " + background_color + " }");
+  setToolTip(tooltip);
+  setToolTipDuration(3000);
 }
 
 void CLineEdit::mouseDoubleClickEvent(QMouseEvent *event)
 {
   if (event->button() == Qt::LeftButton)
     {
-      this->setReadOnly(false);
-      this->setFrame(true);
-      this->setStyleSheet("QLineEdit { background: #F7F7F7 }");
-      this->setToolTip("");
-      this->selectAll();
+      current_text = text();
+      setReadOnly(false);
+      setFrame(true);
+      setStyleSheet("QLineEdit { background: #F7F7F7 }");
+      setToolTip("");
+      selectAll();
     }
 }
 
 void CLineEdit::onEditingFinished()
 {
-  this->setReadOnly(true);
-  this->setFrame(false);
-  this->setStyleSheet("QLineEdit { background: " + background_color + " }");
-  this->setToolTip(tooltip);
+  setReadOnly(true);
+  setFrame(false);
+  setStyleSheet("QLineEdit { background: " + background_color + " }");
+  setToolTip(tooltip);
+  deselect();
 
-  emit fieldChanged(this->text()); 
+  // Avoid spurious DB calls when the user doesn't actually change the text
+  if (current_text != text())
+    {
+      current_text = text();
+      emit textChanged(current_text);
+    }
 }

@@ -24,11 +24,12 @@ TextField::TextField(QString sql_field, QString label_name, QWidget *parent)
   label = new QLabel(label_name);
   edit_box = new CLineEdit();
 
-  QObject::connect(edit_box, SIGNAL(fieldChanged(QString)), this, SLOT(onTextChanged(QString)));
+  connect(edit_box, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));
+
   label->setMinimumWidth(120);
 
-  this->addWidget(label);
-  this->addWidget(edit_box);
+  addWidget(label);
+  addWidget(edit_box);
 }
 
 void TextField::onTextChanged(QString new_text)
@@ -36,7 +37,7 @@ void TextField::onTextChanged(QString new_text)
   emit textChanged(field_name, new_text);
 }
 
-void TextField::set_text(QString text)
+void TextField::set_text(QString new_text)
 {
-  edit_box->setText(text);
+  edit_box->setText(new_text);
 }

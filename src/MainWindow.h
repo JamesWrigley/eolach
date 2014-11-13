@@ -34,31 +34,30 @@ class MainWindow : public QMainWindow
 {
   Q_OBJECT
 
- public:
-  MainWindow();
-  ~MainWindow();
-
- private:
-  void add_book(QString, QString, QString, QString, QString);
-  void center_window();
-  void populate_keys();
-  void update_statusbar();
-
-  QSqlDatabase bookstore;
-  InfoWidget *info_widget;
-  KeysWidget *books_widget;
-  QHash<int, QString> key_table;
-
-  QMenu *file_menu;
-  QSplitter *splitter;
-  QTabWidget *keys_tabwidget;
-
-  QAction *exit_action;
-
   private slots:
     void change_book(int);
     void onFieldChanged(QString, QString);
 
+ public:
+    MainWindow();
+    ~MainWindow();
+
+ private:
+    void add_book(QString, QString, QString, QString, QString);
+    void center_window();
+    void populate_keys();
+    void update_statusbar();
+
+    QSqlDatabase bookstore;
+    InfoWidget *info_widget;
+    KeysWidget *books_widget;
+    QHash<int, QString> key_table;
+
+    QMenu *file_menu;
+    QSplitter *splitter;
+    QTabWidget *keys_tabwidget;
+
+    QAction *exit_action;
 };
 
 #endif // MAINWINDOW_H

@@ -19,7 +19,6 @@
 #include <QDir>
 #include <QFile>
 #include <QMenuBar>
-#include <iostream>
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QStatusBar>
@@ -47,7 +46,7 @@ MainWindow::MainWindow()
 
   exit_action = new QAction("Exit", this);
   exit_action->setShortcut(QKeySequence("Ctrl+Q"));
-  QObject::connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
+  connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
 
   file_menu = menuBar()->addMenu("File");
   file_menu->addAction(exit_action);
@@ -97,9 +96,10 @@ MainWindow::MainWindow()
 
   // Set the info_widget to display book info when one is clicked, and to change
   // the info of a book when it's edited.
-  QObject::connect(books_widget, SIGNAL(currentCellChanged(int, int, int, int)),
-                   this, SLOT(change_book(int)));
-  QObject::connect(info_widget, SIGNAL(fieldChanged(QString, QString)), this, SLOT(onFieldChanged(QString, QString)));
+  connect(books_widget, SIGNAL(currentCellChanged(int, int, int, int)),
+          this, SLOT(change_book(int)));
+  connect(info_widget, SIGNAL(fieldChanged(QString, QString)),
+          this, SLOT(onFieldChanged(QString, QString)));
 
   if (books_widget->rowCount() > 0)
     {
@@ -109,10 +109,10 @@ MainWindow::MainWindow()
 
   update_statusbar();
 
-  this->setCentralWidget(splitter);
-  this->setWindowState(Qt::WindowMaximized);
-  this->center_window();
-  this->setWindowTitle("Eolach");
+  setCentralWidget(splitter);
+  setWindowState(Qt::WindowMaximized);
+  center_window();
+  setWindowTitle("Eolach");
 }
 
 MainWindow::~MainWindow()
@@ -120,7 +120,10 @@ MainWindow::~MainWindow()
   bookstore.close();
 }
 
-void MainWindow::add_book(QString isbn, QString title, QString author, QString publication_date, QString genre)
+/* General functions */
+
+void MainWindow::add_book(QString isbn, QString title, QString author,
+                          QString publication_date, QString genre)
 {
   // Generate hash of book data to be used as a key
   QString book_data = isbn + title + author + publication_date + genre;
@@ -134,39 +137,12 @@ void MainWindow::add_book(QString isbn, QString title, QString author, QString p
     "', '" + publication_date + "', '" + genre + "');";
   QSqlQuery insert(bookstore);
   bool success = insert.exec(insert_sql);
-  if (!success)
-    {
-      std::cout << insert_sql.toStdString() << std::endl;
-      std::cout << insert.lastError().text().toStdString() << std::endl;
-    }
 
   // Insert the book hash into key_table, add the book to books_widget,
-  // and update the statusbar.
+  // and update the statusbar stats
   key_table.insert(books_widget->rowCount(), book_key);
   books_widget->add_book(book_key);
   update_statusbar();
-}
-
-void MainWindow::change_book(int r)
-{
-  info_widget->set_book(key_table.value(r));
-}
-
-void MainWindow::onFieldChanged(QString field_name, QString text)
-{
-  QString book_key = key_table.value(books_widget->currentRow());
-
-  QSqlQuery update_book_info(bookstore);
-  update_book_info.exec("UPDATE bookstore SET " + field_name + "='" + text +
-                        "' WHERE key='" + book_key + "';");
-
-  info_widget->set_book(book_key);
-  books_widget->update_book(books_widget->currentRow(), book_key);
-}
-
-void MainWindow::update_statusbar()
-{
-  this->statusBar()->showMessage(QString::number(key_table.size()) + " books.");
 }
 
 void MainWindow::center_window()
@@ -188,4 +164,28 @@ void MainWindow::populate_keys()
   add_book("9780573698996", "Emma", "Jane Austen", "1815", "Fiction");
   add_book("9781598898316", "The Invisible Man", "H.G.Wells", "1897", "Fiction");
   add_book("9780143039990", "War and Peace", "Leo Tolstoy", "1869", "War Novel");
+}
+
+void MainWindow::update_statusbar()
+{
+  statusBar()->showMessage(QString::number(key_table.size()) + " books.");
+}
+
+/* Slots */
+
+void MainWindow::change_book(int r)
+{
+  info_widget->set_book(key_table.value(r));
+}
+
+void MainWindow::onFieldChanged(QString sql_field_name, QString new_text)
+{
+  QString book_key = key_table.value(books_widget->currentRow());
+
+  QSqlQuery update_book_info(bookstore);
+  update_book_info.exec("UPDATE bookstore SET " + sql_field_name + "='" + new_text +
+                        "' WHERE key='" + book_key + "';");
+
+  info_widget->set_book(book_key);
+  books_widget->update_book(books_widget->currentRow(), book_key);
 }

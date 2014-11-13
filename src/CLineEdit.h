@@ -25,20 +25,21 @@ class CLineEdit : public QLineEdit
 {
   Q_OBJECT
 
- public:
-  CLineEdit(QWidget* parent = 0);
-
   private slots:
     void onEditingFinished();
+
+ signals:
+    void textChanged(QString);
+
+ public:
+    CLineEdit(QWidget* parent = 0);
 
  private:
     void mouseDoubleClickEvent(QMouseEvent *event);
 
+    QString current_text;
     QString tooltip;
     QString background_color;
-
- signals:
-    void fieldChanged(QString);
 };
 
 #endif // CLINEEDIT_H

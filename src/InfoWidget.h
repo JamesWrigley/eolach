@@ -21,10 +21,6 @@
 
 #include <QFrame>
 #include <QLabel>
-#include <QString>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QGridLayout>
 #include <QVBoxLayout>
 #include "TextField.h"
 
@@ -32,12 +28,12 @@ class InfoWidget : public QFrame
 {
   Q_OBJECT
 
+ signals:
+  void fieldChanged(QString, QString);
+
  public:
   InfoWidget();
   void set_book(QString);
-
- signals:
-  void fieldChanged(QString, QString);
 
  private:
   QString current_book;
@@ -51,7 +47,6 @@ class InfoWidget : public QFrame
   TextField* publication_date;
 
   QVBoxLayout *main_vbox;
-  QGridLayout *info_grid;
 };
 
 #endif // INFOWIDGET_H

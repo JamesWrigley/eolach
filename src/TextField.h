@@ -21,7 +21,6 @@
 
 #include <QLabel>
 #include <QAction>
-#include <QString>
 #include <QLineEdit>
 #include <QHBoxLayout>
 #include "CLineEdit.h"
@@ -31,23 +30,23 @@ class TextField : public QHBoxLayout
 {
   Q_OBJECT
 
- public:
-  // First argument: the SQL field name, second argument: the text to display in edit_box
-  TextField(QString, QString, QWidget *parent = 0);
-  void set_text(QString);
-
- signals:
-  // First argument: the SQL field name, second argument: the changed text (from edit_box)
-  void textChanged(QString, QString);
-
- private:
-  QLabel *label;
-  QString field_name;
-  QAction *edit_text;
-  CLineEdit *edit_box;
-
   private slots:
     void onTextChanged(QString);
+
+ signals:
+    // Arguments: the SQL field name and the changed text (from edit_box)
+    void textChanged(QString, QString);
+
+ public:
+    // Constructor arguments: the SQL field name and the text to display in edit_box
+    TextField(QString, QString, QWidget *parent = 0);
+    void set_text(QString);
+
+ private:
+    QLabel *label;
+    QString field_name;
+    QAction *edit_text;
+    CLineEdit *edit_box;
 };
 
 #endif // TEXTFIELD_H
