@@ -136,7 +136,7 @@ void MainWindow::add_book(QString isbn, QString title, QString author,
     "VALUES ('" + book_key + "', '" + isbn + "', '" + title + "', '" + author +
     "', '" + publication_date + "', '" + genre + "');";
   QSqlQuery insert(bookstore);
-  bool success = insert.exec(insert_sql);
+  insert.exec(insert_sql);
 
   // Insert the book hash into key_table, add the book to books_widget,
   // and update the statusbar stats
