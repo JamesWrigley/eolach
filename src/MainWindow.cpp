@@ -16,8 +16,6 @@
  *                                                                                *
  *********************************************************************************/
 
-#include <QDir>
-#include <QFile>
 #include <QMenuBar>
 #include <QSqlQuery>
 #include <QSqlError>
@@ -51,47 +49,16 @@ MainWindow::MainWindow()
   file_menu = menuBar()->addMenu("File");
   file_menu->addAction(exit_action);
 
-  // Set up DB connection
-  QString config_dir_path = QDir().homePath() + "/.eolach/";
-  QString db_path = config_dir_path + "bookstore.db";
+  // Populate books_widget with the books from bookstore
+  bookstore = QSqlDatabase::database();
+  QSqlQuery get_book_keys(bookstore);
+  get_book_keys.exec("SELECT key FROM bookstore;");
 
-  if (QFile(db_path).exists())
+  while (get_book_keys.next())
     {
-      bookstore = QSqlDatabase::addDatabase("QSQLITE");
-      bookstore.setDatabaseName(db_path);
-      bookstore.open();
-
-      // Load existing books from the DB
-      QSqlQuery get_book_keys(bookstore);
-      get_book_keys.exec("SELECT key FROM bookstore;");
-
-      while (get_book_keys.next())
-        {
-          QString book_key = get_book_keys.value(0).toString();
-          key_table.insert(books_widget->rowCount(), book_key);
-          books_widget->add_book(book_key);
-        }
-    }
-  else
-    {
-      // Note: the key is defined as the SHA1 hash of the book data
-      QString initialize_db_sql = "CREATE TABLE bookstore ("
-        "key TEXT PRIMARY KEY, "
-        "isbn TEXT, "
-        "title TEXT, "
-        "author TEXT, "
-        "publication_date TEXT, "
-        "genre TEXT);";
-
-      QDir().mkdir(config_dir_path);
-      bookstore = QSqlDatabase::addDatabase("QSQLITE");
-      bookstore.setDatabaseName(db_path);
-      bookstore.open();
-
-      QSqlQuery initialize_db(bookstore);
-      initialize_db.exec(initialize_db_sql);
-
-      populate_keys();
+      QString book_key = get_book_keys.value(0).toString();
+      key_table.insert(books_widget->rowCount(), book_key);
+      books_widget->add_book(book_key);
     }
 
   // Set the info_widget to display book info when one is clicked, and to change

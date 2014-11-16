@@ -22,7 +22,6 @@
 #include <QMenu>
 #include <QHash>
 #include <QAction>
-#include <QString>
 #include <QSplitter>
 #include <QTabWidget>
 #include <QMainWindow>
