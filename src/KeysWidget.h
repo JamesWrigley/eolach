@@ -25,18 +25,22 @@ class KeysWidget : public QTableWidget
 {
   Q_OBJECT
 
+ signals:
+  void book_removed();
+
   private slots:
     void create_context_menu(QPoint);
     void remove_book();
 
  public:
-  KeysWidget(QWidget *parent = 0);
-  void add_book(QString);
-  void update_book(int, QString);
+    KeysWidget(QWidget *parent = 0);
+    void add_book(QString);
+    void load_items();
+    void update_book(int, QString);
 
  private:
-  QMenu *context_menu;
-  QAction *remove_book_action;
+    QMenu *context_menu;
+    QAction *remove_book_action;
 };
 
 #endif // KEYSWIDGET_H

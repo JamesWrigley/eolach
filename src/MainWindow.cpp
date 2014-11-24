@@ -56,17 +56,7 @@ MainWindow::MainWindow()
   file_menu->addAction(exit_action);
   toolbar->addAction(add_book_action);  
 
-  // Populate books_widget with the books from bookstore
-  bookstore = QSqlDatabase::database();
-  QSqlQuery get_book_keys(bookstore);
-  get_book_keys.exec("SELECT key FROM bookstore;");
-
-  while (get_book_keys.next())
-    {
-      QString book_key = get_book_keys.value(0).toString();
-      books_widget->add_book(book_key);
-    }
-
+  books_widget->load_items();
   if (books_widget->rowCount() > 0)
     {
       books_widget->selectRow(0);

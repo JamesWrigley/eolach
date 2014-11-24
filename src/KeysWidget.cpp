@@ -70,6 +70,20 @@ void KeysWidget::add_book(QString book_key)
   setItem(rowCount() - 1, 1, author);
 }
 
+void KeysWidget::load_items()
+{
+  // Populate books_widget with the books from bookstore
+  QSqlDatabase bookstore = QSqlDatabase::database();
+  QSqlQuery get_book_keys(bookstore);
+  get_book_keys.exec("SELECT key FROM bookstore;");
+
+  while (get_book_keys.next())
+    {
+      QString book_key = get_book_keys.value(0).toString();
+      add_book(book_key);
+    }
+}
+
 void KeysWidget::update_book(int row, QString book_key)
 {
   QSqlDatabase db = QSqlDatabase::database();
@@ -94,6 +108,11 @@ void KeysWidget::create_context_menu(QPoint pos)
 void KeysWidget::remove_book()
 {
   QString book_key = static_cast<BookItem*>(currentItem())->book_key;
-  //  QSqlDatabase bookstore = QSqlDatabase::database();
-  std::cout << book_key.toStdString() << std::endl;
+  int current_item_index = currentRow();
+  QSqlDatabase bookstore = QSqlDatabase::database();
+  QSqlQuery remove_book(bookstore);
+  remove_book.exec("REMOVE FROM bookstore WHERE key='" + book_key + "';");
+
+  emit book_removed();
+  selectRow(--current_item_index);
 }
