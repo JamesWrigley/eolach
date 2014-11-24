@@ -16,6 +16,7 @@
  *                                                                                *
  *********************************************************************************/
 
+#include <iostream>
 #include <QMenuBar>
 #include <QSqlQuery>
 #include <QSqlError>
@@ -23,17 +24,19 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QCryptographicHash>
+#include "BookItem.h"
 #include "MainWindow.h"
 #include "KeysWidget.h"
 #include "InfoWidget.h"
+#include "AddBookDialog.h"
 
 MainWindow::MainWindow()
 {
   // Set up GUI
   keys_tabwidget = new QTabWidget();
-  splitter = new QSplitter(this);
   books_widget = new KeysWidget();
   info_widget = new InfoWidget();
+  splitter = new QSplitter(this);
 
   keys_tabwidget->addTab(books_widget, "Books");
 
@@ -42,12 +45,16 @@ MainWindow::MainWindow()
   splitter->setStretchFactor(0, 2);
   splitter->setStretchFactor(1, 1);
 
-  exit_action = new QAction("Exit", this);
-  exit_action->setShortcut(QKeySequence("Ctrl+Q"));
-  connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
-
+  QIcon::setThemeName("oxygen");
+  toolbar = addToolBar("");
   file_menu = menuBar()->addMenu("File");
+
+  exit_action = new QAction("Exit", this);
+  add_book_action = new QAction(QIcon::fromTheme("list-add"), "", this);
+  exit_action->setShortcut(QKeySequence("Ctrl+Q"));
+
   file_menu->addAction(exit_action);
+  toolbar->addAction(add_book_action);  
 
   // Populate books_widget with the books from bookstore
   bookstore = QSqlDatabase::database();
@@ -57,25 +64,24 @@ MainWindow::MainWindow()
   while (get_book_keys.next())
     {
       QString book_key = get_book_keys.value(0).toString();
-      key_table.insert(books_widget->rowCount(), book_key);
       books_widget->add_book(book_key);
     }
-
-  // Set the info_widget to display book info when one is clicked, and to change
-  // the info of a book when it's edited.
-  connect(books_widget, SIGNAL(currentCellChanged(int, int, int, int)),
-          this, SLOT(change_book(int)));
-  connect(info_widget, SIGNAL(fieldChanged(QString, QString)),
-          this, SLOT(onFieldChanged(QString, QString)));
 
   if (books_widget->rowCount() > 0)
     {
       books_widget->selectRow(0);
-      info_widget->set_book(key_table.value(books_widget->currentRow()));
+      // We need to do a static_cast since currentItem() returns a QTableWidgetItem*
+      info_widget->set_book(static_cast<BookItem*>(books_widget->currentItem())->book_key);
     }
 
-  update_statusbar();
+  connect(books_widget, SIGNAL(currentCellChanged(int, int, int, int)),
+          this, SLOT(change_book()));
+  connect(info_widget, SIGNAL(fieldChanged(QString, QString)),
+          this, SLOT(onFieldChanged(QString, QString)));
+  connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
+  connect(add_book_action, SIGNAL(triggered()), this, SLOT(create_add_book_dialog()));
 
+  update_statusbar();
   setCentralWidget(splitter);
   setWindowState(Qt::WindowMaximized);
   center_window();
@@ -89,27 +95,14 @@ MainWindow::~MainWindow()
 
 /* General functions */
 
-void MainWindow::add_book(QString isbn, QString title, QString author,
-                          QString publication_date, QString genre)
+void MainWindow::create_add_book_dialog()
 {
-  // Generate hash of book data to be used as a key
-  QString book_data = isbn + title + author + publication_date + genre;
-  QCryptographicHash sha1Hasher(QCryptographicHash::Sha1);
-  sha1Hasher.addData(book_data.toUtf8());
-  QString book_key = QString(sha1Hasher.result().toHex());
-
-  // Insert new book into DB
-  QString insert_sql = "INSERT INTO bookstore (key, isbn, title, author, publication_date, genre) "
-    "VALUES ('" + book_key + "', '" + isbn + "', '" + title + "', '" + author +
-    "', '" + publication_date + "', '" + genre + "');";
-  QSqlQuery insert(bookstore);
-  insert.exec(insert_sql);
-
-  // Insert the book hash into key_table, add the book to books_widget,
-  // and update the statusbar stats
-  key_table.insert(books_widget->rowCount(), book_key);
-  books_widget->add_book(book_key);
-  update_statusbar();
+  AddBookDialog add_book_dialog(this);
+  if (QDialog::Accepted == add_book_dialog.exec())
+    {
+      books_widget->add_book(add_book_dialog.book_key);
+      update_statusbar();
+    }
 }
 
 void MainWindow::center_window()
@@ -123,31 +116,21 @@ void MainWindow::center_window()
   main_window->move(x,y);
 }
 
-void MainWindow::populate_keys()
-{
-  // Initialize test books
-  add_book("9780760714898", "The Mysterious Island", "Jules Verne", "1874", "Science Fiction");
-  add_book("9780895263469", "The Count of Monte Cristo", "Alexandre Dumas", "1844", "Fiction");
-  add_book("9780573698996", "Emma", "Jane Austen", "1815", "Fiction");
-  add_book("9781598898316", "The Invisible Man", "H.G.Wells", "1897", "Fiction");
-  add_book("9780143039990", "War and Peace", "Leo Tolstoy", "1869", "War Novel");
-}
-
 void MainWindow::update_statusbar()
 {
-  statusBar()->showMessage(QString::number(key_table.size()) + " books.");
+  statusBar()->showMessage(QString::number(books_widget->rowCount()) + " books.");
 }
 
 /* Slots */
 
-void MainWindow::change_book(int r)
+void MainWindow::change_book()
 {
-  info_widget->set_book(key_table.value(r));
+  info_widget->set_book(static_cast<BookItem*>(books_widget->currentItem())->book_key);
 }
 
 void MainWindow::onFieldChanged(QString sql_field_name, QString new_text)
 {
-  QString book_key = key_table.value(books_widget->currentRow());
+  QString book_key = static_cast<BookItem*>(books_widget->currentItem())->book_key;
 
   QSqlQuery update_book_info(bookstore);
   update_book_info.exec("UPDATE bookstore SET " + sql_field_name + "='" + new_text +

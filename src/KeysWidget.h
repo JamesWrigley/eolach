@@ -19,12 +19,15 @@
 #ifndef KEYSWIDGET_H
 #define KEYSWIDGET_H
 
-#include <QStringList>
 #include <QTableWidget>
 
 class KeysWidget : public QTableWidget
 {
   Q_OBJECT
+
+  private slots:
+    void create_context_menu(QPoint);
+    void remove_book();
 
  public:
   KeysWidget(QWidget *parent = 0);
@@ -32,7 +35,8 @@ class KeysWidget : public QTableWidget
   void update_book(int, QString);
 
  private:
-  QStringList headers;
+  QMenu *context_menu;
+  QAction *remove_book_action;
 };
 
 #endif // KEYSWIDGET_H

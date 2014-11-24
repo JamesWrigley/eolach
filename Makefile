@@ -13,12 +13,12 @@ MAKEFILE      = Makefile
 CC            = gcc
 CXX           = g++
 DEFINES       = -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_SQL_LIB -DQT_GUI_LIB -DQT_CORE_LIB
-CFLAGS        = -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches -m64 -mtune=generic -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES)
-CXXFLAGS      = -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches -m64 -mtune=generic -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES)
-INCPATH       = -I/usr/lib64/qt5/mkspecs/linux-g++-64 -I. -I. -Isrc -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtWidgets -isystem /usr/include/qt5/QtSql -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -I.
+CFLAGS        = -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches -m64 -mtune=generic -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES)
+CXXFLAGS      = -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches -m64 -mtune=generic -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES) -std=c++11
+INCPATH       = -I/usr/lib64/qt5/mkspecs/linux-g++ -I. -I. -Isrc -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtWidgets -isystem /usr/include/qt5/QtSql -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -I.
 LINK          = g++
-LFLAGS        = -m64 -Wl,-O1 -Wl,-z,relro
-LIBS          = $(SUBLIBS) -L/usr/X11R6/lib64 -lQt5Widgets -lQt5Sql -lQt5Gui -lQt5Core -lGL -lpthread 
+LFLAGS        = -Wl,-O1 -Wl,-z,relro
+LIBS          = $(SUBLIBS) -lQt5Widgets -lQt5Sql -lQt5Gui -lQt5Core -lGL -lpthread 
 AR            = ar cqs
 RANLIB        = 
 QMAKE         = /usr/bin/qmake-qt5
@@ -45,27 +45,33 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = src/InfoWidget.cpp \
+SOURCES       = src/AddBookDialog.cpp \
+		src/CLineEdit.cpp \
+		src/InfoWidget.cpp \
 		src/KeysWidget.cpp \
 		src/main.cpp \
 		src/MainWindow.cpp \
-		src/TextField.cpp \
-		src/CLineEdit.cpp moc_InfoWidget.cpp \
+		src/TextField.cpp moc_AddBookDialog.cpp \
+		moc_BookItem.cpp \
+		moc_CLineEdit.cpp \
+		moc_InfoWidget.cpp \
 		moc_KeysWidget.cpp \
 		moc_MainWindow.cpp \
-		moc_TextField.cpp \
-		moc_CLineEdit.cpp
-OBJECTS       = InfoWidget.o \
+		moc_TextField.cpp
+OBJECTS       = AddBookDialog.o \
+		CLineEdit.o \
+		InfoWidget.o \
 		KeysWidget.o \
 		main.o \
 		MainWindow.o \
 		TextField.o \
-		CLineEdit.o \
+		moc_AddBookDialog.o \
+		moc_BookItem.o \
+		moc_CLineEdit.o \
 		moc_InfoWidget.o \
 		moc_KeysWidget.o \
 		moc_MainWindow.o \
-		moc_TextField.o \
-		moc_CLineEdit.o
+		moc_TextField.o
 DIST          = /usr/lib64/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib64/qt5/mkspecs/common/shell-unix.conf \
 		/usr/lib64/qt5/mkspecs/common/unix.conf \
@@ -119,7 +125,7 @@ DIST          = /usr/lib64/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib64/qt5/mkspecs/modules/qt_lib_xml_private.pri \
 		/usr/lib64/qt5/mkspecs/features/qt_functions.prf \
 		/usr/lib64/qt5/mkspecs/features/qt_config.prf \
-		/usr/lib64/qt5/mkspecs/linux-g++-64/qmake.conf \
+		/usr/lib64/qt5/mkspecs/linux-g++/qmake.conf \
 		/usr/lib64/qt5/mkspecs/features/spec_post.prf \
 		/usr/lib64/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib64/qt5/mkspecs/features/default_pre.prf \
@@ -136,12 +142,13 @@ DIST          = /usr/lib64/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib64/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib64/qt5/mkspecs/features/yacc.prf \
 		/usr/lib64/qt5/mkspecs/features/lex.prf \
-		eolach.pro src/InfoWidget.cpp \
+		eolach.pro src/AddBookDialog.cpp \
+		src/CLineEdit.cpp \
+		src/InfoWidget.cpp \
 		src/KeysWidget.cpp \
 		src/main.cpp \
 		src/MainWindow.cpp \
-		src/TextField.cpp \
-		src/CLineEdit.cpp
+		src/TextField.cpp
 QMAKE_TARGET  = eolach
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = eolach
@@ -174,7 +181,7 @@ all: Makefile $(TARGET)
 $(TARGET):  $(OBJECTS)  
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
-Makefile: eolach.pro /usr/lib64/qt5/mkspecs/linux-g++-64/qmake.conf /usr/lib64/qt5/mkspecs/features/spec_pre.prf \
+Makefile: eolach.pro /usr/lib64/qt5/mkspecs/linux-g++/qmake.conf /usr/lib64/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib64/qt5/mkspecs/common/shell-unix.conf \
 		/usr/lib64/qt5/mkspecs/common/unix.conf \
 		/usr/lib64/qt5/mkspecs/common/linux.conf \
@@ -227,7 +234,7 @@ Makefile: eolach.pro /usr/lib64/qt5/mkspecs/linux-g++-64/qmake.conf /usr/lib64/q
 		/usr/lib64/qt5/mkspecs/modules/qt_lib_xml_private.pri \
 		/usr/lib64/qt5/mkspecs/features/qt_functions.prf \
 		/usr/lib64/qt5/mkspecs/features/qt_config.prf \
-		/usr/lib64/qt5/mkspecs/linux-g++-64/qmake.conf \
+		/usr/lib64/qt5/mkspecs/linux-g++/qmake.conf \
 		/usr/lib64/qt5/mkspecs/features/spec_post.prf \
 		/usr/lib64/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib64/qt5/mkspecs/features/default_pre.prf \
@@ -303,7 +310,7 @@ Makefile: eolach.pro /usr/lib64/qt5/mkspecs/linux-g++-64/qmake.conf /usr/lib64/q
 /usr/lib64/qt5/mkspecs/modules/qt_lib_xml_private.pri:
 /usr/lib64/qt5/mkspecs/features/qt_functions.prf:
 /usr/lib64/qt5/mkspecs/features/qt_config.prf:
-/usr/lib64/qt5/mkspecs/linux-g++-64/qmake.conf:
+/usr/lib64/qt5/mkspecs/linux-g++/qmake.conf:
 /usr/lib64/qt5/mkspecs/features/spec_post.prf:
 /usr/lib64/qt5/mkspecs/features/exclusive_builds.prf:
 /usr/lib64/qt5/mkspecs/features/default_pre.prf:
@@ -332,7 +339,7 @@ qmake_all: FORCE
 
 dist: 
 	@test -d .tmp/eolach1.0.0 || mkdir -p .tmp/eolach1.0.0
-	$(COPY_FILE) --parents $(DIST) .tmp/eolach1.0.0/ && $(COPY_FILE) --parents src/InfoWidget.h src/KeysWidget.h src/MainWindow.h src/TextField.h src/CLineEdit.h .tmp/eolach1.0.0/ && $(COPY_FILE) --parents src/InfoWidget.cpp src/KeysWidget.cpp src/main.cpp src/MainWindow.cpp src/TextField.cpp src/CLineEdit.cpp .tmp/eolach1.0.0/ && (cd `dirname .tmp/eolach1.0.0` && $(TAR) eolach1.0.0.tar eolach1.0.0 && $(COMPRESS) eolach1.0.0.tar) && $(MOVE) `dirname .tmp/eolach1.0.0`/eolach1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/eolach1.0.0
+	$(COPY_FILE) --parents $(DIST) .tmp/eolach1.0.0/ && $(COPY_FILE) --parents src/AddBookDialog.h src/BookItem.h src/CLineEdit.h src/InfoWidget.h src/KeysWidget.h src/MainWindow.h src/TextField.h .tmp/eolach1.0.0/ && $(COPY_FILE) --parents src/AddBookDialog.cpp src/CLineEdit.cpp src/InfoWidget.cpp src/KeysWidget.cpp src/main.cpp src/MainWindow.cpp src/TextField.cpp .tmp/eolach1.0.0/ && (cd `dirname .tmp/eolach1.0.0` && $(TAR) eolach1.0.0.tar eolach1.0.0 && $(COMPRESS) eolach1.0.0.tar) && $(MOVE) `dirname .tmp/eolach1.0.0`/eolach1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/eolach1.0.0
 
 
 clean:compiler_clean 
@@ -355,30 +362,36 @@ check: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_InfoWidget.cpp moc_KeysWidget.cpp moc_MainWindow.cpp moc_TextField.cpp moc_CLineEdit.cpp
+compiler_moc_header_make_all: moc_AddBookDialog.cpp moc_BookItem.cpp moc_CLineEdit.cpp moc_InfoWidget.cpp moc_KeysWidget.cpp moc_MainWindow.cpp moc_TextField.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_InfoWidget.cpp moc_KeysWidget.cpp moc_MainWindow.cpp moc_TextField.cpp moc_CLineEdit.cpp
+	-$(DEL_FILE) moc_AddBookDialog.cpp moc_BookItem.cpp moc_CLineEdit.cpp moc_InfoWidget.cpp moc_KeysWidget.cpp moc_MainWindow.cpp moc_TextField.cpp
+moc_AddBookDialog.cpp: src/AddBookDialog.h
+	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++ -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtSql -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/AddBookDialog.h -o moc_AddBookDialog.cpp
+
+moc_BookItem.cpp: src/BookItem.h
+	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++ -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtSql -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/BookItem.h -o moc_BookItem.cpp
+
+moc_CLineEdit.cpp: src/CLineEdit.h
+	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++ -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtSql -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/CLineEdit.h -o moc_CLineEdit.cpp
+
 moc_InfoWidget.cpp: src/TextField.h \
 		src/CLineEdit.h \
 		src/InfoWidget.h
-	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++-64 -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtSql -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/InfoWidget.h -o moc_InfoWidget.cpp
+	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++ -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtSql -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/InfoWidget.h -o moc_InfoWidget.cpp
 
 moc_KeysWidget.cpp: src/KeysWidget.h
-	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++-64 -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtSql -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/KeysWidget.h -o moc_KeysWidget.cpp
+	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++ -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtSql -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/KeysWidget.h -o moc_KeysWidget.cpp
 
 moc_MainWindow.cpp: src/KeysWidget.h \
 		src/InfoWidget.h \
 		src/TextField.h \
 		src/CLineEdit.h \
 		src/MainWindow.h
-	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++-64 -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtSql -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/MainWindow.h -o moc_MainWindow.cpp
+	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++ -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtSql -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/MainWindow.h -o moc_MainWindow.cpp
 
 moc_TextField.cpp: src/CLineEdit.h \
 		src/TextField.h
-	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++-64 -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtSql -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/TextField.h -o moc_TextField.cpp
-
-moc_CLineEdit.cpp: src/CLineEdit.h
-	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++-64 -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtSql -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/CLineEdit.h -o moc_CLineEdit.cpp
+	/usr/lib64/qt5/bin/moc $(DEFINES) -I/usr/lib64/qt5/mkspecs/linux-g++ -I/home/james/git/eolach -I/home/james/git/eolach -I/home/james/git/eolach/src -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtSql -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/4.8.3 -I/usr/include/c++/4.8.3/x86_64-redhat-linux -I/usr/include/c++/4.8.3/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include -I/usr/local/include -I/usr/include src/TextField.h -o moc_TextField.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
@@ -394,12 +407,19 @@ compiler_clean: compiler_moc_header_clean
 
 ####### Compile
 
+AddBookDialog.o: src/AddBookDialog.cpp src/AddBookDialog.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o AddBookDialog.o src/AddBookDialog.cpp
+
+CLineEdit.o: src/CLineEdit.cpp src/CLineEdit.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CLineEdit.o src/CLineEdit.cpp
+
 InfoWidget.o: src/InfoWidget.cpp src/InfoWidget.h \
 		src/TextField.h \
 		src/CLineEdit.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o InfoWidget.o src/InfoWidget.cpp
 
-KeysWidget.o: src/KeysWidget.cpp src/KeysWidget.h
+KeysWidget.o: src/KeysWidget.cpp src/KeysWidget.h \
+		src/BookItem.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o KeysWidget.o src/KeysWidget.cpp
 
 main.o: src/main.cpp src/MainWindow.h \
@@ -413,15 +433,22 @@ MainWindow.o: src/MainWindow.cpp src/MainWindow.h \
 		src/KeysWidget.h \
 		src/InfoWidget.h \
 		src/TextField.h \
-		src/CLineEdit.h
+		src/CLineEdit.h \
+		src/AddBookDialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MainWindow.o src/MainWindow.cpp
 
 TextField.o: src/TextField.cpp src/TextField.h \
 		src/CLineEdit.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o TextField.o src/TextField.cpp
 
-CLineEdit.o: src/CLineEdit.cpp src/CLineEdit.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CLineEdit.o src/CLineEdit.cpp
+moc_AddBookDialog.o: moc_AddBookDialog.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_AddBookDialog.o moc_AddBookDialog.cpp
+
+moc_BookItem.o: moc_BookItem.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_BookItem.o moc_BookItem.cpp
+
+moc_CLineEdit.o: moc_CLineEdit.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_CLineEdit.o moc_CLineEdit.cpp
 
 moc_InfoWidget.o: moc_InfoWidget.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_InfoWidget.o moc_InfoWidget.cpp
@@ -434,9 +461,6 @@ moc_MainWindow.o: moc_MainWindow.cpp
 
 moc_TextField.o: moc_TextField.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_TextField.o moc_TextField.cpp
-
-moc_CLineEdit.o: moc_CLineEdit.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_CLineEdit.o moc_CLineEdit.cpp
 
 ####### Install
 

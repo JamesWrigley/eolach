@@ -16,48 +16,17 @@
  *                                                                                *
  *********************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef BOOKITEM_H
+#define BOOKITEM_H
 
-#include <QMenu>
-#include <QAction>
-#include <QToolBar>
-#include <QSplitter>
-#include <QTabWidget>
-#include <QMainWindow>
-#include <QSqlDatabase>
-#include "KeysWidget.h"
-#include "InfoWidget.h"
+#include <QTableWidgetItem>
 
-class MainWindow : public QMainWindow
+class BookItem : public QTableWidgetItem
 {
-  Q_OBJECT
-
-  private slots:
-    void create_add_book_dialog();
-    void change_book();
-    void onFieldChanged(QString, QString);
+  using QTableWidgetItem::QTableWidgetItem;
 
  public:
-    MainWindow();
-    ~MainWindow();
-
- private:
-    void center_window();
-    void update_statusbar();
-
-    QSqlDatabase bookstore;
-    InfoWidget *info_widget;
-    KeysWidget *books_widget;
-
-    QMenu *file_menu;
-    QSplitter *splitter;
-    QTabWidget *keys_tabwidget;
-
-    QToolBar* toolbar;
-
-    QAction *add_book_action;
-    QAction *exit_action;
+  QString book_key;
 };
 
-#endif // MAINWINDOW_H
+#endif // BOOKITEM_H

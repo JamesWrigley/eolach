@@ -16,48 +16,33 @@
  *                                                                                *
  *********************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef ADDBOOKDIALOG_H
+#define ADDBOOKDIALOG_H
 
-#include <QMenu>
-#include <QAction>
-#include <QToolBar>
-#include <QSplitter>
-#include <QTabWidget>
-#include <QMainWindow>
-#include <QSqlDatabase>
-#include "KeysWidget.h"
-#include "InfoWidget.h"
+#include <QDialog>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QVBoxLayout>
 
-class MainWindow : public QMainWindow
+class AddBookDialog : public QDialog
 {
   Q_OBJECT
 
   private slots:
-    void create_add_book_dialog();
-    void change_book();
-    void onFieldChanged(QString, QString);
+    void add_book();
 
  public:
-    MainWindow();
-    ~MainWindow();
+    AddBookDialog(QWidget *parent);
+    QString book_key;
 
  private:
-    void center_window();
-    void update_statusbar();
-
-    QSqlDatabase bookstore;
-    InfoWidget *info_widget;
-    KeysWidget *books_widget;
-
-    QMenu *file_menu;
-    QSplitter *splitter;
-    QTabWidget *keys_tabwidget;
-
-    QToolBar* toolbar;
-
-    QAction *add_book_action;
-    QAction *exit_action;
+    QLineEdit *title;
+    QLineEdit *author;
+    QLineEdit *genre;
+    QLineEdit *isbn;
+    QLineEdit *publication_date;
+    QPushButton *finish_button;
+    QVBoxLayout *main_layout;
 };
 
-#endif // MAINWINDOW_H
+#endif // ADDBOOKDIALOG_H
