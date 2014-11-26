@@ -22,7 +22,6 @@
 #include <QSqlQuery>
 #include <QStringList>
 #include <QHeaderView>
-#include "BookItem.h"
 #include "KeysWidget.h"
 
 KeysWidget::KeysWidget(QWidget *parent)
@@ -58,10 +57,10 @@ void KeysWidget::add_book(QString book_key)
   get_book_info.exec("SELECT title, author FROM bookstore WHERE key='" + book_key + "';");
   get_book_info.next();
 
-  BookItem *title = new BookItem(get_book_info.value(0).toString());
-  BookItem *author = new BookItem(get_book_info.value(1).toString());
-  title->book_key = book_key;
-  author->book_key = book_key;
+  QTableWidgetItem *title = new QTableWidgetItem(get_book_info.value(0).toString());
+  QTableWidgetItem *author = new QTableWidgetItem(get_book_info.value(1).toString());
+  title->setData(Qt::UserRole, QVariant(book_key));
+  author->setData(Qt::UserRole, QVariant(book_key));
 
   insertRow(rowCount());
   setItem(rowCount() - 1, 0, title);
@@ -102,7 +101,7 @@ void KeysWidget::create_context_menu(QPoint pos)
 
 void KeysWidget::removeBook()
 {
-  QString book_key = static_cast<BookItem*>(currentItem())->book_key;
+  QString book_key = currentItem()->data(Qt::UserRole).toString();
   QSqlQuery remove_book(bookstore);
   remove_book.exec("DELETE FROM bookstore WHERE key='" + book_key + "';");
 

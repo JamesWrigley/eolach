@@ -10,7 +10,6 @@ QT += sql
 
 # Input
 HEADERS += src/AddBookDialog.h \
-           src/BookItem.h \
            src/CLineEdit.h \
            src/InfoWidget.h \
            src/KeysWidget.h \

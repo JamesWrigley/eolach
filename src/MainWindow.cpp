@@ -24,7 +24,6 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QCryptographicHash>
-#include "BookItem.h"
 #include "MainWindow.h"
 #include "KeysWidget.h"
 #include "InfoWidget.h"
@@ -60,8 +59,7 @@ MainWindow::MainWindow()
   if (books_widget->rowCount() > 0)
     {
       books_widget->selectRow(0);
-      // We need to do a static_cast since currentItem() returns a QTableWidgetItem*
-      info_widget->set_book(static_cast<BookItem*>(books_widget->currentItem())->book_key);
+      info_widget->set_book(books_widget->currentItem()->data(Qt::UserRole).toString());
     }
 
   connect(books_widget, SIGNAL(currentCellChanged(int, int, int, int)),
@@ -116,7 +114,7 @@ void MainWindow::update_statusbar()
 
 void MainWindow::change_book()
 {
-  info_widget->set_book(static_cast<BookItem*>(books_widget->currentItem())->book_key);
+  info_widget->set_book(books_widget->currentItem()->data(Qt::UserRole).toString());
 }
 
 void MainWindow::onBookRemoved()
@@ -131,7 +129,7 @@ void MainWindow::onBookRemoved()
 
 void MainWindow::onFieldChanged(QString sql_field_name, QString new_text)
 {
-  QString book_key = static_cast<BookItem*>(books_widget->currentItem())->book_key;
+  QString book_key = books_widget->currentItem()->data(Qt::UserRole).toString();
 
   QSqlQuery update_book_info(bookstore);
   update_book_info.exec("UPDATE bookstore SET " + sql_field_name + "='" + new_text +
