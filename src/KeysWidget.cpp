@@ -17,15 +17,13 @@
  *********************************************************************************/
 
 #include <QMenu>
-#include <QtGui>
 #include <QAction>
 #include <QVariant>
 #include <QSqlQuery>
 #include <QStringList>
 #include <QHeaderView>
-#include "KeysWidget.h"
 #include "BookItem.h"
-#include <iostream>
+#include "KeysWidget.h"
 
 KeysWidget::KeysWidget(QWidget *parent)
 {
