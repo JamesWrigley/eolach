@@ -16,6 +16,7 @@
  *                                                                                *
  *********************************************************************************/
 
+#include <array>
 #include <QVariant>
 #include <QSqlQuery>
 #include <QSqlDatabase>
@@ -27,18 +28,18 @@ InfoWidget::InfoWidget()
 
   title = new TextField("title", "Title:");
   author = new TextField("author", "Author:");
+  genre = new TextField("genre", "Genre:");
   publication_date = new TextField("publication_date", "Publication Date:");
-  connect(title, SIGNAL(textChanged(QString, QString)),
-          this, SIGNAL(fieldChanged(QString, QString)));
-  connect(author, SIGNAL(textChanged(QString, QString)),
-          this, SIGNAL(fieldChanged(QString, QString)));
-  connect(publication_date, SIGNAL(textChanged(QString, QString)),
-          this, SIGNAL(fieldChanged(QString, QString)));
+  isbn = new TextField("isbn", "ISBN:");
 
-  // Packing
-  main_vbox->addLayout(title);
-  main_vbox->addLayout(author);
-  main_vbox->addLayout(publication_date);
+  fields = {title, author, genre, publication_date, isbn};
+  for (TextField *field : fields)
+    {
+      connect(field, SIGNAL(textChanged(QString, QString)),
+              this, SIGNAL(fieldChanged(QString, QString)));
+      main_vbox->addLayout(field);
+    }
+
   main_vbox->addStretch();
 
   setLayout(main_vbox);
@@ -49,20 +50,22 @@ InfoWidget::InfoWidget()
 
 void InfoWidget::clear()
 {
-  title->set_text("");
-  author->set_text("");
-  publication_date->set_text("");
+  for (unsigned int i = 0; i < fields.size(); ++i)
+    {
+      fields[i]->set_text("");
+    }
 }
 
 void InfoWidget::set_book(QString book_key)
 {
   QSqlDatabase db = QSqlDatabase::database();
   QSqlQuery get_book_info(db);
-  get_book_info.exec("SELECT title, author, publication_date FROM bookstore WHERE key='"
-                     + book_key + "'");
+  get_book_info.exec("SELECT title, author, genre, publication_date, isbn FROM bookstore "
+                     "WHERE key='" + book_key + "'");
   get_book_info.next();
 
-  title->set_text(get_book_info.value(0).toString());
-  author->set_text(get_book_info.value(1).toString());
-  publication_date->set_text(get_book_info.value(2).toString());
+  for (unsigned int i = 0; i < fields.size(); ++i)
+    {
+      fields[i]->set_text(get_book_info.value(i).toString());
+    }
 }
