@@ -49,14 +49,14 @@ KeysWidget::KeysWidget(QWidget *parent)
   context_menu->addAction(remove_book_action);
 
   connect(remove_book_action, SIGNAL(triggered()), this, SLOT(removeBook()));
+  bookstore = QSqlDatabase::database();
 }
 
 /* General functions */
 
 void KeysWidget::add_book(QString book_key)
 {
-  QSqlDatabase db = QSqlDatabase::database();
-  QSqlQuery get_book_info(db);
+  QSqlQuery get_book_info(bookstore);
   get_book_info.exec("SELECT title, author FROM bookstore WHERE key='" + book_key + "';");
   get_book_info.next();
 
@@ -72,7 +72,6 @@ void KeysWidget::add_book(QString book_key)
 
 void KeysWidget::load_items()
 {
-  QSqlDatabase bookstore = QSqlDatabase::database();
   QSqlQuery get_book_keys(bookstore);
   get_book_keys.exec("SELECT key FROM bookstore;");
 
@@ -85,8 +84,7 @@ void KeysWidget::load_items()
 
 void KeysWidget::update_book(int row, QString book_key)
 {
-  QSqlDatabase db = QSqlDatabase::database();
-  QSqlQuery get_book_info(db);
+  QSqlQuery get_book_info(bookstore);
   get_book_info.exec("SELECT title, author FROM bookstore WHERE key='" + book_key + "';");
   get_book_info.next();
 
@@ -107,7 +105,6 @@ void KeysWidget::create_context_menu(QPoint pos)
 void KeysWidget::removeBook()
 {
   QString book_key = static_cast<BookItem*>(currentItem())->book_key;
-  QSqlDatabase bookstore = QSqlDatabase::database();
   QSqlQuery remove_book(bookstore);
   remove_book.exec("DELETE FROM bookstore WHERE key='" + book_key + "';");
 

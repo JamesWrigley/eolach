@@ -19,6 +19,7 @@
 #ifndef KEYSWIDGET_H
 #define KEYSWIDGET_H
 
+#include <QSqlDatabase>
 #include <QTableWidget>
 
 class KeysWidget : public QTableWidget
@@ -41,6 +42,8 @@ class KeysWidget : public QTableWidget
  private:
     QMenu *context_menu;
     QAction *remove_book_action;
+
+    QSqlDatabase bookstore;
 };
 
 #endif // KEYSWIDGET_H
