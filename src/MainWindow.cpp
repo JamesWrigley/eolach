@@ -54,7 +54,7 @@ MainWindow::MainWindow()
   exit_action->setShortcut(QKeySequence("Ctrl+Q"));
 
   file_menu->addAction(exit_action);
-  toolbar->addAction(add_book_action);  
+  toolbar->addAction(add_book_action);
 
   books_widget->load_items();
   if (books_widget->rowCount() > 0)
@@ -66,6 +66,7 @@ MainWindow::MainWindow()
 
   connect(books_widget, SIGNAL(currentCellChanged(int, int, int, int)),
           this, SLOT(change_book()));
+  connect(books_widget, SIGNAL(bookRemoved()), this, SLOT(onBookRemoved()));
   connect(info_widget, SIGNAL(fieldChanged(QString, QString)),
           this, SLOT(onFieldChanged(QString, QString)));
   connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
@@ -116,6 +117,16 @@ void MainWindow::update_statusbar()
 void MainWindow::change_book()
 {
   info_widget->set_book(static_cast<BookItem*>(books_widget->currentItem())->book_key);
+}
+
+void MainWindow::onBookRemoved()
+{
+  if (0 == books_widget->rowCount())
+    {
+      info_widget->clear();
+    }
+  books_widget->removeRow(books_widget->currentRow());
+  update_statusbar();
 }
 
 void MainWindow::onFieldChanged(QString sql_field_name, QString new_text)

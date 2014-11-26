@@ -26,11 +26,11 @@ class KeysWidget : public QTableWidget
   Q_OBJECT
 
  signals:
-  void book_removed();
+  void bookRemoved();
 
   private slots:
     void create_context_menu(QPoint);
-    void remove_book();
+    void removeBook();
 
  public:
     KeysWidget(QWidget *parent = 0);

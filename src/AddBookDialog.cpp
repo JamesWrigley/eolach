@@ -54,18 +54,18 @@ AddBookDialog::AddBookDialog(QWidget *parent)
 void AddBookDialog::add_book()
 {
   // Generate hash of book data to be used as a key
-  // QString book_data = title->text() + author->text() + genre->text() + isbn->text() + publication_date->text();
-  // QCryptographicHash sha1Hasher(QCryptographicHash::Sha1);
-  // sha1Hasher.addData(book_data.toUtf8());
-  // book_key = QString(sha1Hasher.result().toHex());
+  QString book_data = title->text() + author->text() + genre->text() + isbn->text() + publication_date->text();
+  QCryptographicHash sha1Hasher(QCryptographicHash::Sha1);
+  sha1Hasher.addData(book_data.toUtf8());
+  book_key = QString(sha1Hasher.result().toHex());
 
-  // // Insert new book into DB
-  // QSqlDatabase bookstore = QSqlDatabase::database();
-  // QString insert_sql = "INSERT INTO bookstore (key, isbn, title, author, publication_date, genre) "
-  //   "VALUES ('" + book_key + "', '" + isbn->text() + "', '" + title->text() + "', '" + author->text() +
-  //   "', '" + publication_date->text() + "', '" + genre->text() + "');";
-  // QSqlQuery insert(bookstore);
-  // insert.exec(insert_sql);
+  // Insert new book into DB
+  QSqlDatabase bookstore = QSqlDatabase::database();
+  QString insert_sql = "INSERT INTO bookstore (key, isbn, title, author, publication_date, genre) "
+    "VALUES ('" + book_key + "', '" + isbn->text() + "', '" + title->text() + "', '" + author->text() +
+    "', '" + publication_date->text() + "', '" + genre->text() + "');";
+  QSqlQuery insert(bookstore);
+  insert.exec(insert_sql);
 
   done(QDialog::Accepted);
 }

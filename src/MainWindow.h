@@ -37,6 +37,7 @@ class MainWindow : public QMainWindow
     void create_add_book_dialog();
     void change_book();
     void onFieldChanged(QString, QString);
+    void onBookRemoved();
 
  public:
     MainWindow();

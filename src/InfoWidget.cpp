@@ -47,6 +47,13 @@ InfoWidget::InfoWidget()
   setStyleSheet("QFrame#MainQFrame {border: 8px solid #909090; border-radius: 7px;}");
 }
 
+void InfoWidget::clear()
+{
+  title->set_text("");
+  author->set_text("");
+  publication_date->set_text("");
+}
+
 void InfoWidget::set_book(QString book_key)
 {
   QSqlDatabase db = QSqlDatabase::database();

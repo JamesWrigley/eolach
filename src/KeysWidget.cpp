@@ -48,7 +48,7 @@ KeysWidget::KeysWidget(QWidget *parent)
   remove_book_action = new QAction("Remove", this);
   context_menu->addAction(remove_book_action);
 
-  connect(remove_book_action, SIGNAL(triggered()), this, SLOT(remove_book()));
+  connect(remove_book_action, SIGNAL(triggered()), this, SLOT(removeBook()));
 }
 
 /* General functions */
@@ -72,7 +72,6 @@ void KeysWidget::add_book(QString book_key)
 
 void KeysWidget::load_items()
 {
-  // Populate books_widget with the books from bookstore
   QSqlDatabase bookstore = QSqlDatabase::database();
   QSqlQuery get_book_keys(bookstore);
   get_book_keys.exec("SELECT key FROM bookstore;");
@@ -105,14 +104,12 @@ void KeysWidget::create_context_menu(QPoint pos)
     }
 }
 
-void KeysWidget::remove_book()
+void KeysWidget::removeBook()
 {
   QString book_key = static_cast<BookItem*>(currentItem())->book_key;
-  int current_item_index = currentRow();
   QSqlDatabase bookstore = QSqlDatabase::database();
   QSqlQuery remove_book(bookstore);
-  remove_book.exec("REMOVE FROM bookstore WHERE key='" + book_key + "';");
+  remove_book.exec("DELETE FROM bookstore WHERE key='" + book_key + "';");
 
-  emit book_removed();
-  selectRow(--current_item_index);
+  emit bookRemoved();
 }

@@ -33,6 +33,7 @@ class InfoWidget : public QFrame
 
  public:
   InfoWidget();
+  void clear();
   void set_book(QString);
 
  private:
