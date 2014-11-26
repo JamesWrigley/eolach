@@ -55,7 +55,6 @@ MainWindow::MainWindow()
   file_menu->addAction(exit_action);
   toolbar->addAction(add_book_action);
 
-  books_widget->load_items();
   if (books_widget->rowCount() > 0)
     {
       books_widget->selectRow(0);

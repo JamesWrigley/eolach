@@ -47,6 +47,9 @@ KeysWidget::KeysWidget(QWidget *parent)
 
   connect(remove_book_action, SIGNAL(triggered()), this, SLOT(removeBook()));
   bookstore = QSqlDatabase::database();
+  load_items();
+  setSortingEnabled(true);
+  sortByColumn(0, Qt::AscendingOrder);
 }
 
 /* General functions */
@@ -64,7 +67,8 @@ void KeysWidget::add_book(QString book_key)
 
   insertRow(rowCount());
   setItem(rowCount() - 1, 0, title);
-  setItem(rowCount() - 1, 1, author);
+  setCurrentItem(title);
+  setItem(currentRow(), 1, author);
 }
 
 void KeysWidget::load_items()
