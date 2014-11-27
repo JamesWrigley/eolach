@@ -16,7 +16,9 @@
  *                                                                                *
  *********************************************************************************/
 
+#include <iostream>
 #include <QSqlQuery>
+#include <QMessageBox>
 #include <QCryptographicHash>
 #include "AddBookDialog.h"
 
@@ -37,7 +39,7 @@ AddBookDialog::AddBookDialog(QWidget *parent)
   publication_date->setPlaceholderText("Publication Date");
   finish_button->setDefault(true);
 
-  connect(finish_button, SIGNAL(clicked(bool)), this, SLOT(add_book()));
+  connect(finish_button, SIGNAL(clicked(bool)), this, SLOT(check_fields()));
 
   main_layout->addWidget(title);
   main_layout->addWidget(author);
@@ -49,6 +51,28 @@ AddBookDialog::AddBookDialog(QWidget *parent)
   main_layout->addStretch();
 
   setLayout(main_layout);
+}
+
+void AddBookDialog::check_fields()
+{
+  if (!validate_isbn())
+    {
+      int warning_dialog = QMessageBox::warning(this, "Warning",
+                                                "ISBN invalid, would you like to continue anyway?",
+                                                QMessageBox::Yes, QMessageBox::No);
+      if (QMessageBox::No == warning_dialog)
+        {
+          done(QDialog::Rejected);
+        }
+      else
+        {
+          add_book();
+        }
+    }
+  else
+    {
+      add_book();
+    }
 }
 
 void AddBookDialog::add_book()
@@ -68,4 +92,31 @@ void AddBookDialog::add_book()
   insert.exec(insert_sql);
 
   done(QDialog::Accepted);
+}
+
+bool AddBookDialog::validate_isbn()
+{
+  QString isbn_value = isbn->text();
+  int sum = 0;
+  int check_digit = 10;
+
+  if (10 == isbn_value.length())
+    {
+      for (int i = 0; i < isbn_value.length() - 1; ++i)
+        {
+          sum += isbn_value[i].digitValue() * (10 - i);
+        }
+      check_digit = (11 - (sum % 11)) % 11;
+    }
+  else if (13 == isbn_value.length())
+    {
+      for (int i = 1; i < isbn_value.length(); i += 2)
+        {
+          sum += isbn_value[i].digitValue() * 3;
+          sum += isbn_value[i - 1].digitValue();
+        }
+      check_digit = (10 - (sum % 10)) % 10;
+    }
+
+  return isbn_value.endsWith(QString::number(check_digit));
 }

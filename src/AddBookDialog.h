@@ -29,13 +29,16 @@ class AddBookDialog : public QDialog
   Q_OBJECT
 
   private slots:
-    void add_book();
+    void check_fields();
 
  public:
     AddBookDialog(QWidget *parent);
     QString book_key;
 
  private:
+    void add_book();
+    bool validate_isbn();
+
     QLineEdit *title;
     QLineEdit *author;
     QLineEdit *genre;
