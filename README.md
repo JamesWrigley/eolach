@@ -1,8 +1,8 @@
 Eolach
 ======
 
-A simple ILS.
+A simple ILS (Integrated Library System).
 
-To compile, simply run `make`.
+To compile, just run `qmake; make` (note that it must the Qt 5 version of qmake).
 
-Requirements: Qt 5
+Requirements: Qt 5, SQLite.
