@@ -59,11 +59,7 @@ void AddBookDialog::check_fields()
       int warning_dialog = QMessageBox::warning(this, "Warning",
                                                 "ISBN invalid, would you like to continue anyway?",
                                                 QMessageBox::Yes, QMessageBox::No);
-      if (QMessageBox::No == warning_dialog)
-        {
-          done(QDialog::Rejected);
-        }
-      else
+      if (QMessageBox::Yes == warning_dialog)
         {
           add_book();
         }
