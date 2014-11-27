@@ -16,7 +16,6 @@
  *                                                                                *
  *********************************************************************************/
 
-#include <iostream>
 #include <QSqlQuery>
 #include <QMessageBox>
 #include <QCryptographicHash>
