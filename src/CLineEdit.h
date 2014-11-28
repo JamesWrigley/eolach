@@ -21,6 +21,8 @@
 
 #include <QLineEdit>
 
+/* A QLineEdit subclass that will change modes when double-clicked and emit
+   signals if the contents are changed. */
 class CLineEdit : public QLineEdit
 {
   Q_OBJECT

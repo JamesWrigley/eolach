@@ -25,7 +25,7 @@
 #include <QHBoxLayout>
 #include "CLineEdit.h"
 
-// A class that will represent each field displayed in the info widget
+/* A class that will represent each field displayed in the info widget */
 class TextField : public QHBoxLayout
 {
   Q_OBJECT

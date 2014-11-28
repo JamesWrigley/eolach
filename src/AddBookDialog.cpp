@@ -89,6 +89,7 @@ void AddBookDialog::add_book()
   done(QDialog::Accepted);
 }
 
+/* Implements the checksumming algorithm for 10 and 13 digit ISBN's */
 bool AddBookDialog::validate_isbn()
 {
   QString isbn_value = isbn->text();

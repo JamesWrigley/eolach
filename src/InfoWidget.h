@@ -25,6 +25,8 @@
 #include <QVBoxLayout>
 #include "TextField.h"
 
+/* The widget that holds all the book info. Basically a QFrame with a bunch of
+   labels. */
 class InfoWidget : public QFrame
 {
   Q_OBJECT

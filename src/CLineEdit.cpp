@@ -23,7 +23,7 @@ CLineEdit::CLineEdit(QWidget* parent)
 {
   connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
   // We set this now to use in onEditingFinished since the window color will
-  // have then been changed by mouseDoubleClickEvent().
+  // have by then been changed by mouseDoubleClickEvent().
   background_color = palette().color(QPalette::Window).name();
   tooltip = "Double-click to edit";
 

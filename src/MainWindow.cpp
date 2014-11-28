@@ -103,6 +103,8 @@ void MainWindow::center_window()
   main_window->move(x,y);
 }
 
+/* Calculate the number of books in the DB (by counting the rows in books_widget)
+   and displays them in the statusbar */
 void MainWindow::update_statusbar()
 {
   statusBar()->showMessage(QString::number(books_widget->rowCount()) + " books.");
@@ -125,6 +127,7 @@ void MainWindow::onBookRemoved()
   update_statusbar();
 }
 
+/* Called when a books data is changed from the info_widget */
 void MainWindow::onFieldChanged(QString sql_field_name, QString new_text)
 {
   QString book_key = books_widget->currentItem()->data(Qt::UserRole).toString();
