@@ -16,10 +16,8 @@
  *                                                                                *
  *********************************************************************************/
 
-#include <array>
 #include <QVariant>
 #include <QSqlQuery>
-#include <QSqlDatabase>
 #include "InfoWidget.h"
 
 InfoWidget::InfoWidget()

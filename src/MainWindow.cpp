@@ -16,7 +16,6 @@
  *                                                                                *
  *********************************************************************************/
 
-#include <iostream>
 #include <QMenuBar>
 #include <QSqlQuery>
 #include <QSqlError>
