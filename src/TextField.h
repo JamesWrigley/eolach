@@ -41,6 +41,7 @@ class TextField : public QHBoxLayout
     // Constructor arguments: the SQL field name and the text to display in edit_box
     TextField(QString, QString, QWidget *parent = 0);
     void set_text(QString);
+    void enterEditMode();
 
  private:
     QLabel *label;

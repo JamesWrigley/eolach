@@ -155,6 +155,7 @@ void MainWindow::onFieldChanged(QString sql_field_name, QString new_text)
                                                 QMessageBox::Yes, QMessageBox::No);
       if (QMessageBox::No == warning_dialog)
         {
+          isbn->enterEditMode();
           return;
         }
     }

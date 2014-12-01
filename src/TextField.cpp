@@ -16,6 +16,8 @@
  *                                                                                *
  *********************************************************************************/
 
+#include <QMouseEvent>
+#include <QApplication>
 #include "TextField.h"
 
 TextField::TextField(QString sql_field, QString label_name, QWidget *parent)
@@ -30,6 +32,12 @@ TextField::TextField(QString sql_field, QString label_name, QWidget *parent)
 
   addWidget(label);
   addWidget(edit_box);
+}
+
+void TextField::enterEditMode()
+{
+  QMouseEvent double_click(QEvent::MouseButtonDblClick, QPointF(), Qt::LeftButton, 0, 0);
+  QApplication::sendEvent(edit_box, &double_click);
 }
 
 void TextField::onTextChanged(QString new_text)
