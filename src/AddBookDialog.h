@@ -34,10 +34,10 @@ class AddBookDialog : public QDialog
  public:
     AddBookDialog(QWidget *parent);
     QString book_key;
+    static bool validate_isbn(QString);
 
  private:
     void add_book();
-    bool validate_isbn();
 
     QLineEdit *title;
     QLineEdit *author;

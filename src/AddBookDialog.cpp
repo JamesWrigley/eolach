@@ -54,7 +54,7 @@ AddBookDialog::AddBookDialog(QWidget *parent)
 
 void AddBookDialog::check_fields()
 {
-  if (!validate_isbn())
+  if (!validate_isbn(isbn->text()))
     {
       int warning_dialog = QMessageBox::warning(this, "Warning",
                                                 "ISBN invalid, would you like to continue anyway?",
@@ -90,9 +90,8 @@ void AddBookDialog::add_book()
 }
 
 /* Implements the checksumming algorithm for 10 and 13 digit ISBN's */
-bool AddBookDialog::validate_isbn()
+bool AddBookDialog::validate_isbn(QString isbn_value)
 {
-  QString isbn_value = isbn->text();
   int sum = 0;
   int check_digit = 10;
 

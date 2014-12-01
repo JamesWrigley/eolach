@@ -18,6 +18,7 @@
 
 #include <QMouseEvent>
 #include "CLineEdit.h"
+#include "AddBookDialog.h"
 
 CLineEdit::CLineEdit(QWidget* parent)
 {
