@@ -49,6 +49,7 @@ KeysWidget::KeysWidget(QWidget *parent)
   bookstore = QSqlDatabase::database();
   load_items();
   setSortingEnabled(true);
+  setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
   sortByColumn(0, Qt::AscendingOrder);
 }
 
