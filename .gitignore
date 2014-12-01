@@ -17,6 +17,7 @@ moc_*
 
 ## Eolach ##
 *.ep
+*.png
 Makefile
 
 ### C++ ###
