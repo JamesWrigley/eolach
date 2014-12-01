@@ -34,7 +34,7 @@ TextField::TextField(QString sql_field, QString label_name, QWidget *parent)
 
 void TextField::onTextChanged(QString new_text)
 {
-  emit textChanged(field_name, new_text);
+  emit fieldChanged(field_name, new_text);
 }
 
 void TextField::set_text(QString new_text)

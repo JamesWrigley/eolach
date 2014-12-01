@@ -35,7 +35,7 @@ class TextField : public QHBoxLayout
 
  signals:
     // Arguments: the SQL field name and the changed text (from edit_box)
-    void textChanged(QString, QString);
+    void fieldChanged(QString, QString);
 
  public:
     // Constructor arguments: the SQL field name and the text to display in edit_box

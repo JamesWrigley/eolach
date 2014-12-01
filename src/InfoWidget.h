@@ -19,7 +19,7 @@
 #ifndef INFOWIDGET_H
 #define INFOWIDGET_H
 
-#include <array>
+#include <vector>
 #include <QFrame>
 #include <QLabel>
 #include <QVBoxLayout>
@@ -31,26 +31,14 @@ class InfoWidget : public QFrame
 {
   Q_OBJECT
 
- signals:
-  void fieldChanged(QString, QString);
-
  public:
   InfoWidget();
   void clear();
   void set_book(QString);
+  void add_field(TextField*);
 
  private:
-  std::array<TextField*, 5> fields;
-
-  QLabel *title_label;
-  QLabel *author_label;
-  QLabel *publication_date_label;
-
-  TextField *title;
-  TextField *author;
-  TextField *genre;
-  TextField *publication_date;
-  TextField *isbn;
+  std::vector<TextField*> fields;
 
   QVBoxLayout *main_vbox;
 };

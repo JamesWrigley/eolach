@@ -20,6 +20,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QStatusBar>
+#include <QMessageBox>
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QCryptographicHash>
@@ -32,8 +33,8 @@ MainWindow::MainWindow()
 {
   // Set up GUI
   keys_tabwidget = new QTabWidget();
+  create_info_widget();
   books_widget = new KeysWidget();
-  info_widget = new InfoWidget();
   splitter = new QSplitter(this);
 
   keys_tabwidget->addTab(books_widget, "Books");
@@ -63,8 +64,6 @@ MainWindow::MainWindow()
   connect(books_widget, SIGNAL(currentCellChanged(int, int, int, int)),
           this, SLOT(change_book()));
   connect(books_widget, SIGNAL(bookRemoved()), this, SLOT(onBookRemoved()));
-  connect(info_widget, SIGNAL(fieldChanged(QString, QString)),
-          this, SLOT(onFieldChanged(QString, QString)));
   connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
   connect(add_book_action, SIGNAL(triggered()), this, SLOT(create_add_book_dialog()));
 
@@ -89,6 +88,24 @@ void MainWindow::create_add_book_dialog()
     {
       books_widget->add_book(add_book_dialog.book_key);
       update_statusbar();
+    }
+}
+
+void MainWindow::create_info_widget()
+{
+  info_widget = new InfoWidget();
+  
+  title = new TextField("title", "Title:");
+  author = new TextField("author", "Author:");
+  genre = new TextField("genre", "Genre:");
+  publication_date = new TextField("publication_date", "Publication Date:");
+  isbn = new TextField("isbn", "ISBN:");
+
+  for (TextField* field : {title, author, genre, publication_date, isbn})
+    {
+      connect(field, SIGNAL(fieldChanged(QString, QString)),
+              this, SLOT(onFieldChanged(QString, QString)));
+      info_widget->add_field(field);
     }
 }
 
@@ -130,6 +147,18 @@ void MainWindow::onBookRemoved()
 /* Called when a books data is changed from the info_widget */
 void MainWindow::onFieldChanged(QString sql_field_name, QString new_text)
 {
+  // Warn the user if the ISBN is invalid
+  if ("isbn" == sql_field_name && !AddBookDialog::validate_isbn(new_text))
+    {
+      int warning_dialog = QMessageBox::warning(this, "Warning",
+                                                "ISBN invalid, would you like to continue anyway?",
+                                                QMessageBox::Yes, QMessageBox::No);
+      if (QMessageBox::No == warning_dialog)
+        {
+          return;
+        }
+    }
+
   QString book_key = books_widget->currentItem()->data(Qt::UserRole).toString();
 
   QSqlQuery update_book_info(bookstore);

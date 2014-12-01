@@ -45,20 +45,24 @@ class MainWindow : public QMainWindow
 
  private:
     void center_window();
+    void create_info_widget();
     void update_statusbar();
 
     QSqlDatabase bookstore;
-    InfoWidget *info_widget;
     KeysWidget *books_widget;
-
     QMenu *file_menu;
     QSplitter *splitter;
     QTabWidget *keys_tabwidget;
-
-    QToolBar* toolbar;
-
+    QToolBar *toolbar;
     QAction *add_book_action;
     QAction *exit_action;
+
+    InfoWidget *info_widget;
+    TextField *title;
+    TextField *author;
+    TextField *genre;
+    TextField *publication_date;
+    TextField *isbn;
 };
 
 #endif // MAINWINDOW_H
