@@ -42,8 +42,6 @@ class InfoWidget : public QFrame
  private:
   std::array<TextField*, 5> fields;
 
-  QString current_book;
-
   QLabel *title_label;
   QLabel *author_label;
   QLabel *publication_date_label;
