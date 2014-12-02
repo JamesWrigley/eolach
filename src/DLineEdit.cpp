@@ -16,38 +16,37 @@
  *                                                                                *
  *********************************************************************************/
 
-#ifndef ADDBOOKDIALOG_H
-#define ADDBOOKDIALOG_H
-
-#include <QDialog>
-#include <QPushButton>
-#include <QVBoxLayout>
+#include <QIcon>
 #include "DLineEdit.h"
 
-class AddBookDialog : public QDialog
+DLineEdit::DLineEdit(QString placeholdertext, bool (*function)(QString), QWidget *parent)
 {
-  Q_OBJECT
+  lineedit = new QLineEdit();
+  lineedit->setPlaceholderText(placeholdertext);
+  connect(lineedit, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));
 
-  private slots:
-    void check_fields();
+  icon = new QLabel();
+  icon->setPixmap(QIcon::fromTheme("dialog-cancel").pixmap(20));
 
- public:
-    AddBookDialog(QWidget *parent);
-    QString book_key;
-    static bool validate_isbn(QString);
-    static bool validate_generic_field(QString);
-    static bool validate_numeric_field(QString);
+  check_function = function;
 
- private:
-    void add_book();
+  addWidget(lineedit);
+  addWidget(icon);
+}
 
-    DLineEdit *title;
-    DLineEdit *author;
-    DLineEdit *genre;
-    DLineEdit *isbn;
-    DLineEdit *publication_date;
-    QPushButton *finish_button;
-    QVBoxLayout *main_layout;
-};
+void DLineEdit::onTextChanged(QString field_text)
+{
+  if (check_function(field_text))
+    {
+      icon->setPixmap(QIcon::fromTheme("dialog-ok-apply").pixmap(20));
+    }
+  else
+    {
+      icon->setPixmap(QIcon::fromTheme("dialog-cancel").pixmap(20));
+    }
+}
 
-#endif // ADDBOOKDIALOG_H
+QString DLineEdit::text()
+{
+  return lineedit->text();
+}

@@ -24,27 +24,23 @@
 AddBookDialog::AddBookDialog(QWidget *parent)
 {
   main_layout = new QVBoxLayout(this);
-  finish_button = new QPushButton("Finish");
-  title = new QLineEdit();
-  author = new QLineEdit();
-  genre = new QLineEdit();
-  isbn = new QLineEdit();
-  publication_date = new QLineEdit();
 
-  title->setPlaceholderText("Title");
-  author->setPlaceholderText("Author");
-  genre->setPlaceholderText("Genre");
-  isbn->setPlaceholderText("ISBN");
-  publication_date->setPlaceholderText("Publication Date");
+  title = new DLineEdit("Title", &validate_generic_field);
+  author = new DLineEdit("Author", &validate_generic_field);
+  genre = new DLineEdit("Genre", &validate_generic_field);
+  isbn = new DLineEdit("ISBN", &validate_isbn);
+  publication_date = new DLineEdit("Publication Date", &validate_numeric_field);
+
+  finish_button = new QPushButton("Finish");
   finish_button->setDefault(true);
 
   connect(finish_button, SIGNAL(clicked(bool)), this, SLOT(check_fields()));
 
-  main_layout->addWidget(title);
-  main_layout->addWidget(author);
-  main_layout->addWidget(genre);
-  main_layout->addWidget(isbn);
-  main_layout->addWidget(publication_date);
+  main_layout->addLayout(title);
+  main_layout->addLayout(author);
+  main_layout->addLayout(genre);
+  main_layout->addLayout(isbn);
+  main_layout->addLayout(publication_date);
   main_layout->addStretch();
   main_layout->addWidget(finish_button);
   main_layout->addStretch();
@@ -87,6 +83,18 @@ void AddBookDialog::add_book()
   insert.exec(insert_sql);
 
   done(QDialog::Accepted);
+}
+
+bool AddBookDialog::validate_generic_field(QString field_text)
+{
+  return field_text.length() > 0;
+}
+
+bool AddBookDialog::validate_numeric_field(QString field_text)
+{
+  bool success = false;
+  field_text.toFloat(&success);
+  return success;
 }
 
 /* Implements the checksumming algorithm for 10 and 13 digit ISBN's */

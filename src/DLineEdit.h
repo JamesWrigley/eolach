@@ -16,38 +16,31 @@
  *                                                                                *
  *********************************************************************************/
 
-#ifndef ADDBOOKDIALOG_H
-#define ADDBOOKDIALOG_H
+#ifndef DLINEEDIT_H
+#define DLINEEDIT_H
 
-#include <QDialog>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include "DLineEdit.h"
+#include <QLabel>
+#include <QLineEdit>
+#include <QHBoxLayout>
 
-class AddBookDialog : public QDialog
+/* The layout that holds a QLineEdit and icon (in a QLabel) to use in the AddBookDialog.
+ A function is passed in to check the QLineEdit's text and change the icon accordingly. */
+class DLineEdit : public QHBoxLayout
 {
   Q_OBJECT
 
   private slots:
-    void check_fields();
+    void onTextChanged(QString);
 
  public:
-    AddBookDialog(QWidget *parent);
-    QString book_key;
-    static bool validate_isbn(QString);
-    static bool validate_generic_field(QString);
-    static bool validate_numeric_field(QString);
+  DLineEdit(QString, bool (*)(QString), QWidget *parent = 0);
+  QString text();
 
  private:
-    void add_book();
+  QLabel *icon;
+  QLineEdit *lineedit;
 
-    DLineEdit *title;
-    DLineEdit *author;
-    DLineEdit *genre;
-    DLineEdit *isbn;
-    DLineEdit *publication_date;
-    QPushButton *finish_button;
-    QVBoxLayout *main_layout;
+  bool (*check_function)(QString);
 };
 
-#endif // ADDBOOKDIALOG_H
+#endif // DLINEEDIT_H

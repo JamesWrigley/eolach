@@ -11,12 +11,14 @@ QT += sql
 
 # Input
 HEADERS += src/AddBookDialog.h \
+           src/DLineEdit.h \
            src/CLineEdit.h \
            src/InfoWidget.h \
            src/KeysWidget.h \
            src/MainWindow.h \
            src/TextField.h
 SOURCES += src/AddBookDialog.cpp \
+           src/DLineEdit.cpp \
            src/CLineEdit.cpp \
            src/InfoWidget.cpp \
            src/KeysWidget.cpp \
