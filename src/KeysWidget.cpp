@@ -107,9 +107,9 @@ void KeysWidget::create_context_menu(QPoint pos)
 
 void KeysWidget::removeBook()
 {
-  int warning_dialog = QMessageBox::warning(this, "Confirm", "Are you sure you wish to remove this book?",
+  int confirm = QMessageBox::warning(this, "Confirm", "Are you sure you wish to remove this book?",
                                             QMessageBox::Yes, QMessageBox::No);
-  if (QMessageBox::Yes == warning_dialog)
+  if (QMessageBox::Yes == confirm)
     {
       QString book_key = currentItem()->data(Qt::UserRole).toString();
       QSqlQuery remove_book(bookstore);

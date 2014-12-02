@@ -150,10 +150,10 @@ void MainWindow::onFieldChanged(QString sql_field_name, QString new_text)
   // Warn the user if the ISBN is invalid
   if ("isbn" == sql_field_name && !AddBookDialog::validate_isbn(new_text))
     {
-      int warning_dialog = QMessageBox::warning(this, "Warning",
+      int confirm = QMessageBox::warning(this, "Warning",
                                                 "ISBN invalid, would you like to continue anyway?",
                                                 QMessageBox::Yes, QMessageBox::No);
-      if (QMessageBox::No == warning_dialog)
+      if (QMessageBox::No == confirm)
         {
           isbn->enterEditMode();
           return;
