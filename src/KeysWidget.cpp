@@ -22,6 +22,7 @@
 #include <QSqlQuery>
 #include <QStringList>
 #include <QHeaderView>
+#include <QMessageBox>
 #include "KeysWidget.h"
 
 KeysWidget::KeysWidget(QWidget *parent)
@@ -106,9 +107,14 @@ void KeysWidget::create_context_menu(QPoint pos)
 
 void KeysWidget::removeBook()
 {
-  QString book_key = currentItem()->data(Qt::UserRole).toString();
-  QSqlQuery remove_book(bookstore);
-  remove_book.exec("DELETE FROM bookstore WHERE key='" + book_key + "';");
+  int warning_dialog = QMessageBox::warning(this, "Confirm", "Are you sure you wish to remove this book?",
+                                            QMessageBox::Yes, QMessageBox::No);
+  if (QMessageBox::Yes == warning_dialog)
+    {
+      QString book_key = currentItem()->data(Qt::UserRole).toString();
+      QSqlQuery remove_book(bookstore);
+      remove_book.exec("DELETE FROM bookstore WHERE key='" + book_key + "';");
 
-  emit bookRemoved();
+      emit bookRemoved();
+    }
 }
