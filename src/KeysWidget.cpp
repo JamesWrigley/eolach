@@ -29,7 +29,7 @@ KeysWidget::KeysWidget(QWidget *parent)
   insertColumn(0);
   insertColumn(1);
 
-  QStringList headers = (QStringList() << "Title" << "Author");
+  QStringList headers{"Title", "Author"};
   setHorizontalHeaderLabels(headers);
   horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
