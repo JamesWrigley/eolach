@@ -53,8 +53,8 @@ void AddBookDialog::check_fields()
   if (!validate_isbn(isbn->text()))
     {
       int confirm = QMessageBox::warning(this, "Warning",
-                                                "ISBN invalid, would you like to continue anyway?",
-                                                QMessageBox::Yes, QMessageBox::No);
+                                         "ISBN invalid, would you like to continue anyway?",
+                                         QMessageBox::Yes, QMessageBox::No);
       if (QMessageBox::Yes == confirm)
         {
           add_book();

@@ -99,16 +99,16 @@ void KeysWidget::update_book(int row, QString book_key)
 
 void KeysWidget::create_context_menu(QPoint pos)
 {
-  if (this->itemAt(pos) != 0)
+  if (itemAt(pos) != 0)
     {
-      context_menu->popup(this->viewport()->mapToGlobal(pos));
+      context_menu->popup(viewport()->mapToGlobal(pos));
     }
 }
 
 void KeysWidget::removeBook()
 {
   int confirm = QMessageBox::warning(this, "Confirm", "Are you sure you wish to remove this book?",
-                                            QMessageBox::Yes, QMessageBox::No);
+                                     QMessageBox::Yes, QMessageBox::No);
   if (QMessageBox::Yes == confirm)
     {
       QString book_key = currentItem()->data(Qt::UserRole).toString();
