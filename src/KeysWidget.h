@@ -19,6 +19,7 @@
 #ifndef KEYSWIDGET_H
 #define KEYSWIDGET_H
 
+#include <QHash>
 #include <QSqlDatabase>
 #include <QTableWidget>
 
@@ -32,7 +33,9 @@ class KeysWidget : public QTableWidget
   void bookRemoved();
 
   private slots:
-    void create_context_menu(QPoint);
+    void create_item_context_menu(QPoint);
+    void create_header_context_menu(QPoint);
+    void modify_header(bool);
     void removeBook();
 
  public:
@@ -42,10 +45,13 @@ class KeysWidget : public QTableWidget
     void update_book(int, QString);
 
  private:
-    QMenu *context_menu;
-    QAction *remove_book_action;
-
+    int visible_column_count;
+    QMenu *item_context_menu;
+    QMenu *header_context_menu;
+    QStringList headers;
     QSqlDatabase bookstore;
+
+    QAction *remove_book_action;
 };
 
 #endif // KEYSWIDGET_H

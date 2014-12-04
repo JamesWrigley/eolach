@@ -27,31 +27,55 @@
 
 KeysWidget::KeysWidget(QWidget *parent)
 {
-  insertColumn(0);
-  insertColumn(1);
+  // Set up headers
+  setColumnCount(5);
+  hideColumn(4);
+  hideColumn(3);
+  hideColumn(2);
+  visible_column_count = 2;
 
-  QStringList headers{"Title", "Author"};
+  headers = {"Title", "Author", "Genre", "Publication Date", "ISBN"};
   setHorizontalHeaderLabels(headers);
+  header_context_menu = new QMenu(this);
   horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+  horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(horizontalHeader(), SIGNAL(customContextMenuRequested(QPoint)),
+          this, SLOT(create_header_context_menu(QPoint)));
 
-  setSelectionMode(QAbstractItemView::SingleSelection);
-  setSelectionBehavior(QAbstractItemView::SelectRows);
+  for (QString text : headers)
+    {
+      QAction *action = new QAction(text, this);
+      action->setCheckable(true);
 
-  setEditTriggers(QAbstractItemView::NoEditTriggers);
+      if (text == "Title" or text == "Author")
+        {
+          action->setChecked(true);
+        }
 
+      header_context_menu->addAction(action);
+      connect(action, SIGNAL(toggled(bool)), this, SLOT(modify_header(bool)));
+    }
+
+  // Set up cell context menus
   setContextMenuPolicy(Qt::CustomContextMenu);
-  connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(create_context_menu(QPoint)));
+  connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(create_item_context_menu(QPoint)));
 
-  context_menu = new QMenu(this);
+  item_context_menu = new QMenu(this);
   remove_book_action = new QAction("Remove", this);
-  context_menu->addAction(remove_book_action);
-
+  item_context_menu->addAction(remove_book_action);
   connect(remove_book_action, SIGNAL(triggered()), this, SLOT(removeBook()));
+
+  // Miscellanea
+
   bookstore = QSqlDatabase::database();
   load_items();
+
   setSortingEnabled(true);
-  setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
   sortByColumn(0, Qt::AscendingOrder);
+  setEditTriggers(QAbstractItemView::NoEditTriggers);
+  setSelectionMode(QAbstractItemView::SingleSelection);
+  setSelectionBehavior(QAbstractItemView::SelectRows);
+  setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 }
 
 /* General functions */
@@ -59,18 +83,19 @@ KeysWidget::KeysWidget(QWidget *parent)
 void KeysWidget::add_book(QString book_key)
 {
   QSqlQuery get_book_info(bookstore);
-  get_book_info.exec("SELECT title, author FROM bookstore WHERE key='" + book_key + "';");
+  get_book_info.exec("SELECT title, author, genre, publication_date, isbn FROM bookstore WHERE key='" + book_key + "';");
   get_book_info.next();
 
-  QTableWidgetItem *title = new QTableWidgetItem(get_book_info.value(0).toString());
-  QTableWidgetItem *author = new QTableWidgetItem(get_book_info.value(1).toString());
-  title->setData(Qt::UserRole, QVariant(book_key));
-  author->setData(Qt::UserRole, QVariant(book_key));
-
   insertRow(rowCount());
-  setItem(rowCount() - 1, 0, title);
-  setCurrentItem(title);
-  setItem(currentRow(), 1, author);
+  // We add the items backwards because the rows are sorted by the first cell by
+  // default, and it causes indexing complications if the row is sorted before
+  // we're finished populating its cells.
+  for (int i = headers.length() - 1; i >= 0; --i)
+    {
+      QTableWidgetItem *item = new QTableWidgetItem(get_book_info.value(i).toString());
+      item->setData(Qt::UserRole, QVariant(book_key));
+      setItem(rowCount() - 1, i, item);
+    }
 }
 
 void KeysWidget::load_items()
@@ -80,28 +105,54 @@ void KeysWidget::load_items()
 
   while (get_book_keys.next())
     {
-      QString book_key = get_book_keys.value(0).toString();
-      add_book(book_key);
+      add_book(get_book_keys.value(0).toString());
     }
 }
 
 void KeysWidget::update_book(int row, QString book_key)
 {
   QSqlQuery get_book_info(bookstore);
-  get_book_info.exec("SELECT title, author FROM bookstore WHERE key='" + book_key + "';");
+  get_book_info.exec("SELECT title, author, genre, publication_date, isbn FROM bookstore WHERE key='" + book_key + "';");
   get_book_info.next();
 
-  item(row, 0)->setText(get_book_info.value(0).toString());
-  item(row, 1)->setText(get_book_info.value(1).toString());
+  for (int i = 0; i < headers.length(); ++i)
+    {
+      item(row, i)->setText(get_book_info.value(i).toString());
+    }
 }
 
 /* Slots */
 
-void KeysWidget::create_context_menu(QPoint pos)
+void KeysWidget::create_item_context_menu(QPoint pos)
 {
   if (itemAt(pos) != 0)
     {
-      context_menu->popup(viewport()->mapToGlobal(pos));
+      item_context_menu->popup(viewport()->mapToGlobal(pos));
+    }
+}
+
+void KeysWidget::create_header_context_menu(QPoint pos)
+{
+  header_context_menu->popup(mapToGlobal(pos));
+}
+
+void KeysWidget::modify_header(bool checked)
+{
+  int header_index = headers.indexOf(static_cast<QAction*>(sender())->text());
+  if (checked)
+    {
+      showColumn(header_index);
+      ++visible_column_count;
+    }
+  else if (!checked && visible_column_count > 1)
+    {
+      hideColumn(header_index);
+      --visible_column_count;
+    }
+  else
+    {
+      static_cast<QAction*>(sender())->setChecked(true);
+      --visible_column_count;
     }
 }
 
