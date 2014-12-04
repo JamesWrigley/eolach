@@ -19,9 +19,7 @@
 #ifndef INFOWIDGET_H
 #define INFOWIDGET_H
 
-#include <vector>
 #include <QFrame>
-#include <QLabel>
 #include <QVBoxLayout>
 #include "TextField.h"
 

@@ -19,7 +19,6 @@
 #ifndef KEYSWIDGET_H
 #define KEYSWIDGET_H
 
-#include <QHash>
 #include <QSqlDatabase>
 #include <QTableWidget>
 

@@ -19,7 +19,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMenu>
 #include <QAction>
 #include <QToolBar>
 #include <QSplitter>

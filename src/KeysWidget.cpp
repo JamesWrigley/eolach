@@ -20,7 +20,6 @@
 #include <QAction>
 #include <QVariant>
 #include <QSqlQuery>
-#include <QStringList>
 #include <QHeaderView>
 #include <QMessageBox>
 #include "KeysWidget.h"

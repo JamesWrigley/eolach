@@ -18,12 +18,10 @@
 
 #include <QMenuBar>
 #include <QSqlQuery>
-#include <QSqlError>
 #include <QStatusBar>
 #include <QMessageBox>
 #include <QApplication>
 #include <QDesktopWidget>
-#include <QCryptographicHash>
 #include "MainWindow.h"
 #include "KeysWidget.h"
 #include "InfoWidget.h"
