@@ -34,6 +34,7 @@ class AddBookDialog : public QDialog
  public:
     AddBookDialog(QWidget *parent);
     QString book_key;
+    void setup_completions();
     static bool validate_isbn(QString);
     static bool validate_generic_field(QString);
     static bool validate_numeric_field(QString);

@@ -17,6 +17,7 @@
  *********************************************************************************/
 
 #include <QIcon>
+#include <QCompleter>
 #include "DLineEdit.h"
 
 DLineEdit::DLineEdit(QString placeholdertext, bool (*function)(QString), QWidget *parent)
@@ -32,6 +33,13 @@ DLineEdit::DLineEdit(QString placeholdertext, bool (*function)(QString), QWidget
 
   addWidget(lineedit);
   addWidget(icon);
+}
+
+void DLineEdit::enable_completion(QStringList completions)
+{
+  QCompleter *completer = new QCompleter(completions, this);
+  completer->setCaseSensitivity(Qt::CaseInsensitive);
+  lineedit->setCompleter(completer);
 }
 
 void DLineEdit::onTextChanged(QString field_text)

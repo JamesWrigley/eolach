@@ -28,8 +28,9 @@ AddBookDialog::AddBookDialog(QWidget *parent)
   title = new DLineEdit("Title", &validate_generic_field);
   author = new DLineEdit("Author", &validate_generic_field);
   genre = new DLineEdit("Genre", &validate_generic_field);
-  isbn = new DLineEdit("ISBN", &validate_isbn);
   publication_date = new DLineEdit("Publication Date", &validate_numeric_field);
+  isbn = new DLineEdit("ISBN", &validate_isbn);
+  setup_completions();
 
   finish_button = new QPushButton("Finish");
   finish_button->setDefault(true);
@@ -83,6 +84,28 @@ void AddBookDialog::add_book()
   insert.exec(insert_sql);
 
   done(QDialog::Accepted);
+}
+
+void AddBookDialog::setup_completions()
+{
+  std::vector<QString> sql_fields = {"author", "genre"};
+  std::vector<DLineEdit*> lineedits = {author, genre};
+
+  for (unsigned int i = 0; i < sql_fields.size(); ++i)
+    {
+      QStringList completions;
+      QSqlDatabase bookstore = QSqlDatabase::database();
+      QSqlQuery get_column(bookstore);
+      get_column.exec("SELECT " + sql_fields[i] + " FROM bookstore;");
+
+      while (get_column.next())
+        {
+          completions << get_column.value(0).toString();
+        }
+
+      completions.removeDuplicates();
+      lineedits[i]->enable_completion(completions);
+    }
 }
 
 bool AddBookDialog::validate_generic_field(QString field_text)

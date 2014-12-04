@@ -34,6 +34,7 @@ class DLineEdit : public QHBoxLayout
 
  public:
   DLineEdit(QString, bool (*)(QString), QWidget *parent = 0);
+  void enable_completion(QStringList);
   QString text();
 
  private:
