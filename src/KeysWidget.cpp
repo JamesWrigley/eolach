@@ -75,6 +75,7 @@ KeysWidget::KeysWidget(QWidget *parent)
   setSelectionMode(QAbstractItemView::SingleSelection);
   setSelectionBehavior(QAbstractItemView::SelectRows);
   setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+  verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
 }
 
 /* General functions */
