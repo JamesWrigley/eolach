@@ -100,7 +100,7 @@ void AddBookDialog::setup_completions()
 
       while (get_column.next())
         {
-          completions << get_column.value(0).toString();
+          completions << get_column.value(0).toString().split(",", QString::SkipEmptyParts);
         }
 
       completions.removeDuplicates();
