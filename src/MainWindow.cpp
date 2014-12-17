@@ -129,7 +129,10 @@ void MainWindow::update_statusbar()
 
 void MainWindow::change_book()
 {
-  info_widget->set_book(books_widget->currentItem()->data(Qt::UserRole).toString());
+  if (books_widget->currentRow() > -1)
+    {
+      info_widget->set_book(books_widget->currentItem()->data(Qt::UserRole).toString());
+    }
 }
 
 void MainWindow::onBookRemoved()
