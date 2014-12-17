@@ -137,7 +137,7 @@ void MainWindow::change_book()
 
 void MainWindow::onBookRemoved()
 {
-  if (0 == books_widget->rowCount())
+  if (1 == books_widget->rowCount())
     {
       info_widget->clear();
     }
