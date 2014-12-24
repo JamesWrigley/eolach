@@ -17,7 +17,7 @@
  *********************************************************************************/
 
 #include <QIcon>
-#include <QCompleter>
+//#include <QRegExp>
 #include "DLineEdit.h"
 
 DLineEdit::DLineEdit(QString placeholdertext, bool (*function)(QString), QWidget *parent)
@@ -37,9 +37,10 @@ DLineEdit::DLineEdit(QString placeholdertext, bool (*function)(QString), QWidget
 
 void DLineEdit::enable_completion(QStringList completions)
 {
-  QCompleter *completer = new QCompleter(completions, this);
+  completer = new QCompleter(completions, this);
   completer->setCaseSensitivity(Qt::CaseInsensitive);
   lineedit->setCompleter(completer);
+  completion_enabled = true;
 }
 
 void DLineEdit::onTextChanged(QString field_text)
@@ -52,6 +53,12 @@ void DLineEdit::onTextChanged(QString field_text)
     {
       icon->setPixmap(QIcon::fromTheme("dialog-cancel").pixmap(20));
     }
+
+  // if (completion_enabled && field_text.length() > 0)
+  //   {
+  //     completer->setCompletionPrefix(field_text.split(QRegExp("\\s?,\\s?"), QString::SkipEmptyParts).last());
+  //     completer->complete();
+  //   }
 }
 
 QString DLineEdit::text()

@@ -21,6 +21,7 @@
 
 #include <QLabel>
 #include <QLineEdit>
+#include <QCompleter>
 #include <QHBoxLayout>
 
 /* The layout that holds a QLineEdit and icon (in a QLabel) to use in the AddBookDialog.
@@ -40,6 +41,8 @@ class DLineEdit : public QHBoxLayout
  private:
   QLabel *icon;
   QLineEdit *lineedit;
+  QCompleter *completer;
+  bool completion_enabled = false;
 
   bool (*check_function)(QString);
 };
