@@ -21,11 +21,12 @@
 
 #include <QLabel>
 #include <QLineEdit>
-#include <QCompleter>
 #include <QHBoxLayout>
+#include <QStringListModel>
+#include "DCompleter.h"
 
 /* The layout that holds a QLineEdit and icon (in a QLabel) to use in the AddBookDialog.
- A function is passed in to check the QLineEdit's text and change the icon accordingly. */
+   A function is passed in to check the QLineEdit's text and change the icon accordingly. */
 class DLineEdit : public QHBoxLayout
 {
   Q_OBJECT
@@ -35,13 +36,13 @@ class DLineEdit : public QHBoxLayout
 
  public:
   DLineEdit(QString, bool (*)(QString), QWidget *parent = 0);
-  void enable_completion(QStringList);
+  void enable_completion(QStringListModel*);
   QString text();
 
  private:
   QLabel *icon;
   QLineEdit *lineedit;
-  QCompleter *completer;
+  DCompleter *completer;
   bool completion_enabled = false;
 
   bool (*check_function)(QString);

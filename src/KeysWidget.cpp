@@ -33,7 +33,7 @@ KeysWidget::KeysWidget(QWidget *parent)
   hideColumn(2);
   visible_column_count = 2;
 
-  headers = {"Title", "Author", "Genre", "Publication Date", "ISBN"};
+  headers << "Title" << "Author" << "Genre" << "Publication Date" << "ISBN";
   setHorizontalHeaderLabels(headers);
   header_context_menu = new QMenu(this);
   horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);

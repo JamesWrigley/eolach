@@ -16,6 +16,7 @@
  *                                                                                *
  *********************************************************************************/
 
+#include <QRegExp>
 #include <QSqlQuery>
 #include <QMessageBox>
 #include <QCryptographicHash>
@@ -93,18 +94,26 @@ void AddBookDialog::setup_completions()
 
   for (unsigned int i = 0; i < sql_fields.size(); ++i)
     {
-      QStringList completions;
+      QStringListModel* completion_model = new QStringListModel(this);
+      QStringList completion_list;
       QSqlDatabase bookstore = QSqlDatabase::database();
+
       QSqlQuery get_column(bookstore);
       get_column.exec("SELECT " + sql_fields[i] + " FROM bookstore;");
 
       while (get_column.next())
         {
-          completions << get_column.value(0).toString().split(",", QString::SkipEmptyParts);
+	  completion_list << get_column.value(0).toString().
+	    split(",", QString::SkipEmptyParts);
         }
+      for (int i = 0; i < completion_list.size(); ++i)
+	{
+	  completion_list[i] = completion_list[i].trimmed();
+	}
 
-      completions.removeDuplicates();
-      lineedits[i]->enable_completion(completions);
+      completion_list.removeDuplicates();
+      completion_model->setStringList(completion_list);
+      lineedits[i]->enable_completion(completion_model);
     }
 }
 

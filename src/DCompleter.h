@@ -16,45 +16,21 @@
  *                                                                                *
  *********************************************************************************/
 
-#include <QIcon>
-#include "DLineEdit.h"
+#ifndef DCOMPLETER_H
+#define DCOMPLETER_H
 
-DLineEdit::DLineEdit(QString placeholdertext, bool (*function)(QString), QWidget *parent)
+#include <QLineEdit>
+#include <QCompleter>
+
+class DCompleter : public QCompleter
 {
-  lineedit = new QLineEdit();
-  lineedit->setPlaceholderText(placeholdertext);
-  connect(lineedit, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));
+  Q_OBJECT
 
-  icon = new QLabel();
-  icon->setPixmap(QIcon::fromTheme("dialog-cancel").pixmap(20));
+  using QCompleter::QCompleter;
 
-  check_function = function;
+ public:
+  QString pathFromIndex(const QModelIndex&) const;
+  QStringList splitPath(const QString&) const;
+};
 
-  addWidget(lineedit);
-  addWidget(icon);
-}
-
-void DLineEdit::enable_completion(QStringListModel* completions)
-{
-  completer = new DCompleter(completions, this);
-  completer->setCaseSensitivity(Qt::CaseInsensitive);
-  lineedit->setCompleter(completer);
-  completion_enabled = true;
-}
-
-void DLineEdit::onTextChanged(QString field_text)
-{
-  if (check_function(field_text))
-    {
-      icon->setPixmap(QIcon::fromTheme("dialog-ok-apply").pixmap(20));
-    }
-  else
-    {
-      icon->setPixmap(QIcon::fromTheme("dialog-cancel").pixmap(20));
-    }
-}
-
-QString DLineEdit::text()
-{
-  return lineedit->text();
-}
+#endif // DCOMPLETER_H

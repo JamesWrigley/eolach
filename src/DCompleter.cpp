@@ -16,45 +16,31 @@
  *                                                                                *
  *********************************************************************************/
 
-#include <QIcon>
-#include "DLineEdit.h"
+#include "DCompleter.h"
 
-DLineEdit::DLineEdit(QString placeholdertext, bool (*function)(QString), QWidget *parent)
+QString DCompleter::pathFromIndex(const QModelIndex& index) const
 {
-  lineedit = new QLineEdit();
-  lineedit->setPlaceholderText(placeholdertext);
-  connect(lineedit, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));
+  QString path = QCompleter::pathFromIndex(index);
+  QString text = static_cast<QLineEdit*>(widget())->text();
 
-  icon = new QLabel();
-  icon->setPixmap(QIcon::fromTheme("dialog-cancel").pixmap(20));
-
-  check_function = function;
-
-  addWidget(lineedit);
-  addWidget(icon);
-}
-
-void DLineEdit::enable_completion(QStringListModel* completions)
-{
-  completer = new DCompleter(completions, this);
-  completer->setCaseSensitivity(Qt::CaseInsensitive);
-  lineedit->setCompleter(completer);
-  completion_enabled = true;
-}
-
-void DLineEdit::onTextChanged(QString field_text)
-{
-  if (check_function(field_text))
+  int pos = text.lastIndexOf(",");
+  if (pos >= 0)
     {
-      icon->setPixmap(QIcon::fromTheme("dialog-ok-apply").pixmap(20));
+      path = text.left(pos) + ", " + path;
     }
-  else
-    {
-      icon->setPixmap(QIcon::fromTheme("dialog-cancel").pixmap(20));
-    }
+
+  return path;
 }
 
-QString DLineEdit::text()
+QStringList DCompleter::splitPath(const QString& path) const
 {
-  return lineedit->text();
+  int pos = path.lastIndexOf(",") + 1;
+
+  while (pos < path.length() && QString(path.at(pos)) == QString(" "))
+    {
+      pos++;
+    }
+
+  QStringList value = QStringList(path.mid(pos));
+  return value;
 }
