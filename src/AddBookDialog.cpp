@@ -76,13 +76,16 @@ void AddBookDialog::add_book()
   sha1Hasher.addData(book_data.toUtf8());
   book_key = QString(sha1Hasher.result().toHex());
 
-  // Insert new book into DB
-  QSqlDatabase bookstore = QSqlDatabase::database();
-  QString insert_sql = "INSERT INTO bookstore (key, isbn, title, author, publication_date, genre) "
-    "VALUES ('" + book_key + "', '" + isbn->text() + "', '" + title->text() + "', '" + author->text() +
-    "', '" + publication_date->text() + "', '" + genre->text() + "');";
-  QSqlQuery insert(bookstore);
-  insert.exec(insert_sql);
+  QSqlQuery insert(QSqlDatabase::database());
+  insert.prepare("INSERT INTO bookstore (key, isbn, title, author, publication_date, genre) "
+		 "VALUES (:key, :isbn, :title, :author, :publication_date, :genre)");
+  insert.bindValue(":key", book_key);
+  insert.bindValue(":isbn", isbn->text());
+  insert.bindValue(":title", title->text());
+  insert.bindValue(":author", author->text());
+  insert.bindValue(":publication_date", publication_date->text());
+  insert.bindValue(":genre", genre->text());
+  insert.exec();
 
   done(QDialog::Accepted);
 }
