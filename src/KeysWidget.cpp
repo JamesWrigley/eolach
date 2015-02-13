@@ -83,7 +83,9 @@ KeysWidget::KeysWidget(QWidget *parent)
 void KeysWidget::add_book(QString book_key)
 {
   QSqlQuery get_book_info(bookstore);
-  get_book_info.exec("SELECT title, author, genre, publication_date, isbn FROM bookstore WHERE key='" + book_key + "';");
+  get_book_info.prepare("SELECT title, author, genre, publication_date, isbn FROM bookstore WHERE key=:key;");
+  get_book_info.bindValue(":key", book_key);
+  get_book_info.exec();
   get_book_info.next();
 
   insertRow(rowCount());
