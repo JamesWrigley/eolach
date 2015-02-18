@@ -65,7 +65,6 @@ KeysWidget::KeysWidget(QWidget *parent)
   connect(remove_book_action, SIGNAL(triggered()), this, SLOT(removeBook()));
 
   // Miscellanea
-
   bookstore = QSqlDatabase::database();
   load_items();
 
@@ -89,15 +88,19 @@ void KeysWidget::add_book(QString book_key)
   get_book_info.next();
 
   insertRow(rowCount());
-  // We add the items backwards because the rows are sorted by the first cell by
-  // default, and it causes indexing complications if the row is sorted before
-  // we're finished populating its cells.
+  // We temporarily disable sorting because it causes indexing complications if
+  // the row is sorted before we're finished populating its cells.
+  int sorter_section = horizontalHeader()->sortIndicatorSection();
+  Qt::SortOrder sort_order = horizontalHeader()->sortIndicatorOrder();
+  setSortingEnabled(false);
   for (int i = headers.length() - 1; i >= 0; --i)
     {
       QTableWidgetItem *item = new QTableWidgetItem(get_book_info.value(i).toString());
       item->setData(Qt::UserRole, QVariant(book_key));
       setItem(rowCount() - 1, i, item);
     }
+  setSortingEnabled(true);
+  sortByColumn(sorter_section, sort_order);
 }
 
 void KeysWidget::load_items()
