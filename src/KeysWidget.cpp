@@ -68,8 +68,7 @@ KeysWidget::KeysWidget(QWidget *parent)
   bookstore = QSqlDatabase::database();
   load_items();
 
-  setSortingEnabled(true);
-  sortByColumn(0, Qt::AscendingOrder);
+  enable_sorting(0, Qt::AscendingOrder);
   setEditTriggers(QAbstractItemView::NoEditTriggers);
   setSelectionMode(QAbstractItemView::SingleSelection);
   setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -90,17 +89,28 @@ void KeysWidget::add_book(QString book_key)
   insertRow(rowCount());
   // We temporarily disable sorting because it causes indexing complications if
   // the row is sorted before we're finished populating its cells.
-  int sorter_section = horizontalHeader()->sortIndicatorSection();
-  Qt::SortOrder sort_order = horizontalHeader()->sortIndicatorOrder();
-  setSortingEnabled(false);
+  std::pair<int, Qt::SortOrder> sorting_info(disable_sorting());
   for (int i = headers.length() - 1; i >= 0; --i)
     {
       QTableWidgetItem *item = new QTableWidgetItem(get_book_info.value(i).toString());
       item->setData(Qt::UserRole, QVariant(book_key));
       setItem(rowCount() - 1, i, item);
     }
+  enable_sorting(sorting_info.first, sorting_info.second);
+}
+
+std::pair<int, Qt::SortOrder> KeysWidget::disable_sorting()
+{
+  std::pair<int, Qt::SortOrder> sorting_info(horizontalHeader()->sortIndicatorSection(),
+					     horizontalHeader()->sortIndicatorOrder());
+  setSortingEnabled(false);
+  return(sorting_info);
+}
+
+void KeysWidget::enable_sorting(int sort_column, Qt::SortOrder sort_order)
+{
   setSortingEnabled(true);
-  sortByColumn(sorter_section, sort_order);
+  sortByColumn(sort_column, sort_order);
 }
 
 void KeysWidget::load_items()
@@ -120,10 +130,12 @@ void KeysWidget::update_book(int row, QString book_key)
   get_book_info.exec("SELECT title, author, genre, publication_date, isbn FROM bookstore WHERE key='" + book_key + "';");
   get_book_info.next();
 
+  std::pair<int, Qt::SortOrder> sorting_info(disable_sorting());
   for (int i = 0; i < headers.length(); ++i)
     {
       item(row, i)->setText(get_book_info.value(i).toString());
     }
+  enable_sorting(sorting_info.first, sorting_info.second);
 }
 
 /* Slots */

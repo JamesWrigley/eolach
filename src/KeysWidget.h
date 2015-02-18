@@ -19,6 +19,7 @@
 #ifndef KEYSWIDGET_H
 #define KEYSWIDGET_H
 
+#include <utility>
 #include <QSqlDatabase>
 #include <QTableWidget>
 
@@ -44,6 +45,8 @@ class KeysWidget : public QTableWidget
     void update_book(int, QString);
 
  private:
+    std::pair<int, Qt::SortOrder> disable_sorting();
+    void enable_sorting(int, Qt::SortOrder);
     int visible_column_count;
     QMenu *item_context_menu;
     QMenu *header_context_menu;
