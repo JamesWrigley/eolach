@@ -74,15 +74,23 @@ void AddBookDialog::add_book()
   std::random_device key_gen;
   book_key = QString::number(key_gen());
 
+  // Sort the authors and genres
+  QStringList authors_list = author->text().split(",", QString::SkipEmptyParts);
+  for (int i = 0; i < authors_list.size(); ++i) { authors_list[i] = authors_list[i].simplified(); }
+  authors_list.sort(Qt::CaseInsensitive);
+  QStringList genres_list = genre->text().split(",", QString::SkipEmptyParts);
+  for (int i = 0; i < genres_list.size(); ++i) { genres_list[i] = genres_list[i].simplified(); }
+  genres_list.sort(Qt::CaseInsensitive);
+
   QSqlQuery insert(QSqlDatabase::database());
   insert.prepare("INSERT INTO bookstore (key, isbn, title, author, publication_date, genre) "
 		 "VALUES (:key, :isbn, :title, :author, :publication_date, :genre)");
   insert.bindValue(":key", book_key);
   insert.bindValue(":isbn", isbn->text());
   insert.bindValue(":title", title->text());
-  insert.bindValue(":author", author->text());
+  insert.bindValue(":author", authors_list.join(", "));
   insert.bindValue(":publication_date", publication_date->text());
-  insert.bindValue(":genre", genre->text());
+  insert.bindValue(":genre", genres_list.join(", "));
   insert.exec();
 
   done(QDialog::Accepted);
