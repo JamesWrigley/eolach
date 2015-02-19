@@ -16,10 +16,10 @@
  *                                                                                *
  *********************************************************************************/
 
+#include <random>
 #include <QRegExp>
 #include <QSqlQuery>
 #include <QMessageBox>
-#include <QCryptographicHash>
 #include "AddBookDialog.h"
 
 AddBookDialog::AddBookDialog(QWidget *parent)
@@ -71,10 +71,8 @@ void AddBookDialog::check_fields()
 void AddBookDialog::add_book()
 {
   // Generate hash of book data to be used as a key
-  QString book_data = title->text() + author->text() + genre->text() + isbn->text() + publication_date->text();
-  QCryptographicHash sha1Hasher(QCryptographicHash::Sha1);
-  sha1Hasher.addData(book_data.toUtf8());
-  book_key = QString(sha1Hasher.result().toHex());
+  std::random_device key_gen;
+  book_key = QString::number(key_gen());
 
   QSqlQuery insert(QSqlDatabase::database());
   insert.prepare("INSERT INTO bookstore (key, isbn, title, author, publication_date, genre) "
