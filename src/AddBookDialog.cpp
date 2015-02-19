@@ -67,7 +67,11 @@ void AddBookDialog::check_fields()
   if (!warnings.isEmpty())
     {
       QString invalid_fields;
-      if (warnings.size() == 2)
+      if (warnings.size() == 1)
+	{
+	  invalid_fields = warnings[0];
+	}
+      else if (warnings.size() == 2)
 	{
 	  invalid_fields = warnings.join(" and ");
 	}
@@ -76,6 +80,7 @@ void AddBookDialog::check_fields()
 	  warnings[warnings.size() - 1].prepend("and ");
 	  invalid_fields = warnings.join(", ");
 	}
+
       int confirm = QMessageBox::warning(this, "Warning",
                                          invalid_fields +
 					 " invalid, would you like to continue anyway?",
