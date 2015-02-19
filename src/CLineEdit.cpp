@@ -41,7 +41,7 @@ void CLineEdit::mouseDoubleClickEvent(QMouseEvent *event)
 {
   QSqlDatabase bookstore = QSqlDatabase::database();
   QSqlQuery get_row_count;
-  get_row_count.exec("SELECT COUNT(*) FROM bookstore");
+  get_row_count.exec("SELECT COUNT(*) FROM bookstore;");
   get_row_count.next();
 
   if (event->button() == Qt::LeftButton && 0 < get_row_count.value(0).toInt())

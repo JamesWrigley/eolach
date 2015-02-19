@@ -162,10 +162,11 @@ void MainWindow::onFieldChanged(QString sql_field_name, QString new_text)
     }
 
   QString book_key = books_widget->currentItem()->data(Qt::UserRole).toString();
-
   QSqlQuery update_book_info(bookstore);
-  update_book_info.exec("UPDATE bookstore SET " + sql_field_name + "='" + new_text +
-                        "' WHERE key='" + book_key + "';");
+  update_book_info.prepare(QString("UPDATE bookstore SET %1=:new_text WHERE key=:book_key;").arg(sql_field_name));
+  update_book_info.bindValue(":new_text", new_text);
+  update_book_info.bindValue(":book_key", book_key);
+  update_book_info.exec();
 
   info_widget->set_book(book_key);
   books_widget->update_book(books_widget->currentRow(), book_key);

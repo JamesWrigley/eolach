@@ -127,7 +127,9 @@ void KeysWidget::load_items()
 void KeysWidget::update_book(int row, QString book_key)
 {
   QSqlQuery get_book_info(bookstore);
-  get_book_info.exec("SELECT title, author, genre, publication_date, isbn FROM bookstore WHERE key='" + book_key + "';");
+  get_book_info.prepare("SELECT title, author, genre, publication_date, isbn FROM bookstore WHERE key=:book_key;");
+  get_book_info.bindValue(":book_key", book_key);
+  get_book_info.exec();
   get_book_info.next();
 
   std::pair<int, Qt::SortOrder> sorting_info(disable_sorting());

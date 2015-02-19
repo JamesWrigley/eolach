@@ -49,8 +49,10 @@ void InfoWidget::set_book(QString book_key)
 {
   QSqlDatabase db = QSqlDatabase::database();
   QSqlQuery get_book_info(db);
-  get_book_info.exec("SELECT title, author, genre, publication_date, isbn FROM bookstore "
-                     "WHERE key='" + book_key + "'");
+  get_book_info.prepare("SELECT title, author, genre, publication_date, isbn FROM bookstore "
+			"WHERE key=:book_key;");
+  get_book_info.bindValue(":book_key", book_key);
+  get_book_info.exec();
   get_book_info.next();
 
   for (unsigned int i = 0; i < fields.size(); ++i)

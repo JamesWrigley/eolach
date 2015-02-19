@@ -131,7 +131,7 @@ void AddBookDialog::setup_completions()
       QSqlDatabase bookstore = QSqlDatabase::database();
 
       QSqlQuery get_column(bookstore);
-      get_column.exec("SELECT " + sql_fields[i] + " FROM bookstore;");
+      get_column.exec(QString("SELECT %1 FROM bookstore;").arg(sql_fields[i]));
 
       while (get_column.next())
         {
