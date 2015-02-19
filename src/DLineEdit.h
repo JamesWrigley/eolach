@@ -35,9 +35,10 @@ class DLineEdit : public QHBoxLayout
     void onTextChanged(QString);
 
  public:
-  DLineEdit(QString, bool (*)(QString), QWidget *parent = 0);
-  void enable_completion(QStringListModel*);
+  bool valid;
   QString text();
+  void enable_completion(QStringListModel*);
+  DLineEdit(QString, bool (*)(QString), QWidget *parent = 0);
 
  private:
   QLabel *icon;

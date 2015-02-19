@@ -52,10 +52,33 @@ AddBookDialog::AddBookDialog(QWidget *parent)
 
 void AddBookDialog::check_fields()
 {
-  if (!validate_isbn(isbn->text()))
+  QStringList warnings;
+  if (!title->valid)
+      warnings << "Title";
+  if (!author->valid)
+      warnings << "Author";
+  if (!genre->valid)
+    warnings << "Genre";
+  if (!isbn->valid)
+    warnings << "ISBN";
+  if (!publication_date->valid)
+    warnings << "Publication Date";
+
+  if (!warnings.isEmpty())
     {
+      QString invalid_fields;
+      if (warnings.size() == 2)
+	{
+	  invalid_fields = warnings.join(" and ");
+	}
+      else if (warnings.size() > 2)
+	{
+	  warnings[warnings.size() - 1].prepend("and ");
+	  invalid_fields = warnings.join(", ");
+	}
       int confirm = QMessageBox::warning(this, "Warning",
-                                         "ISBN invalid, would you like to continue anyway?",
+                                         invalid_fields +
+					 " invalid, would you like to continue anyway?",
                                          QMessageBox::Yes, QMessageBox::No);
       if (QMessageBox::Yes == confirm)
         {

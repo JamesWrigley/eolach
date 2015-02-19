@@ -25,6 +25,7 @@ DLineEdit::DLineEdit(QString placeholdertext, bool (*function)(QString), QWidget
   lineedit->setPlaceholderText(placeholdertext);
   connect(lineedit, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));
 
+  valid = false;
   icon = new QLabel();
   icon->setPixmap(QIcon::fromTheme("dialog-cancel").pixmap(20));
 
@@ -47,10 +48,12 @@ void DLineEdit::onTextChanged(QString field_text)
   if (check_function(field_text))
     {
       icon->setPixmap(QIcon::fromTheme("dialog-ok-apply").pixmap(20));
+      valid = true;
     }
   else
     {
       icon->setPixmap(QIcon::fromTheme("dialog-cancel").pixmap(20));
+      valid = false;
     }
 }
 
