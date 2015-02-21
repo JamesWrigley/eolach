@@ -93,11 +93,12 @@ void MainWindow::create_info_widget()
 {
   info_widget = new InfoWidget();
   
-  title = new TextField("title", "Title:");
-  author = new TextField("author", "Author:");
-  genre = new TextField("genre", "Genre:");
-  publication_date = new TextField("publication_date", "Publication Date:");
-  isbn = new TextField("isbn", "ISBN:");
+  title = new TextField("title", "Title:", &AddBookDialog::validate_generic_field);
+  author = new TextField("author", "Author:", &AddBookDialog::validate_generic_field);
+  genre = new TextField("genre", "Genre:", &AddBookDialog::validate_generic_field);
+  publication_date = new TextField("publication_date", "Publication Date:",
+				   &AddBookDialog::validate_numeric_field);
+  isbn = new TextField("isbn", "ISBN:", &AddBookDialog::validate_isbn);
 
   for (TextField* field : {title, author, genre, publication_date, isbn})
     {

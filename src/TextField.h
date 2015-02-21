@@ -31,6 +31,8 @@ class TextField : public QHBoxLayout
   Q_OBJECT
 
   private slots:
+    void onDoubleClicked();
+    void onTextModified(QString);
     void onTextChanged(QString);
 
  signals:
@@ -39,15 +41,18 @@ class TextField : public QHBoxLayout
 
  public:
     // Constructor arguments: the SQL field name and the text to display in edit_box
-    TextField(QString, QString, QWidget *parent = 0);
+    TextField(QString, QString, bool (*)(QString), QWidget *parent = 0);
     void set_text(QString);
     void enterEditMode();
 
  private:
+    QLabel *icon;
     QLabel *label;
     QString field_name;
     QAction *edit_text;
     CLineEdit *edit_box;
+
+    bool (*check_function)(QString);
 };
 
 #endif // TEXTFIELD_H

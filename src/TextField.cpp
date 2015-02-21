@@ -16,22 +16,28 @@
  *                                                                                *
  *********************************************************************************/
 
+#include <QIcon>
 #include <QMouseEvent>
 #include <QApplication>
 #include "TextField.h"
 
-TextField::TextField(QString sql_field, QString label_name, QWidget *parent)
+TextField::TextField(QString sql_field, QString label_name, bool (*function)(QString), QWidget *parent)
 {
   field_name = sql_field;
+  check_function = function;
   label = new QLabel(label_name);
+  icon = new QLabel();
+  icon->setPixmap(QIcon::fromTheme("dialog-cancel").pixmap(20));
   edit_box = new CLineEdit();
-
+  connect(edit_box, SIGNAL(textModified(QString)), this, SLOT(onTextModified(QString)));
   connect(edit_box, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));
+  connect(edit_box, SIGNAL(doubleClicked()), this, SLOT(onDoubleClicked()));
 
   label->setMinimumWidth(120);
-
   addWidget(label);
   addWidget(edit_box);
+  addWidget(icon);
+  icon->hide();
 }
 
 void TextField::enterEditMode()
@@ -42,10 +48,39 @@ void TextField::enterEditMode()
 
 void TextField::onTextChanged(QString new_text)
 {
+  if (check_function(new_text))
+    {
+      icon->setPixmap(QIcon::fromTheme("dialog-ok-apply").pixmap(20));
+    }
+  else
+    {
+      icon->setPixmap(QIcon::fromTheme("dialog-cancel").pixmap(20));
+    }
+}
+
+void TextField::onTextModified(QString new_text)
+{
+  if (check_function(new_text))
+    {
+      icon->hide();
+    }
   emit fieldChanged(field_name, new_text);
+}
+
+void TextField::onDoubleClicked()
+{
+  icon->show();
 }
 
 void TextField::set_text(QString new_text)
 {
   edit_box->setText(new_text);
+  if (!check_function(new_text))
+    {
+      icon->show();
+    }
+  else
+    {
+      icon->hide();
+    }
 }

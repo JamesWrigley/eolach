@@ -20,7 +20,6 @@
 #include <QSqlDatabase>
 #include <QMouseEvent>
 #include "CLineEdit.h"
-#include "AddBookDialog.h"
 
 CLineEdit::CLineEdit(QWidget* parent)
 {
@@ -44,6 +43,7 @@ void CLineEdit::mouseDoubleClickEvent(QMouseEvent *event)
   get_row_count.exec("SELECT COUNT(*) FROM bookstore;");
   get_row_count.next();
 
+  emit doubleClicked();
   if (event->button() == Qt::LeftButton && 0 < get_row_count.value(0).toInt())
     {
       current_text = text();
@@ -67,6 +67,6 @@ void CLineEdit::onEditingFinished()
   if (current_text != text())
     {
       current_text = text();
-      emit textChanged(current_text);
+      emit textModified(current_text);
     }
 }
