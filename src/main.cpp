@@ -37,22 +37,27 @@ int main(int argc, char *argv[])
     }
   else
     {
-      // Note: the key is defined as the SHA1 hash of the book data
-      QString initialize_db_sql = "CREATE TABLE bookstore ("
-        "key TEXT PRIMARY KEY, "
-        "isbn TEXT, "
-        "title TEXT, "
-        "author TEXT, "
-        "publication_date TEXT, "
-        "genre TEXT);";
-
       QDir().mkdir(config_dir_path);
       bookstore = QSqlDatabase::addDatabase("QSQLITE");
       bookstore.setDatabaseName(db_path);
       bookstore.open();
 
       QSqlQuery initialize_db(bookstore);
-      initialize_db.exec(initialize_db_sql);
+      initialize_db.exec("CREATE TABLE bookstore ("
+			 "key TEXT PRIMARY KEY, "
+			 "isbn TEXT, "
+			 "title TEXT, "
+			 "author TEXT, "
+			 "publication_date TEXT, "
+			 "genre TEXT); "
+			 
+			 "CREATE TABLE patrons ("
+			 "key TEXT PRIMARY KEY, "
+			 "name TEXT, "
+			 "address TEXT, "
+			 "mobile_num TEXT, "
+			 "landline_num TEXT, "
+			 "items TEXT);");
     }
 
   // Start the application
