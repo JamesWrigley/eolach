@@ -6,6 +6,7 @@ CONFIG += c++11
 TEMPLATE = app
 TARGET = eolach
 INCLUDEPATH += . src
+RESOURCES = eolach.qrc
 QT += widgets
 QT += sql
 

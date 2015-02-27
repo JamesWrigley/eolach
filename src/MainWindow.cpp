@@ -42,12 +42,11 @@ MainWindow::MainWindow()
   splitter->setStretchFactor(0, 2);
   splitter->setStretchFactor(1, 1);
 
-  QIcon::setThemeName("oxygen");
   toolbar = addToolBar("");
   file_menu = menuBar()->addMenu("File");
 
   exit_action = new QAction("Exit", this);
-  add_book_action = new QAction(QIcon::fromTheme("list-add"), "", this);
+  add_book_action = new QAction(QIcon(":/new-book-icon"), "", this);
   exit_action->setShortcut(QKeySequence("Ctrl+Q"));
 
   file_menu->addAction(exit_action);
