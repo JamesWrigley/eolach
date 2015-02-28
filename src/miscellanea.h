@@ -16,36 +16,18 @@
  *                                                                                *
  *********************************************************************************/
 
-#ifndef ADDBOOKDIALOG_H
-#define ADDBOOKDIALOG_H
+#ifndef MISCELLANEA_H
+#define MISCELLANEA_H
 
-#include <QDialog>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include "DLineEdit.h"
+#include <QString>
 
-class AddBookDialog : public QDialog
-{
-  Q_OBJECT
+/* Here we define some things that don't quite fit anywhere else */
+QString get_book_info();
+QString get_patron_info();
 
-  private slots:
-    void check_fields();
+// Validation functions
+bool validate_generic_field(QString);
+bool validate_numeric_field(QString);
+bool validate_isbn(QString);
 
- public:
-    AddBookDialog(QWidget *parent);
-    QString book_key;
-    void setup_completions();
-
- private:
-    void add_book();
-
-    DLineEdit *title;
-    DLineEdit *author;
-    DLineEdit *genre;
-    DLineEdit *isbn;
-    DLineEdit *publication_date;
-    QPushButton *finish_button;
-    QVBoxLayout *main_layout;
-};
-
-#endif // ADDBOOKDIALOG_H
+#endif // MISCELLANEA_H

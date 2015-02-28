@@ -16,36 +16,56 @@
  *                                                                                *
  *********************************************************************************/
 
-#ifndef ADDBOOKDIALOG_H
-#define ADDBOOKDIALOG_H
+#include "miscellanea.h"
 
-#include <QDialog>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include "DLineEdit.h"
 
-class AddBookDialog : public QDialog
+// SQL queries for getting all the columns for a row from the patrons and
+// bookstore tables. These need to be functions for annoying can't-do-stuff-outside-of-functions reasons.
+QString get_book_info()
 {
-  Q_OBJECT
+  return(QString("SELECT title, author, genre, publication_date, isbn FROM bookstore WHERE key=:key;"));
+}
 
-  private slots:
-    void check_fields();
+QString get_patron_info()
+{
+  return(QString("SELECT name, address, mobile_num, landline_num, items FROM patrons WHERE key=:key;"));
+}
 
- public:
-    AddBookDialog(QWidget *parent);
-    QString book_key;
-    void setup_completions();
+// Validation functions
+bool validate_generic_field(QString field_text)
+{
+  return field_text.length() > 0;
+}
 
- private:
-    void add_book();
+bool validate_numeric_field(QString field_text)
+{
+  bool success = false;
+  field_text.toFloat(&success);
+  return success;
+}
 
-    DLineEdit *title;
-    DLineEdit *author;
-    DLineEdit *genre;
-    DLineEdit *isbn;
-    DLineEdit *publication_date;
-    QPushButton *finish_button;
-    QVBoxLayout *main_layout;
-};
+bool validate_isbn(QString isbn_value)
+{ // Implements the checksumming algorithm for 10 and 13 digit ISBN's
+  int sum = 0;
+  int check_digit = 10;
 
-#endif // ADDBOOKDIALOG_H
+  if (10 == isbn_value.length())
+    {
+      for (int i = 0; i < isbn_value.length() - 1; ++i)
+        {
+          sum += isbn_value[i].digitValue() * (10 - i);
+        }
+      check_digit = (11 - (sum % 11)) % 11;
+    }
+  else if (13 == isbn_value.length())
+    {
+      for (int i = 1; i < isbn_value.length(); i += 2)
+        {
+          sum += isbn_value[i].digitValue() * 3;
+          sum += isbn_value[i - 1].digitValue();
+        }
+      check_digit = (10 - (sum % 10)) % 10;
+    }
+
+  return isbn_value.endsWith(QString::number(check_digit));
+}

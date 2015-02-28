@@ -30,19 +30,19 @@ class KeysWidget : public QTableWidget
   Q_OBJECT
 
  signals:
-  void bookRemoved();
+  void itemRemoved();
 
   private slots:
     void create_item_context_menu(QPoint);
     void create_header_context_menu(QPoint);
     void modify_header(bool);
-    void removeBook();
+    void removeItem();
 
  public:
-    KeysWidget(QWidget *parent = 0);
-    void add_book(QString);
+    KeysWidget(QString, QString, QStringList, QWidget *parent = 0);
+    void add_item(QString);
     void load_items();
-    void update_book(int, QString);
+    void update_item(int, QString);
 
  private:
     std::pair<int, Qt::SortOrder> disable_sorting();
@@ -50,10 +50,12 @@ class KeysWidget : public QTableWidget
     int visible_column_count;
     QMenu *item_context_menu;
     QMenu *header_context_menu;
+    QString data_type;
+    QString table_name;
     QStringList headers;
     QSqlDatabase bookstore;
 
-    QAction *remove_book_action;
+    QAction *remove_item_action;
 };
 
 #endif // KEYSWIDGET_H

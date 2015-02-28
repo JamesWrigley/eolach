@@ -23,17 +23,16 @@
 #include <QHeaderView>
 #include <QMessageBox>
 #include "KeysWidget.h"
+#include "miscellanea.h"
 
-KeysWidget::KeysWidget(QWidget *parent)
+KeysWidget::KeysWidget(QString datatype, QString tablename, QStringList header_list, QWidget *parent)
 {
-  // Set up headers
-  setColumnCount(5);
-  hideColumn(4);
-  hideColumn(3);
-  hideColumn(2);
-  visible_column_count = 2;
+  data_type = datatype;
+  table_name = tablename;
+  headers = header_list;
 
-  headers << "Title" << "Author" << "Genre" << "Publication Date" << "ISBN";
+  setColumnCount(headers.length());
+  visible_column_count = headers.length();
   setHorizontalHeaderLabels(headers);
   header_context_menu = new QMenu(this);
   horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -45,11 +44,7 @@ KeysWidget::KeysWidget(QWidget *parent)
     {
       QAction *action = new QAction(text, this);
       action->setCheckable(true);
-
-      if (text == "Title" or text == "Author")
-        {
-          action->setChecked(true);
-        }
+      action->setChecked(true);
 
       header_context_menu->addAction(action);
       connect(action, SIGNAL(toggled(bool)), this, SLOT(modify_header(bool)));
@@ -60,14 +55,13 @@ KeysWidget::KeysWidget(QWidget *parent)
   connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(create_item_context_menu(QPoint)));
 
   item_context_menu = new QMenu(this);
-  remove_book_action = new QAction("Remove", this);
-  item_context_menu->addAction(remove_book_action);
-  connect(remove_book_action, SIGNAL(triggered()), this, SLOT(removeBook()));
+  remove_item_action = new QAction("Remove", this);
+  item_context_menu->addAction(remove_item_action);
+  connect(remove_item_action, SIGNAL(triggered()), this, SLOT(removeItem()));
 
   // Miscellanea
-  bookstore = QSqlDatabase::database();
   load_items();
-
+  bookstore = QSqlDatabase::database();
   enable_sorting(0, Qt::AscendingOrder);
   setEditTriggers(QAbstractItemView::NoEditTriggers);
   setSelectionMode(QAbstractItemView::SingleSelection);
@@ -78,13 +72,13 @@ KeysWidget::KeysWidget(QWidget *parent)
 
 /* General functions */
 
-void KeysWidget::add_book(QString book_key)
+void KeysWidget::add_item(QString item_key)
 {
-  QSqlQuery get_book_info(bookstore);
-  get_book_info.prepare("SELECT title, author, genre, publication_date, isbn FROM bookstore WHERE key=:key;");
-  get_book_info.bindValue(":key", book_key);
-  get_book_info.exec();
-  get_book_info.next();
+  QSqlQuery get_item_info(bookstore);
+  get_item_info.prepare(data_type == "book" ? get_book_info() : get_patron_info());
+  get_item_info.bindValue(":key", item_key);
+  get_item_info.exec();
+  get_item_info.next();
 
   insertRow(rowCount());
   // We temporarily disable sorting because it causes indexing complications if
@@ -92,8 +86,8 @@ void KeysWidget::add_book(QString book_key)
   std::pair<int, Qt::SortOrder> sorting_info(disable_sorting());
   for (int i = headers.length() - 1; i >= 0; --i)
     {
-      QTableWidgetItem *item = new QTableWidgetItem(get_book_info.value(i).toString());
-      item->setData(Qt::UserRole, QVariant(book_key));
+      QTableWidgetItem *item = new QTableWidgetItem(get_item_info.value(i).toString());
+      item->setData(Qt::UserRole, QVariant(item_key));
       setItem(rowCount() - 1, i, item);
     }
   enable_sorting(sorting_info.first, sorting_info.second);
@@ -115,27 +109,27 @@ void KeysWidget::enable_sorting(int sort_column, Qt::SortOrder sort_order)
 
 void KeysWidget::load_items()
 {
-  QSqlQuery get_book_keys(bookstore);
-  get_book_keys.exec("SELECT key FROM bookstore;");
+  QSqlQuery get_item_keys(bookstore);
+  get_item_keys.exec(QString("SELECT key FROM %1;").arg(table_name));
 
-  while (get_book_keys.next())
+  while (get_item_keys.next())
     {
-      add_book(get_book_keys.value(0).toString());
+      add_item(get_item_keys.value(0).toString());
     }
 }
 
-void KeysWidget::update_book(int row, QString book_key)
+void KeysWidget::update_item(int row, QString item_key)
 {
-  QSqlQuery get_book_info(bookstore);
-  get_book_info.prepare("SELECT title, author, genre, publication_date, isbn FROM bookstore WHERE key=:book_key;");
-  get_book_info.bindValue(":book_key", book_key);
-  get_book_info.exec();
-  get_book_info.next();
+  QSqlQuery get_item_info(bookstore);
+  get_item_info.prepare(data_type == "book" ? get_book_info() : get_patron_info());
+  get_item_info.bindValue(":key", item_key);
+  get_item_info.exec();
+  get_item_info.next();
 
   std::pair<int, Qt::SortOrder> sorting_info(disable_sorting());
   for (int i = 0; i < headers.length(); ++i)
     {
-      item(row, i)->setText(get_book_info.value(i).toString());
+      item(row, i)->setText(get_item_info.value(i).toString());
     }
   enable_sorting(sorting_info.first, sorting_info.second);
 }
@@ -175,16 +169,20 @@ void KeysWidget::modify_header(bool checked)
     }
 }
 
-void KeysWidget::removeBook()
+void KeysWidget::removeItem()
 {
-  int confirm = QMessageBox::warning(this, "Confirm", "Are you sure you wish to remove this book?",
+  int confirm = QMessageBox::warning(this, "Confirm",
+				     QString("Are you sure you wish to remove this %1?").arg(data_type),
                                      QMessageBox::Yes, QMessageBox::No);
   if (QMessageBox::Yes == confirm)
     {
-      QString book_key = currentItem()->data(Qt::UserRole).toString();
-      QSqlQuery remove_book(bookstore);
-      remove_book.exec("DELETE FROM bookstore WHERE key='" + book_key + "';");
+      QString item_key = currentItem()->data(Qt::UserRole).toString();
+      QSqlQuery remove_item(bookstore);
+      remove_item.prepare("DELETE FROM :table WHERE key=:key;");
+      remove_item.bindValue(":table", table_name);
+      remove_item.bindValue(":key", item_key);
+      remove_item.exec();
 
-      emit bookRemoved();
+      emit itemRemoved();
     }
 }

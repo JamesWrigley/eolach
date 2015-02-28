@@ -25,6 +25,7 @@
 #include "MainWindow.h"
 #include "KeysWidget.h"
 #include "InfoWidget.h"
+#include "miscellanea.h"
 #include "AddBookDialog.h"
 
 MainWindow::MainWindow()
@@ -32,7 +33,8 @@ MainWindow::MainWindow()
   // Set up GUI
   keys_tabwidget = new QTabWidget();
   create_info_widget();
-  books_widget = new KeysWidget();
+  books_widget = new KeysWidget("book", "bookstore", (QStringList() <<"Title" << "Author"
+						      << "Genre" << "Publication Date" << "ISBN"));
   splitter = new QSplitter(this);
 
   keys_tabwidget->addTab(books_widget, "Books");
@@ -60,7 +62,7 @@ MainWindow::MainWindow()
 
   connect(books_widget, SIGNAL(currentCellChanged(int, int, int, int)),
           this, SLOT(change_book()));
-  connect(books_widget, SIGNAL(bookRemoved()), this, SLOT(onBookRemoved()));
+  connect(books_widget, SIGNAL(itemRemoved()), this, SLOT(onBookRemoved()));
   connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
   connect(add_book_action, SIGNAL(triggered()), this, SLOT(create_add_book_dialog()));
 
@@ -83,7 +85,7 @@ void MainWindow::create_add_book_dialog()
   AddBookDialog add_book_dialog(this);
   if (QDialog::Accepted == add_book_dialog.exec())
     {
-      books_widget->add_book(add_book_dialog.book_key);
+      books_widget->add_item(add_book_dialog.book_key);
       update_statusbar();
     }
 }
@@ -92,12 +94,12 @@ void MainWindow::create_info_widget()
 {
   info_widget = new InfoWidget();
   
-  title = new TextField("title", "Title:", &AddBookDialog::validate_generic_field);
-  author = new TextField("author", "Author:", &AddBookDialog::validate_generic_field);
-  genre = new TextField("genre", "Genre:", &AddBookDialog::validate_generic_field);
+  title = new TextField("title", "Title:", &validate_generic_field);
+  author = new TextField("author", "Author:", &validate_generic_field);
+  genre = new TextField("genre", "Genre:", &validate_generic_field);
   publication_date = new TextField("publication_date", "Publication Date:",
-				   &AddBookDialog::validate_numeric_field);
-  isbn = new TextField("isbn", "ISBN:", &AddBookDialog::validate_isbn);
+				   &validate_numeric_field);
+  isbn = new TextField("isbn", "ISBN:", &validate_isbn);
 
   for (TextField* field : {title, author, genre, publication_date, isbn})
     {
@@ -148,19 +150,6 @@ void MainWindow::onBookRemoved()
 /* Called when a books data is changed from the info_widget */
 void MainWindow::onFieldChanged(QString sql_field_name, QString new_text)
 {
-  // Warn the user if the ISBN is invalid
-  if ("isbn" == sql_field_name && !AddBookDialog::validate_isbn(new_text))
-    {
-      int confirm = QMessageBox::warning(this, "Warning",
-                                         "ISBN invalid, would you like to continue anyway?",
-                                         QMessageBox::Yes, QMessageBox::No);
-      if (QMessageBox::No == confirm)
-        {
-          isbn->enterEditMode();
-          return;
-        }
-    }
-
   QString book_key = books_widget->currentItem()->data(Qt::UserRole).toString();
   QSqlQuery update_book_info(bookstore);
   update_book_info.prepare(QString("UPDATE bookstore SET %1=:new_text WHERE key=:book_key;").arg(sql_field_name));
@@ -169,5 +158,5 @@ void MainWindow::onFieldChanged(QString sql_field_name, QString new_text)
   update_book_info.exec();
 
   info_widget->set_book(book_key);
-  books_widget->update_book(books_widget->currentRow(), book_key);
+  books_widget->update_item(books_widget->currentRow(), book_key);
 }

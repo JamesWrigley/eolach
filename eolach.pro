@@ -18,6 +18,7 @@ HEADERS += src/AddBookDialog.h \
            src/InfoWidget.h \
            src/KeysWidget.h \
            src/MainWindow.h \
+           src/miscellanea.h \
            src/TextField.h
 SOURCES += src/AddBookDialog.cpp \
            src/CLineEdit.cpp \
@@ -27,4 +28,5 @@ SOURCES += src/AddBookDialog.cpp \
            src/KeysWidget.cpp \
            src/main.cpp \
            src/MainWindow.cpp \
+           src/miscellanea.cpp \
            src/TextField.cpp
