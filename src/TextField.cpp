@@ -27,7 +27,7 @@ TextField::TextField(QString sql_field, QString label_name, bool (*function)(QSt
   check_function = function;
   label = new QLabel(label_name);
   icon = new QLabel();
-  icon->setPixmap(QIcon::fromTheme("dialog-cancel").pixmap(20));
+  icon->setPixmap(QIcon(":/invalid-icon").pixmap(20));
   edit_box = new CLineEdit();
   connect(edit_box, SIGNAL(textModified(QString)), this, SLOT(onTextModified(QString)));
   connect(edit_box, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));
@@ -50,11 +50,11 @@ void TextField::onTextChanged(QString new_text)
 {
   if (check_function(new_text))
     {
-      icon->setPixmap(QIcon::fromTheme("dialog-ok-apply").pixmap(20));
+      icon->setPixmap(QIcon(":/valid-icon").pixmap(20));
     }
   else
     {
-      icon->setPixmap(QIcon::fromTheme("dialog-cancel").pixmap(20));
+      icon->setPixmap(QIcon(":/invalid-icon").pixmap(20));
     }
 }
 

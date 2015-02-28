@@ -27,7 +27,7 @@ DLineEdit::DLineEdit(QString placeholdertext, bool (*function)(QString), QWidget
 
   valid = false;
   icon = new QLabel();
-  icon->setPixmap(QIcon::fromTheme("dialog-cancel").pixmap(20));
+  icon->setPixmap(QIcon(":/invalid-icon").pixmap(20));
 
   check_function = function;
 
@@ -47,12 +47,12 @@ void DLineEdit::onTextChanged(QString field_text)
 {
   if (check_function(field_text))
     {
-      icon->setPixmap(QIcon::fromTheme("dialog-ok-apply").pixmap(20));
+      icon->setPixmap(QIcon(":/valid-icon").pixmap(20));
       valid = true;
     }
   else
     {
-      icon->setPixmap(QIcon::fromTheme("dialog-cancel").pixmap(20));
+      icon->setPixmap(QIcon(":/invalid-icon").pixmap(20));
       valid = false;
     }
 }
