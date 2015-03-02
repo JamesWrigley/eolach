@@ -63,10 +63,6 @@ void CLineEdit::onEditingFinished()
   setToolTip(tooltip);
   deselect();
 
-  // Avoid spurious DB calls when the user doesn't actually change the text
-  if (current_text != text())
-    {
-      current_text = text();
-      emit textModified(current_text);
-    }
+  current_text = text();
+  emit textModified(current_text);
 }

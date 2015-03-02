@@ -37,17 +37,21 @@ class TextField : public QHBoxLayout
 
  signals:
     // Arguments: the SQL field name and the changed text (from edit_box)
-    void fieldChanged(QString, QString);
+    void fieldChanged(QString, QString, QString);
 
  public:
     // Constructor arguments: the SQL field name and the text to display in edit_box
-    TextField(QString, QString, bool (*)(QString), QWidget *parent = 0);
+    TextField(QString, QString, QString, bool (*)(QString), QWidget *parent = 0);
     void set_text(QString);
     void enterEditMode();
+    void hide();
+    void show();
 
  private:
+    bool visible;
     QLabel *icon;
     QLabel *label;
+    QString db_table;
     QString field_name;
     QAction *edit_text;
     CLineEdit *edit_box;

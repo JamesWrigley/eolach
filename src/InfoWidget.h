@@ -32,8 +32,9 @@ class InfoWidget : public QFrame
  public:
   InfoWidget();
   void clear();
-  void set_book(QString);
+  void set_item(QString);
   void add_field(TextField*);
+  void remove_field(TextField*);
 
  private:
   std::vector<TextField*> fields;

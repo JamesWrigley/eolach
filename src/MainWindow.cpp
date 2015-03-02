@@ -27,17 +27,21 @@
 #include "InfoWidget.h"
 #include "miscellanea.h"
 #include "AddBookDialog.h"
+#include "AddPatronDialog.h"
 
 MainWindow::MainWindow()
 {
   // Set up GUI
   keys_tabwidget = new QTabWidget();
   create_info_widget();
-  books_widget = new KeysWidget("book", "bookstore", (QStringList() <<"Title" << "Author"
+  books_widget = new KeysWidget("book", "bookstore", (QStringList() << "Title" << "Author"
 						      << "Genre" << "Publication Date" << "ISBN"));
+  patrons_widget = new KeysWidget("patron", "patrons", (QStringList() << "Name" << "Address" <<
+							"Mobile No." << "Landline No."));
   splitter = new QSplitter(this);
 
   keys_tabwidget->addTab(books_widget, "Books");
+  keys_tabwidget->addTab(patrons_widget, "Patrons");
 
   splitter->addWidget(keys_tabwidget);
   splitter->addWidget(info_widget);
@@ -48,23 +52,28 @@ MainWindow::MainWindow()
   file_menu = menuBar()->addMenu("File");
 
   exit_action = new QAction("Exit", this);
-  add_book_action = new QAction(QIcon(":/new-book-icon"), "", this);
   exit_action->setShortcut(QKeySequence("Ctrl+Q"));
+
+  add_book_action = new QAction(QIcon(":/new-book-icon"), "", this);
+  add_patron_action = new QAction(QIcon(":/new-patron-icon"), "", this);
 
   file_menu->addAction(exit_action);
   toolbar->addAction(add_book_action);
+  toolbar->addAction(add_patron_action);
 
   if (books_widget->rowCount() > 0)
     {
       books_widget->selectRow(0);
-      info_widget->set_book(books_widget->currentItem()->data(Qt::UserRole).toString());
+      info_widget->set_item(books_widget->currentItem()->data(Qt::UserRole).toString());
     }
 
+  connect(keys_tabwidget, SIGNAL(currentChanged(int)), this, SLOT(onTabChanged(int)));
   connect(books_widget, SIGNAL(currentCellChanged(int, int, int, int)),
           this, SLOT(change_book()));
   connect(books_widget, SIGNAL(itemRemoved()), this, SLOT(onBookRemoved()));
   connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
   connect(add_book_action, SIGNAL(triggered()), this, SLOT(create_add_book_dialog()));
+  connect(add_patron_action, SIGNAL(triggered()), this, SLOT(create_add_patron_dialog()));
 
   update_statusbar();
   setCentralWidget(splitter);
@@ -90,22 +99,47 @@ void MainWindow::create_add_book_dialog()
     }
 }
 
+void MainWindow::create_add_patron_dialog()
+{
+  AddPatronDialog add_patron_dialog(this);
+  if (QDialog::Accepted == add_patron_dialog.exec())
+    {
+      patrons_widget->add_item(add_patron_dialog.patron_key);
+      update_statusbar();
+    }
+}
+
 void MainWindow::create_info_widget()
 {
   info_widget = new InfoWidget();
   
-  title = new TextField("title", "Title:", &validate_generic_field);
-  author = new TextField("author", "Author:", &validate_generic_field);
-  genre = new TextField("genre", "Genre:", &validate_generic_field);
-  publication_date = new TextField("publication_date", "Publication Date:",
+  title = new TextField("bookstore", "title", "Title:", &validate_generic_field);
+  author = new TextField("bookstore", "author", "Author:", &validate_generic_field);
+  genre = new TextField("bookstore", "genre", "Genre:", &validate_generic_field);
+  publication_date = new TextField("bookstore", "publication_date", "Publication Date:",
 				   &validate_numeric_field);
-  isbn = new TextField("isbn", "ISBN:", &validate_isbn);
+  isbn = new TextField("bookstore", "isbn", "ISBN:", &validate_isbn);
+  book_fields = {title, author, genre, publication_date, isbn};
 
-  for (TextField* field : {title, author, genre, publication_date, isbn})
+  name = new TextField("patrons", "name", "Name:", &validate_generic_field);
+  address = new TextField("patrons", "address", "Address:", &validate_generic_field);
+  mobile_num = new TextField("patrons", "mobile_num", "Mobile No.", &validate_generic_field);
+  landline_num = new TextField("patrons", "landline_num", "Landline No.", &validate_generic_field);
+  items = new TextField("patrons", "items", "Borrowed items:", &validate_generic_field);
+  patron_fields = {name, address, mobile_num, landline_num, items};
+
+  for (TextField* field : {title, author, genre, publication_date, isbn,
+	                   name, address, mobile_num, landline_num, items})
     {
-      connect(field, SIGNAL(fieldChanged(QString, QString)),
-              this, SLOT(onFieldChanged(QString, QString)));
+      connect(field, SIGNAL(fieldChanged(QString, QString, QString)),
+              this, SLOT(onFieldChanged(QString, QString, QString)));
       info_widget->add_field(field);
+    }
+
+  // We hide the patron fields because the default tab is for the books
+  for (TextField* field : patron_fields)
+    {
+      field->hide();
     }
 }
 
@@ -124,7 +158,8 @@ void MainWindow::center_window()
    and displays them in the statusbar */
 void MainWindow::update_statusbar()
 {
-  statusBar()->showMessage(QString::number(books_widget->rowCount()) + " books.");
+  statusBar()->showMessage(QString::number(books_widget->rowCount()) + " books, " +
+			   QString::number(patrons_widget->rowCount()) + " patrons.");
 }
 
 /* Slots */
@@ -133,7 +168,7 @@ void MainWindow::change_book()
 {
   if (books_widget->currentRow() > -1)
     {
-      info_widget->set_book(books_widget->currentItem()->data(Qt::UserRole).toString());
+      info_widget->set_item(books_widget->currentItem()->data(Qt::UserRole).toString());
     }
 }
 
@@ -148,15 +183,35 @@ void MainWindow::onBookRemoved()
 }
 
 /* Called when a books data is changed from the info_widget */
-void MainWindow::onFieldChanged(QString sql_field_name, QString new_text)
+void MainWindow::onFieldChanged(QString db_table, QString sql_field_name, QString new_text)
 {
-  QString book_key = books_widget->currentItem()->data(Qt::UserRole).toString();
+  KeysWidget* current_tab = static_cast<KeysWidget*>(keys_tabwidget->currentWidget());
+  QString item_key = current_tab->currentItem()->data(Qt::UserRole).toString();
   QSqlQuery update_book_info(bookstore);
-  update_book_info.prepare(QString("UPDATE bookstore SET %1=:new_text WHERE key=:book_key;").arg(sql_field_name));
+  update_book_info.prepare(QString("UPDATE %1 SET %2=:new_text WHERE key=:book_key;").arg(db_table, sql_field_name));
+  update_book_info.bindValue(":table", db_table);
   update_book_info.bindValue(":new_text", new_text);
-  update_book_info.bindValue(":book_key", book_key);
+  update_book_info.bindValue(":book_key", item_key);
   update_book_info.exec();
 
-  info_widget->set_book(book_key);
-  books_widget->update_item(books_widget->currentRow(), book_key);
+  info_widget->set_item(item_key);
+  current_tab->update_item(books_widget->currentRow(), item_key);
+}
+
+void MainWindow::onTabChanged(int index)
+{
+  if (index == 0)
+    {
+      for (TextField* field : patron_fields)
+	  field->hide();
+      for (TextField* field : book_fields)
+	  field->show();
+    }
+  else if (index == 1)
+    {
+      for (TextField* field : book_fields)
+	  field->hide();
+      for (TextField* field : patron_fields)
+	  field->show();
+    }
 }

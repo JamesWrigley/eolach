@@ -12,6 +12,7 @@ QT += sql
 
 # Input
 HEADERS += src/AddBookDialog.h \
+           src/AddPatronDialog.h \
            src/CLineEdit.h \
            src/DCompleter.h \
            src/DLineEdit.h \
@@ -21,6 +22,7 @@ HEADERS += src/AddBookDialog.h \
            src/miscellanea.h \
            src/TextField.h
 SOURCES += src/AddBookDialog.cpp \
+           src/AddPatronDialog.cpp \
            src/CLineEdit.cpp \
            src/DCompleter.cpp \
            src/DLineEdit.cpp \

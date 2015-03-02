@@ -25,10 +25,10 @@
 #include "KeysWidget.h"
 #include "miscellanea.h"
 
-KeysWidget::KeysWidget(QString datatype, QString tablename, QStringList header_list, QWidget *parent)
+KeysWidget::KeysWidget(QString datatype, QString table, QStringList header_list, QWidget *parent)
 {
   data_type = datatype;
-  table_name = tablename;
+  db_table = table;
   headers = header_list;
 
   setColumnCount(headers.length());
@@ -110,7 +110,7 @@ void KeysWidget::enable_sorting(int sort_column, Qt::SortOrder sort_order)
 void KeysWidget::load_items()
 {
   QSqlQuery get_item_keys(bookstore);
-  get_item_keys.exec(QString("SELECT key FROM %1;").arg(table_name));
+  get_item_keys.exec(QString("SELECT key FROM %1;").arg(db_table));
 
   while (get_item_keys.next())
     {
@@ -178,8 +178,7 @@ void KeysWidget::removeItem()
     {
       QString item_key = currentItem()->data(Qt::UserRole).toString();
       QSqlQuery remove_item(bookstore);
-      remove_item.prepare("DELETE FROM :table WHERE key=:key;");
-      remove_item.bindValue(":table", table_name);
+      remove_item.prepare(QString("DELETE FROM %1 WHERE key=:key;").arg(db_table));
       remove_item.bindValue(":key", item_key);
       remove_item.exec();
 

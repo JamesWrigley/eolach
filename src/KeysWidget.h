@@ -51,7 +51,7 @@ class KeysWidget : public QTableWidget
     QMenu *item_context_menu;
     QMenu *header_context_menu;
     QString data_type;
-    QString table_name;
+    QString db_table;
     QStringList headers;
     QSqlDatabase bookstore;
 

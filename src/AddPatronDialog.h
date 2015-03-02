@@ -16,52 +16,34 @@
  *                                                                                *
  *********************************************************************************/
 
-#include <QVariant>
-#include <QSqlQuery>
-#include "InfoWidget.h"
+#ifndef ADDPATRONDIALOG_H
+#define ADDPATRONDIALOG_H
 
-InfoWidget::InfoWidget()
+#include <QDialog>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include "DLineEdit.h"
+
+class AddPatronDialog : public QDialog
 {
-  main_vbox = new QVBoxLayout(this);
-  main_vbox->addStretch();
+  Q_OBJECT
 
-  setLayout(main_vbox);
-  setFrameShape(QFrame::StyledPanel);
-  setObjectName("MainQFrame");
-  setStyleSheet("QFrame#MainQFrame {border: 8px solid #909090; border-radius: 7px;}");
-}
+  private slots:
+    void check_fields();
 
-void InfoWidget::add_field(TextField *field)
-{
-  fields.push_back(field);
-  main_vbox->insertLayout(main_vbox->count() - 1, field);
-}
+ public:
+    AddPatronDialog(QWidget *parent);
+    QString patron_key;
 
-void InfoWidget::clear()
-{
-  for (unsigned int i = 0; i < fields.size(); ++i)
-    {
-      fields[i]->set_text("");
-    }
-}
+ private:
+    void add_patron();
 
-void InfoWidget::remove_field(TextField *field)
-{
-  main_vbox->removeItem(field);
-}
+    DLineEdit *name;
+    DLineEdit *address;
+    DLineEdit *mobile_num;
+    DLineEdit *landline_num;
+    QPushButton *finish_button;
+    QVBoxLayout *main_layout;
+};
 
-void InfoWidget::set_item(QString book_key)
-{
-  QSqlDatabase db = QSqlDatabase::database();
-  QSqlQuery get_book_info(db);
-  get_book_info.prepare("SELECT title, author, genre, publication_date, isbn FROM bookstore "
-			"WHERE key=:book_key;");
-  get_book_info.bindValue(":book_key", book_key);
-  get_book_info.exec();
-  get_book_info.next();
-
-  for (unsigned int i = 0; i < fields.size(); ++i)
-    {
-      fields[i]->set_text(get_book_info.value(i).toString());
-    }
-}
+#endif // ADDPATRONDIALOG_H

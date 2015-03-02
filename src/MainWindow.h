@@ -34,9 +34,11 @@ class MainWindow : public QMainWindow
 
   private slots:
     void create_add_book_dialog();
+    void create_add_patron_dialog();
     void change_book();
-    void onFieldChanged(QString, QString);
+    void onFieldChanged(QString, QString, QString);
     void onBookRemoved();
+    void onTabChanged(int);
 
  public:
     MainWindow();
@@ -49,11 +51,13 @@ class MainWindow : public QMainWindow
 
     QSqlDatabase bookstore;
     KeysWidget *books_widget;
+    KeysWidget *patrons_widget;
     QMenu *file_menu;
     QSplitter *splitter;
     QTabWidget *keys_tabwidget;
     QToolBar *toolbar;
     QAction *add_book_action;
+    QAction *add_patron_action;
     QAction *exit_action;
 
     InfoWidget *info_widget;
@@ -62,6 +66,14 @@ class MainWindow : public QMainWindow
     TextField *genre;
     TextField *publication_date;
     TextField *isbn;
+    TextField *name;
+    TextField *address;
+    TextField *mobile_num;
+    TextField *landline_num;
+    TextField *items;
+
+    std::vector<TextField*> book_fields;
+    std::vector<TextField*> patron_fields;
 };
 
 #endif // MAINWINDOW_H
