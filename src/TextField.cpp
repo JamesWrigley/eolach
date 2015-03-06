@@ -85,6 +85,7 @@ void TextField::onDoubleClicked()
 void TextField::set_text(QString new_text)
 {
   edit_box->setText(new_text);
+  onTextChanged(new_text);
   if (!check_function(new_text) && visible)
     {
       icon->show();
@@ -107,5 +108,6 @@ void TextField::show()
     {
       icon->show();
     }
+  
   visible = true;
 }
