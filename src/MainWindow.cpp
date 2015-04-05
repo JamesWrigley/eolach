@@ -69,8 +69,11 @@ MainWindow::MainWindow()
 
   connect(keys_tabwidget, SIGNAL(currentChanged(int)), this, SLOT(onTabChanged(int)));
   connect(books_widget, SIGNAL(currentCellChanged(int, int, int, int)),
-          this, SLOT(change_book()));
+          this, SLOT(change_item()));
   connect(books_widget, SIGNAL(itemRemoved()), this, SLOT(onBookRemoved()));
+  connect(patrons_widget, SIGNAL(currentCellChanged(int, int, int, int)),
+	  this, SLOT(change_item()));
+  //  connect(patrons_widget, SIGNAL(itemRemoved()), this, SLOT(onBookRemoved()));
   connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
   connect(add_book_action, SIGNAL(triggered()), this, SLOT(create_add_book_dialog()));
   connect(add_patron_action, SIGNAL(triggered()), this, SLOT(create_add_patron_dialog()));
@@ -164,11 +167,12 @@ void MainWindow::update_statusbar()
 
 /* Slots */
 
-void MainWindow::change_book()
+void MainWindow::change_item()
 {
-  if (books_widget->currentRow() > -1)
+  KeysWidget* current_tab = static_cast<KeysWidget*>(keys_tabwidget->currentWidget());
+  if (current_tab->currentRow() > -1)
     {
-      info_widget->set_item(books_widget->currentItem()->data(Qt::UserRole).toString());
+      info_widget->set_item(current_tab->currentItem()->data(Qt::UserRole).toString());
     }
 }
 

@@ -19,6 +19,8 @@
 #include <QVariant>
 #include <QSqlQuery>
 #include "InfoWidget.h"
+#include "miscellanea.h"
+#include <iostream>
 
 InfoWidget::InfoWidget()
 {
@@ -50,18 +52,26 @@ void InfoWidget::remove_field(TextField *field)
   main_vbox->removeItem(field);
 }
 
-void InfoWidget::set_item(QString book_key)
+void InfoWidget::set_item(QString item_key)
 {
   QSqlDatabase db = QSqlDatabase::database();
-  QSqlQuery get_book_info(db);
-  get_book_info.prepare("SELECT title, author, genre, publication_date, isbn FROM bookstore "
-			"WHERE key=:book_key;");
-  get_book_info.bindValue(":book_key", book_key);
-  get_book_info.exec();
-  get_book_info.next();
+  QSqlQuery get_item_info(db);
 
-  for (unsigned int i = 0; i < fields.size(); ++i)
+  if (item_key.endsWith("p"))
     {
-      fields[i]->set_text(get_book_info.value(i).toString());
+      get_item_info.prepare(get_patron_info);
+    }
+  else
+    {
+      get_item_info.prepare(get_book_info);
+    }
+
+  get_item_info.bindValue(":key", item_key);
+  get_item_info.exec();
+  get_item_info.next();
+
+  for (unsigned int i = item_key.endsWith("p") ? 5 : 0, j = 0; i < fields.size(); ++i, ++j)
+    {
+      fields[i]->set_text(get_item_info.value(j).toString());
     }
 }

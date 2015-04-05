@@ -35,7 +35,7 @@ class MainWindow : public QMainWindow
   private slots:
     void create_add_book_dialog();
     void create_add_patron_dialog();
-    void change_book();
+    void change_item();
     void onFieldChanged(QString, QString, QString);
     void onBookRemoved();
     void onTabChanged(int);
