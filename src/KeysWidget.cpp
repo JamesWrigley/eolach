@@ -60,7 +60,6 @@ KeysWidget::KeysWidget(QString datatype, QString table, QStringList header_list,
   connect(remove_item_action, SIGNAL(triggered()), this, SLOT(removeItem()));
 
   // Miscellanea
-  load_items();
   bookstore = QSqlDatabase::database();
   enable_sorting(0, Qt::AscendingOrder);
   setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -68,6 +67,8 @@ KeysWidget::KeysWidget(QString datatype, QString table, QStringList header_list,
   setSelectionBehavior(QAbstractItemView::SelectRows);
   setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
   verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+
+  load_items();
 }
 
 /* General functions */
@@ -75,7 +76,7 @@ KeysWidget::KeysWidget(QString datatype, QString table, QStringList header_list,
 void KeysWidget::add_item(QString item_key)
 {
   QSqlQuery get_item_info(bookstore);
-  get_item_info.prepare(data_type == "book" ? get_book_info() : get_patron_info());
+  get_item_info.prepare(data_type == "book" ? get_book_info : get_patron_info);
   get_item_info.bindValue(":key", item_key);
   get_item_info.exec();
   get_item_info.next();
@@ -121,7 +122,7 @@ void KeysWidget::load_items()
 void KeysWidget::update_item(int row, QString item_key)
 {
   QSqlQuery get_item_info(bookstore);
-  get_item_info.prepare(data_type == "book" ? get_book_info() : get_patron_info());
+  get_item_info.prepare(data_type == "book" ? get_book_info : get_patron_info);
   get_item_info.bindValue(":key", item_key);
   get_item_info.exec();
   get_item_info.next();

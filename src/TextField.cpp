@@ -73,6 +73,10 @@ void TextField::onTextModified(QString new_text)
     {
       icon->hide();
     }
+  else
+    {
+      icon->show();
+    }
 
   emit fieldChanged(db_table, field_name, new_text);
 }

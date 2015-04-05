@@ -18,20 +18,6 @@
 
 #include "miscellanea.h"
 
-
-// SQL queries for getting all the columns for a row from the patrons and
-// bookstore tables. These need to be functions for annoying can't-do-stuff-outside-of-functions reasons.
-QString get_book_info()
-{
-  return(QString("SELECT title, author, genre, publication_date, isbn FROM bookstore WHERE key=:key;"));
-}
-
-QString get_patron_info()
-{
-  return(QString("SELECT name, address, mobile_num, landline_num, items FROM patrons WHERE key=:key;"));
-}
-
-// Validation functions
 bool validate_generic_field(QString field_text)
 {
   return field_text.length() > 0;

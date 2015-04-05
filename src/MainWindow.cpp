@@ -113,19 +113,19 @@ void MainWindow::create_info_widget()
 {
   info_widget = new InfoWidget();
   
+  isbn = new TextField("bookstore", "isbn", "ISBN:", &validate_isbn);
   title = new TextField("bookstore", "title", "Title:", &validate_generic_field);
-  author = new TextField("bookstore", "author", "Author:", &validate_generic_field);
   genre = new TextField("bookstore", "genre", "Genre:", &validate_generic_field);
+  author = new TextField("bookstore", "author", "Author:", &validate_generic_field);
   publication_date = new TextField("bookstore", "publication_date", "Publication Date:",
 				   &validate_numeric_field);
-  isbn = new TextField("bookstore", "isbn", "ISBN:", &validate_isbn);
   book_fields = {title, author, genre, publication_date, isbn};
 
   name = new TextField("patrons", "name", "Name:", &validate_generic_field);
   address = new TextField("patrons", "address", "Address:", &validate_generic_field);
+  items = new TextField("patrons", "items", "Borrowed items:", &validate_generic_field);
   mobile_num = new TextField("patrons", "mobile_num", "Mobile No.", &validate_generic_field);
   landline_num = new TextField("patrons", "landline_num", "Landline No.", &validate_generic_field);
-  items = new TextField("patrons", "items", "Borrowed items:", &validate_generic_field);
   patron_fields = {name, address, mobile_num, landline_num, items};
 
   for (TextField* field : {title, author, genre, publication_date, isbn,
