@@ -199,23 +199,19 @@ void MainWindow::onFieldChanged(QString db_table, QString sql_field_name, QStrin
   update_book_info.exec();
 
   info_widget->set_item(item_key);
-  current_tab->update_item(books_widget->currentRow(), item_key);
+  current_tab->update_item(current_tab->currentRow(), item_key);
 }
 
 void MainWindow::onTabChanged(int index)
 {
   if (index == 0)
     {
-      for (TextField* field : patron_fields)
-	  field->hide();
-      for (TextField* field : book_fields)
-	  field->show();
+      for (TextField* field : patron_fields) { field->hide(); }
+      for (TextField* field : book_fields) { field->show(); }
     }
   else if (index == 1)
     {
-      for (TextField* field : book_fields)
-	  field->hide();
-      for (TextField* field : patron_fields)
-	  field->show();
+      for (TextField* field : book_fields) { field->hide(); }
+      for (TextField* field : patron_fields) { field->show(); }
     }
 }
