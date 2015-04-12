@@ -37,7 +37,7 @@ class MainWindow : public QMainWindow
     void create_add_patron_dialog();
     void change_item();
     void onFieldChanged(QString, QString, QString);
-    void onBookRemoved();
+    void onItemRemoved();
     void onTabChanged(int);
 
  public:

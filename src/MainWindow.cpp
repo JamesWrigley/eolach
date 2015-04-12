@@ -70,10 +70,10 @@ MainWindow::MainWindow()
   connect(keys_tabwidget, SIGNAL(currentChanged(int)), this, SLOT(onTabChanged(int)));
   connect(books_widget, SIGNAL(currentCellChanged(int, int, int, int)),
           this, SLOT(change_item()));
-  connect(books_widget, SIGNAL(itemRemoved()), this, SLOT(onBookRemoved()));
+  connect(books_widget, SIGNAL(itemRemoved()), this, SLOT(onItemRemoved()));
   connect(patrons_widget, SIGNAL(currentCellChanged(int, int, int, int)),
 	  this, SLOT(change_item()));
-  //  connect(patrons_widget, SIGNAL(itemRemoved()), this, SLOT(onBookRemoved()));
+  connect(patrons_widget, SIGNAL(itemRemoved()), this, SLOT(onItemRemoved()));
   connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
   connect(add_book_action, SIGNAL(triggered()), this, SLOT(create_add_book_dialog()));
   connect(add_patron_action, SIGNAL(triggered()), this, SLOT(create_add_patron_dialog()));
@@ -176,13 +176,14 @@ void MainWindow::change_item()
     }
 }
 
-void MainWindow::onBookRemoved()
+void MainWindow::onItemRemoved()
 {
-  if (1 == books_widget->rowCount())
+  KeysWidget* current_tab = static_cast<KeysWidget*>(keys_tabwidget->currentWidget());
+  if (1 == current_tab->rowCount())
     {
       info_widget->clear();
     }
-  books_widget->removeRow(books_widget->currentRow());
+  current_tab->removeRow(current_tab->currentRow());
   update_statusbar();
 }
 
