@@ -28,8 +28,8 @@ AddPatronDialog::AddPatronDialog(QWidget *parent)
 
   name = new DLineEdit("Name", &validate_generic_field);
   address = new DLineEdit("Address", &validate_generic_field);
-  mobile_num = new DLineEdit("Mobile No.", &validate_generic_field);
-  landline_num = new DLineEdit("Landline No.", &validate_generic_field);
+  mobile_num = new DLineEdit("Mobile No.", &validate_numeric_field);
+  landline_num = new DLineEdit("Landline No.", &validate_numeric_field);
 
   finish_button = new QPushButton("Finish");
   finish_button->setDefault(true);

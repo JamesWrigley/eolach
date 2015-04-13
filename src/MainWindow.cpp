@@ -126,9 +126,9 @@ void MainWindow::create_info_widget()
 
   name = new TextField("patrons", "name", "Name:", &validate_generic_field);
   address = new TextField("patrons", "address", "Address:", &validate_generic_field);
-  items = new TextField("patrons", "items", "Borrowed items:", &validate_generic_field);
-  mobile_num = new TextField("patrons", "mobile_num", "Mobile No.", &validate_generic_field);
-  landline_num = new TextField("patrons", "landline_num", "Landline No.", &validate_generic_field);
+  items = new TextField("patrons", "items", "Borrowed items:", &validate_generic_field); // Check if any items are overdue instead?
+  mobile_num = new TextField("patrons", "mobile_num", "Mobile No.", &validate_numeric_field);
+  landline_num = new TextField("patrons", "landline_num", "Landline No.", &validate_numeric_field);
   patron_fields = {name, address, mobile_num, landline_num, items};
 
   for (TextField* field : {title, author, genre, publication_date, isbn,
