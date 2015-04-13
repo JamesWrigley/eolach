@@ -39,7 +39,7 @@ class KeysWidget : public QTableWidget
     void removeItem();
 
  public:
-    KeysWidget(QString, QString, QStringList, QWidget *parent = 0);
+    KeysWidget(QString, QStringList, QWidget *parent = 0);
     void add_item(QString);
     void load_items();
     void update_item(int, QString);
@@ -50,7 +50,6 @@ class KeysWidget : public QTableWidget
     int visible_column_count;
     QMenu *item_context_menu;
     QMenu *header_context_menu;
-    QString data_type;
     QString db_table;
     QStringList headers;
     QSqlDatabase bookstore;

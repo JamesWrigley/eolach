@@ -101,7 +101,7 @@ void AddBookDialog::add_book()
 {
   // Generate hash of book data to be used as a key
   std::random_device key_gen;
-  book_key = QString::number(key_gen());
+  book_key = QString::number(key_gen()) + "b";
 
   // Sort the authors and genres
   QStringList authors_list = author->text().split(",", QString::SkipEmptyParts);

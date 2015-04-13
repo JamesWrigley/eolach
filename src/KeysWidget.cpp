@@ -25,9 +25,8 @@
 #include "KeysWidget.h"
 #include "miscellanea.h"
 
-KeysWidget::KeysWidget(QString datatype, QString table, QStringList header_list, QWidget *parent)
+KeysWidget::KeysWidget(QString table, QStringList header_list, QWidget *parent)
 {
-  data_type = datatype;
   db_table = table;
   headers = header_list;
 
@@ -76,7 +75,7 @@ KeysWidget::KeysWidget(QString datatype, QString table, QStringList header_list,
 void KeysWidget::add_item(QString item_key)
 {
   QSqlQuery get_item_info(bookstore);
-  get_item_info.prepare(data_type == "book" ? get_book_info : get_patron_info);
+  get_item_info.prepare(item_key.endsWith("b") ? get_book_info : get_patron_info);
   get_item_info.bindValue(":key", item_key);
   get_item_info.exec();
   get_item_info.next();
@@ -122,7 +121,7 @@ void KeysWidget::load_items()
 void KeysWidget::update_item(int row, QString item_key)
 {
   QSqlQuery get_item_info(bookstore);
-  get_item_info.prepare(data_type == "book" ? get_book_info : get_patron_info);
+  get_item_info.prepare(item_key.endsWith("b") ? get_book_info : get_patron_info);
   get_item_info.bindValue(":key", item_key);
   get_item_info.exec();
   get_item_info.next();
@@ -173,7 +172,7 @@ void KeysWidget::modify_header(bool checked)
 void KeysWidget::removeItem()
 {
   int confirm = QMessageBox::warning(this, "Confirm",
-				     QString("Are you sure you wish to remove this %1?").arg(data_type),
+				     QString("Are you sure you wish to remove this item?"),
                                      QMessageBox::Yes, QMessageBox::No);
   if (QMessageBox::Yes == confirm)
     {

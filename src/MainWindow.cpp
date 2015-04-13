@@ -34,9 +34,9 @@ MainWindow::MainWindow()
   // Set up GUI
   keys_tabwidget = new QTabWidget();
   create_info_widget();
-  books_widget = new KeysWidget("book", "bookstore", (QStringList() << "Title" << "Author"
+  books_widget = new KeysWidget("bookstore", (QStringList() << "Title" << "Author"
 						      << "Genre" << "Publication Date" << "ISBN"));
-  patrons_widget = new KeysWidget("patron", "patrons", (QStringList() << "Name" << "Address" <<
+  patrons_widget = new KeysWidget("patrons", (QStringList() << "Name" << "Address" <<
 							"Mobile No." << "Landline No."));
   splitter = new QSplitter(this);
 
