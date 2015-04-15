@@ -41,7 +41,8 @@ AddItemDialog::AddItemDialog(QWidget *parent)
   book_fields = {title, author, genre, publication_date, isbn};
   for (DLineEdit *field : book_fields) { book_layout->addLayout(field); }
   book_widget->setLayout(book_layout);
-  // setup_completions();
+  setup_completion(author, "author");
+  setup_completion(genre, "genre");
 
   // Patron fields widget
   patron_widget = new QWidget(this);
@@ -169,32 +170,26 @@ void AddItemDialog::check_fields()
     }
 }
 
-void AddItemDialog::setup_completions()
+void AddItemDialog::setup_completion(DLineEdit *field, QString sql_field)
 {
-  std::vector<QString> sql_fields = {"author", "genre"};
-  std::vector<DLineEdit*> lineedits = {author, genre};
+  QStringListModel* completion_model = new QStringListModel(this);
+  QStringList completion_list;
+  QSqlDatabase bookstore = QSqlDatabase::database();
 
-  for (unsigned int i = 0; i < sql_fields.size(); ++i)
+  QSqlQuery get_column(bookstore);
+  get_column.exec(QString("SELECT %1 FROM bookstore;").arg(sql_field));
+
+  while (get_column.next())
     {
-      QStringListModel* completion_model = new QStringListModel(this);
-      QStringList completion_list;
-      QSqlDatabase bookstore = QSqlDatabase::database();
-
-      QSqlQuery get_column(bookstore);
-      get_column.exec(QString("SELECT %1 FROM bookstore;").arg(sql_fields[i]));
-
-      while (get_column.next())
-	{
-	  completion_list << get_column.value(0).toString().
-	    split(",", QString::SkipEmptyParts);
-	}
-      for (int i = 0; i < completion_list.size(); ++i)
-	{
-	  completion_list[i] = completion_list[i].trimmed();
-	}
-
-      completion_list.removeDuplicates();
-      completion_model->setStringList(completion_list);
-      lineedits[i]->enable_completion(completion_model);
+      completion_list << get_column.value(0).toString().
+	split(",", QString::SkipEmptyParts);
     }
+  for (int i = 0; i < completion_list.size(); ++i)
+    {
+      completion_list[i] = completion_list[i].trimmed();
+    }
+
+  completion_list.removeDuplicates();
+  completion_model->setStringList(completion_list);
+  field->enable_completion(completion_model);
 }

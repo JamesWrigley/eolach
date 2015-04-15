@@ -37,7 +37,7 @@ class AddItemDialog : public QDialog
 
  public:
     AddItemDialog(QWidget *parent);
-    void setup_completions();
+    void setup_completion(DLineEdit*, QString);
     QString getItemKey();
 
  private:
