@@ -34,9 +34,9 @@ MainWindow::MainWindow()
   keys_tabwidget = new QTabWidget();
   create_info_widget();
   books_widget = new KeysWidget("bookstore", (QStringList() << "Title" << "Author"
-						      << "Genre" << "Publication Date" << "ISBN"));
+					      << "Genre" << "Publication Date" << "ISBN"));
   patrons_widget = new KeysWidget("patrons", (QStringList() << "Name" << "Address" <<
-							"Mobile No." << "Landline No."));
+					      "Mobile No." << "Landline No."));
   splitter = new QSplitter(this);
 
   keys_tabwidget->addTab(books_widget, "Books");
@@ -59,21 +59,17 @@ MainWindow::MainWindow()
   file_menu->addAction(exit_action);
   toolbar->addAction(add_item_action);
 
-  if (books_widget->rowCount() > 0)
-    {
-      books_widget->selectRow(0);
-      info_widget->set_item(books_widget->currentItem()->data(Qt::UserRole).toString());
-    }
-
   connect(keys_tabwidget, SIGNAL(currentChanged(int)), this, SLOT(onTabChanged(int)));
   connect(books_widget, SIGNAL(currentCellChanged(int, int, int, int)),
-          this, SLOT(change_item()));
+	  this, SLOT(change_item()));
   connect(books_widget, SIGNAL(itemRemoved()), this, SLOT(onItemRemoved()));
   connect(patrons_widget, SIGNAL(currentCellChanged(int, int, int, int)),
 	  this, SLOT(change_item()));
   connect(patrons_widget, SIGNAL(itemRemoved()), this, SLOT(onItemRemoved()));
   connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
   connect(add_item_action, SIGNAL(triggered()), this, SLOT(create_add_item_dialog()));
+
+  if (books_widget->rowCount() > 0) { books_widget->selectRow(0); }
 
   update_statusbar();
   setCentralWidget(splitter);
@@ -109,7 +105,7 @@ void MainWindow::create_add_item_dialog()
 void MainWindow::create_info_widget()
 {
   info_widget = new InfoWidget();
-  
+
   isbn = new TextField("bookstore", "isbn", "ISBN:", &validate_isbn);
   title = new TextField("bookstore", "title", "Title:", &validate_generic_field);
   genre = new TextField("bookstore", "genre", "Genre:", &validate_generic_field);
@@ -126,10 +122,10 @@ void MainWindow::create_info_widget()
   patron_fields = {name, address, mobile_num, landline_num, items};
 
   for (TextField* field : {title, author, genre, publication_date, isbn,
-	                   name, address, mobile_num, landline_num, items})
+	name, address, mobile_num, landline_num, items})
     {
       connect(field, SIGNAL(fieldChanged(QString, QString, QString)),
-              this, SLOT(onFieldChanged(QString, QString, QString)));
+	      this, SLOT(onFieldChanged(QString, QString, QString)));
       info_widget->add_field(field);
     }
 
