@@ -21,49 +21,69 @@
 #include <QSqlQuery>
 #include <QMessageBox>
 #include "miscellanea.h"
-#include "AddBookDialog.h"
+#include "AddItemDialog.h"
 
-AddBookDialog::AddBookDialog(QWidget *parent)
+AddItemDialog::AddItemDialog(QWidget *parent)
 {
   main_layout = new QVBoxLayout(this);
+  stacker = new QStackedWidget();
+  item_selector = new QComboBox();
+  selector_hbox  = new QHBoxLayout();
 
+  // Book fields widget
+  book_widget = new QWidget(this);
+  QVBoxLayout *book_layout = new QVBoxLayout();
   title = new DLineEdit("Title", &validate_generic_field);
   author = new DLineEdit("Author", &validate_generic_field);
   genre = new DLineEdit("Genre", &validate_generic_field);
   publication_date = new DLineEdit("Publication Date", &validate_numeric_field);
   isbn = new DLineEdit("ISBN", &validate_isbn);
-  setup_completions();
+  book_fields = {title, author, genre, publication_date, isbn};
+  for (DLineEdit *field : book_fields) { book_layout->addLayout(field); }
+  book_widget->setLayout(book_layout);
+  // setup_completions();
 
+  // Patron fields widget
+  patron_widget = new QWidget(this);
+  QVBoxLayout *patron_layout = new QVBoxLayout();
+  name = new DLineEdit("Name", &validate_generic_field);
+  address = new DLineEdit("Address", &validate_generic_field);
+  mobile_num = new DLineEdit("Mobile No.", &validate_numeric_field);
+  landline_num = new DLineEdit("Landline No.", &validate_numeric_field);
+  patron_fields = {name, address, mobile_num, landline_num};
+  for (DLineEdit *field : patron_fields) { patron_layout->addLayout(field); }
+  patron_widget->setLayout(patron_layout);
+
+  selector_description = new QLabel("Add:");
+  
+  stacker->addWidget(book_widget);
+  stacker->addWidget(patron_widget);
+  item_selector->addItem("Book");
+  item_selector->addItem("Patron");
   finish_button = new QPushButton("Finish");
   finish_button->setDefault(true);
 
   connect(finish_button, SIGNAL(clicked(bool)), this, SLOT(check_fields()));
+  connect(item_selector, SIGNAL(currentIndexChanged(int)), stacker, SLOT(setCurrentIndex(int)));
 
-  main_layout->addLayout(title);
-  main_layout->addLayout(author);
-  main_layout->addLayout(genre);
-  main_layout->addLayout(isbn);
-  main_layout->addLayout(publication_date);
+  selector_hbox->addWidget(selector_description);
+  selector_hbox->addWidget(item_selector);
+  main_layout->addLayout(selector_hbox);
+  main_layout->addWidget(stacker);
   main_layout->addStretch();
   main_layout->addWidget(finish_button);
-  main_layout->addStretch();
-
   setLayout(main_layout);
 }
 
-void AddBookDialog::check_fields()
+void AddItemDialog::check_fields()
 {
   QStringList warnings;
-  if (!title->valid)
-      warnings << "Title";
-  if (!author->valid)
-      warnings << "Author";
-  if (!genre->valid)
-    warnings << "Genre";
-  if (!isbn->valid)
-    warnings << "ISBN";
-  if (!publication_date->valid)
-    warnings << "Publication Date";
+  for (DLineEdit *field : stacker->currentIndex() == 0 ? book_fields : patron_fields) {
+    if (!field->valid)
+      {
+	warnings << field->placeholderText();
+      }
+  }
 
   if (!warnings.isEmpty())
     {
@@ -83,13 +103,13 @@ void AddBookDialog::check_fields()
 	}
 
       int confirm = QMessageBox::warning(this, "Warning",
-                                         invalid_fields +
+					 invalid_fields +
 					 " invalid, would you like to continue anyway?",
-                                         QMessageBox::Yes, QMessageBox::No);
+					 QMessageBox::Yes, QMessageBox::No);
       if (QMessageBox::Yes == confirm)
-        {
-          add_book();
-        }
+	{
+	  add_book();
+	}
     }
   else
     {
@@ -97,11 +117,11 @@ void AddBookDialog::check_fields()
     }
 }
 
-void AddBookDialog::add_book()
+void AddItemDialog::add_book()
 {
   // Generate hash of book data to be used as a key
   std::random_device key_gen;
-  book_key = QString::number(key_gen()) + "b";
+  item_key = QString::number(key_gen()) + "b";
 
   // Sort the authors and genres
   QStringList authors_list = author->text().split(",", QString::SkipEmptyParts);
@@ -114,7 +134,7 @@ void AddBookDialog::add_book()
   QSqlQuery insert(QSqlDatabase::database());
   insert.prepare("INSERT INTO bookstore (key, isbn, title, author, publication_date, genre) "
 		 "VALUES (:key, :isbn, :title, :author, :publication_date, :genre)");
-  insert.bindValue(":key", book_key);
+  insert.bindValue(":key", item_key);
   insert.bindValue(":isbn", isbn->text());
   insert.bindValue(":title", title->text());
   insert.bindValue(":author", authors_list.join(", "));
@@ -125,7 +145,26 @@ void AddBookDialog::add_book()
   done(QDialog::Accepted);
 }
 
-void AddBookDialog::setup_completions()
+void AddItemDialog::add_patron()
+{
+  std::random_device key_gen;
+  item_key = QString::number(key_gen()) + "p";
+
+  QSqlQuery insert(QSqlDatabase::database());
+  insert.prepare("INSERT INTO patrons (key, name, address, mobile_num, landline_num, items) "
+		 "VALUES (:key, :name, :address, :mobile_num, :landline_num, :items);");
+  insert.bindValue(":key", item_key);
+  insert.bindValue(":name", name->text());
+  insert.bindValue(":address", address->text());
+  insert.bindValue(":mobile_num", mobile_num->text());
+  insert.bindValue(":landline_num", landline_num->text());
+  insert.bindValue(":items", "");
+  insert.exec();
+
+  done(QDialog::Accepted);
+}
+
+void AddItemDialog::setup_completions()
 {
   std::vector<QString> sql_fields = {"author", "genre"};
   std::vector<DLineEdit*> lineedits = {author, genre};
@@ -140,10 +179,10 @@ void AddBookDialog::setup_completions()
       get_column.exec(QString("SELECT %1 FROM bookstore;").arg(sql_fields[i]));
 
       while (get_column.next())
-        {
+	{
 	  completion_list << get_column.value(0).toString().
 	    split(",", QString::SkipEmptyParts);
-        }
+	}
       for (int i = 0; i < completion_list.size(); ++i)
 	{
 	  completion_list[i] = completion_list[i].trimmed();

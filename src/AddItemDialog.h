@@ -16,15 +16,19 @@
  *                                                                                *
  *********************************************************************************/
 
-#ifndef ADDBOOKDIALOG_H
-#define ADDBOOKDIALOG_H
+#ifndef ADDITEMDIALOG_H
+#define ADDITEMDIALOG_H
 
+#include <QLabel>
 #include <QDialog>
+#include <QComboBox>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QStackedWidget>
 #include "DLineEdit.h"
 
-class AddBookDialog : public QDialog
+class AddItemDialog : public QDialog
 {
   Q_OBJECT
 
@@ -32,20 +36,34 @@ class AddBookDialog : public QDialog
     void check_fields();
 
  public:
-    AddBookDialog(QWidget *parent);
-    QString book_key;
+    AddItemDialog(QWidget *parent);
+    QString item_key;
     void setup_completions();
 
  private:
     void add_book();
-
+    void add_patron();
+    QLabel *selector_description;
+    QStackedWidget *stacker;
+    QVBoxLayout *main_layout;
+    QHBoxLayout *selector_hbox;
+    QPushButton *finish_button;
+    QComboBox *item_selector;
+    
     DLineEdit *title;
     DLineEdit *author;
     DLineEdit *genre;
     DLineEdit *isbn;
     DLineEdit *publication_date;
-    QPushButton *finish_button;
-    QVBoxLayout *main_layout;
+    QWidget *book_widget;
+    std::vector<DLineEdit*> book_fields;
+
+    DLineEdit *name;
+    DLineEdit *address;
+    DLineEdit *mobile_num;
+    DLineEdit *landline_num;
+    QWidget *patron_widget;
+    std::vector<DLineEdit*> patron_fields;
 };
 
-#endif // ADDBOOKDIALOG_H
+#endif // ADDITEMDIALOG_H

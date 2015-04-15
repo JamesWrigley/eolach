@@ -33,8 +33,7 @@ class MainWindow : public QMainWindow
   Q_OBJECT
 
   private slots:
-    void create_add_book_dialog();
-    void create_add_patron_dialog();
+    void create_add_item_dialog();
     void change_item();
     void onFieldChanged(QString, QString, QString);
     void onItemRemoved();
@@ -56,8 +55,7 @@ class MainWindow : public QMainWindow
     QSplitter *splitter;
     QTabWidget *keys_tabwidget;
     QToolBar *toolbar;
-    QAction *add_book_action;
-    QAction *add_patron_action;
+    QAction *add_item_action;
     QAction *exit_action;
 
     InfoWidget *info_widget;

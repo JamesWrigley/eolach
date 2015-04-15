@@ -25,7 +25,7 @@
 #include <QStringListModel>
 #include "DCompleter.h"
 
-/* The layout that holds a QLineEdit and icon (in a QLabel) to use in the AddBookDialog.
+/* The layout that holds a QLineEdit and icon (in a QLabel) to use in an AddItemDialog.
    A function is passed in to check the QLineEdit's text and change the icon accordingly. */
 class DLineEdit : public QHBoxLayout
 {
@@ -37,6 +37,7 @@ class DLineEdit : public QHBoxLayout
  public:
   bool valid;
   QString text();
+  QString placeholderText();
   void enable_completion(QStringListModel*);
   DLineEdit(QString, bool (*)(QString), QWidget *parent = 0);
 

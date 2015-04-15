@@ -26,8 +26,8 @@
 #include "KeysWidget.h"
 #include "InfoWidget.h"
 #include "miscellanea.h"
-#include "AddBookDialog.h"
-#include "AddPatronDialog.h"
+#include "AddItemDialog.h"
+#include <iostream>
 
 MainWindow::MainWindow()
 {
@@ -54,12 +54,11 @@ MainWindow::MainWindow()
   exit_action = new QAction("Exit", this);
   exit_action->setShortcut(QKeySequence("Ctrl+Q"));
 
-  add_book_action = new QAction(QIcon(":/new-book-icon"), "", this);
-  add_patron_action = new QAction(QIcon(":/new-patron-icon"), "", this);
+  add_item_action = new QAction(QIcon(":/new-item-icon"), "", this);
+  add_item_action->setToolTip("Add new item");
 
   file_menu->addAction(exit_action);
-  toolbar->addAction(add_book_action);
-  toolbar->addAction(add_patron_action);
+  toolbar->addAction(add_item_action);
 
   if (books_widget->rowCount() > 0)
     {
@@ -75,8 +74,7 @@ MainWindow::MainWindow()
 	  this, SLOT(change_item()));
   connect(patrons_widget, SIGNAL(itemRemoved()), this, SLOT(onItemRemoved()));
   connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
-  connect(add_book_action, SIGNAL(triggered()), this, SLOT(create_add_book_dialog()));
-  connect(add_patron_action, SIGNAL(triggered()), this, SLOT(create_add_patron_dialog()));
+  connect(add_item_action, SIGNAL(triggered()), this, SLOT(create_add_item_dialog()));
 
   update_statusbar();
   setCentralWidget(splitter);
@@ -92,23 +90,14 @@ MainWindow::~MainWindow()
 
 /* General functions */
 
-void MainWindow::create_add_book_dialog()
+void MainWindow::create_add_item_dialog()
 {
-  AddBookDialog add_book_dialog(this);
-  if (QDialog::Accepted == add_book_dialog.exec())
+  AddItemDialog add_item_dialog(this);
+  if (QDialog::Accepted == add_item_dialog.exec())
     {
-      books_widget->add_item(add_book_dialog.book_key);
-      update_statusbar();
-    }
-}
-
-void MainWindow::create_add_patron_dialog()
-{
-  AddPatronDialog add_patron_dialog(this);
-  if (QDialog::Accepted == add_patron_dialog.exec())
-    {
-      patrons_widget->add_item(add_patron_dialog.patron_key);
-      update_statusbar();
+      // books_widget->add_item(add_book_dialog.book_key);
+      // update_statusbar();
+      std::cout << add_item_dialog.item_key.toStdString() << std::endl;
     }
 }
 

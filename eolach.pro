@@ -11,8 +11,7 @@ QT += widgets
 QT += sql
 
 # Input
-HEADERS += src/AddBookDialog.h \
-           src/AddPatronDialog.h \
+HEADERS += src/AddItemDialog.h \
            src/CLineEdit.h \
            src/DCompleter.h \
            src/DLineEdit.h \
@@ -21,8 +20,7 @@ HEADERS += src/AddBookDialog.h \
            src/MainWindow.h \
            src/miscellanea.h \
            src/TextField.h
-SOURCES += src/AddBookDialog.cpp \
-           src/AddPatronDialog.cpp \
+SOURCES += src/AddItemDialog.cpp \
            src/CLineEdit.cpp \
            src/DCompleter.cpp \
            src/DLineEdit.cpp \

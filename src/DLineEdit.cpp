@@ -57,6 +57,11 @@ void DLineEdit::onTextChanged(QString field_text)
     }
 }
 
+QString DLineEdit::placeholderText()
+{
+  return lineedit->placeholderText();
+}
+
 QString DLineEdit::text()
 {
   return lineedit->text();
