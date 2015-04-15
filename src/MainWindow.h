@@ -50,7 +50,9 @@ class MainWindow : public QMainWindow
 
     QSqlDatabase bookstore;
     KeysWidget *books_widget;
+    KeysWidget *discs_widget;
     KeysWidget *patrons_widget;
+    InfoWidget *info_widget;
     QMenu *file_menu;
     QSplitter *splitter;
     QTabWidget *keys_tabwidget;
@@ -58,11 +60,11 @@ class MainWindow : public QMainWindow
     QAction *add_item_action;
     QAction *exit_action;
 
-    InfoWidget *info_widget;
     TextField *title;
     TextField *author;
     TextField *genre;
     TextField *publication_date;
+    
     TextField *isbn;
     TextField *name;
     TextField *address;
@@ -70,7 +72,14 @@ class MainWindow : public QMainWindow
     TextField *landline_num;
     TextField *items;
 
+    TextField *disc_title;
+    TextField *directorOrSpeaker;
+    TextField *length;
+    TextField *year;
+    TextField *type;
+
     std::vector<TextField*> book_fields;
+    std::vector<TextField*> disc_fields;
     std::vector<TextField*> patron_fields;
 };
 

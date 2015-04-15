@@ -20,7 +20,6 @@
 #include <QSqlQuery>
 #include "InfoWidget.h"
 #include "miscellanea.h"
-#include <iostream>
 
 InfoWidget::InfoWidget()
 {
@@ -33,17 +32,23 @@ InfoWidget::InfoWidget()
   setStyleSheet("QFrame#MainQFrame {border: 8px solid #909090; border-radius: 7px;}");
 }
 
-void InfoWidget::add_field(TextField *field)
+void InfoWidget::add_field(TextField *field, QString type)
 {
-  fields.push_back(field);
+  if (type == "b") { book_fields.push_back(field); }
+  else if (type == "d") { disc_fields.push_back(field); }
+  else if (type == "p") { patron_fields.push_back(field); }
+
   main_vbox->insertLayout(main_vbox->count() - 1, field);
 }
 
 void InfoWidget::clear()
 {
-  for (unsigned int i = 0; i < fields.size(); ++i)
+  for (std::vector<TextField*> item_fields : {book_fields, disc_fields, patron_fields})
     {
-      fields[i]->set_text("");
+      for (TextField *field : item_fields)
+	{
+	  field->set_text("");
+	}
     }
 }
 
@@ -56,22 +61,30 @@ void InfoWidget::set_item(QString item_key)
 {
   QSqlDatabase db = QSqlDatabase::database();
   QSqlQuery get_item_info(db);
+  std::vector<TextField*> item_fields;
 
-  if (item_key.endsWith("p"))
-    {
-      get_item_info.prepare(get_patron_info);
-    }
-  else
+  if (item_key.endsWith("b"))
     {
       get_item_info.prepare(get_book_info);
+      item_fields = book_fields;
+    }
+  else if (item_key.endsWith("d"))
+    {
+      get_item_info.prepare(get_disc_info);
+      item_fields = disc_fields;
+    }
+  else if (item_key.endsWith("p"))
+    {
+      get_item_info.prepare(get_patron_info);
+      item_fields = patron_fields;
     }
 
   get_item_info.bindValue(":key", item_key);
   get_item_info.exec();
   get_item_info.next();
 
-  for (unsigned int i = item_key.endsWith("p") ? 5 : 0, j = 0; i < fields.size(); ++i, ++j)
+  for (unsigned int i = 0; i < item_fields.size(); ++i)
     {
-      fields[i]->set_text(get_item_info.value(j).toString());
+      item_fields[i]->set_text(get_item_info.value(i).toString());
     }
 }

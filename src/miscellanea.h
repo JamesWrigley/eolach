@@ -23,8 +23,9 @@
 
 /* Here we define some things that don't quite fit anywhere else */
 
-// SQL queries for getting all the columns for a row from the patrons and bookstore tables.
+// SQL queries for getting all the columns for a row from a table.
 const QString get_book_info = "SELECT title, author, genre, publication_date, isbn FROM bookstore WHERE key=:key;";
+const QString get_disc_info = "SELECT title, directorOrSpeaker, length, year, type FROM discs WHERE key=:key;";
 const QString get_patron_info = "SELECT name, address, mobile_num, landline_num, items FROM patrons WHERE key=:key;";
 
 // Validation functions

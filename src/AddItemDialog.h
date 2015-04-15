@@ -42,6 +42,7 @@ class AddItemDialog : public QDialog
 
  private:
     void add_book();
+    void add_disc();
     void add_patron();
     QString item_key;
     QLabel *selector_description;
@@ -58,6 +59,14 @@ class AddItemDialog : public QDialog
     DLineEdit *publication_date;
     QWidget *book_widget;
     std::vector<DLineEdit*> book_fields;
+
+    DLineEdit *disc_title;
+    DLineEdit *directorOrSpeaker;
+    DLineEdit *length;
+    DLineEdit *year;
+    DLineEdit *type;
+    QWidget *disc_widget;
+    std::vector<DLineEdit*> disc_fields;
 
     DLineEdit *name;
     DLineEdit *address;

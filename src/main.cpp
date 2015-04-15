@@ -57,7 +57,15 @@ int main(int argc, char *argv[])
 			 "address TEXT, "
 			 "mobile_num TEXT, "
 			 "landline_num TEXT, "
-			 "items TEXT);");
+			 "items TEXT); "
+
+			 "CREATE TABLE discs ("
+			 "key TEXT PRIMARY KEY, "
+			 "title TEXT, "
+			 "directorOrSpeaker TEXT, "
+			 "length TEXT, "
+			 "year TEXT, "
+			 "type TEXT);");
     }
 
   // Start the application

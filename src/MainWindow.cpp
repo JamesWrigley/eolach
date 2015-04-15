@@ -35,11 +35,14 @@ MainWindow::MainWindow()
   create_info_widget();
   books_widget = new KeysWidget("bookstore", (QStringList() << "Title" << "Author"
 					      << "Genre" << "Publication Date" << "ISBN"));
+  discs_widget = new KeysWidget("discs", (QStringList() << "Title" << "Director/Speaker"
+					  << "Length" << "Year" << "Type"));
   patrons_widget = new KeysWidget("patrons", (QStringList() << "Name" << "Address" <<
 					      "Mobile No." << "Landline No."));
   splitter = new QSplitter(this);
 
   keys_tabwidget->addTab(books_widget, "Books");
+  keys_tabwidget->addTab(discs_widget, "Discs");
   keys_tabwidget->addTab(patrons_widget, "Patrons");
 
   splitter->addWidget(keys_tabwidget);
@@ -60,11 +63,11 @@ MainWindow::MainWindow()
   toolbar->addAction(add_item_action);
 
   connect(keys_tabwidget, SIGNAL(currentChanged(int)), this, SLOT(onTabChanged(int)));
-  connect(books_widget, SIGNAL(currentCellChanged(int, int, int, int)),
-	  this, SLOT(change_item()));
+  connect(books_widget, SIGNAL(currentCellChanged(int, int, int, int)), this, SLOT(change_item()));
+  connect(discs_widget, SIGNAL(currentCellChanged(int, int, int, int)), this, SLOT(change_item()));
+  connect(patrons_widget, SIGNAL(currentCellChanged(int, int, int, int)), this, SLOT(change_item()));
   connect(books_widget, SIGNAL(itemRemoved()), this, SLOT(onItemRemoved()));
-  connect(patrons_widget, SIGNAL(currentCellChanged(int, int, int, int)),
-	  this, SLOT(change_item()));
+  connect(discs_widget, SIGNAL(itemRemoved()), this, SLOT(onItemRemoved()));
   connect(patrons_widget, SIGNAL(itemRemoved()), this, SLOT(onItemRemoved()));
   connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
   connect(add_item_action, SIGNAL(triggered()), this, SLOT(create_add_item_dialog()));
@@ -94,6 +97,10 @@ void MainWindow::create_add_item_dialog()
 	{
 	  books_widget->add_item(add_item_dialog.getItemKey());
 	}
+      else if (add_item_dialog.getItemKey().endsWith("d"))
+	{
+	  discs_widget->add_item(add_item_dialog.getItemKey());
+	}
       else if (add_item_dialog.getItemKey().endsWith("p"))
 	{
 	  patrons_widget->add_item(add_item_dialog.getItemKey());
@@ -106,14 +113,23 @@ void MainWindow::create_info_widget()
 {
   info_widget = new InfoWidget();
 
+  // Book fields
   isbn = new TextField("bookstore", "isbn", "ISBN:", &validate_isbn);
   title = new TextField("bookstore", "title", "Title:", &validate_generic_field);
   genre = new TextField("bookstore", "genre", "Genre:", &validate_generic_field);
   author = new TextField("bookstore", "author", "Author:", &validate_generic_field);
-  publication_date = new TextField("bookstore", "publication_date", "Publication Date:",
-				   &validate_numeric_field);
+  publication_date = new TextField("bookstore", "publication_date", "Publication Date:", &validate_numeric_field);
   book_fields = {title, author, genre, publication_date, isbn};
 
+  // Disc fields
+  disc_title = new TextField("discs", "title", "Title:", &validate_generic_field);
+  directorOrSpeaker = new TextField("discs", "directorOrSpeaker", "Director/Speaker:", &validate_generic_field);
+  length = new TextField("discs", "length", "Length:", &validate_generic_field);
+  year = new TextField("discs", "year", "Year:", &validate_numeric_field);
+  type = new TextField("discs", "type", "Type:", &validate_generic_field);
+  disc_fields = {disc_title, directorOrSpeaker, length, year, type};
+
+  // Patron fields
   name = new TextField("patrons", "name", "Name:", &validate_generic_field);
   address = new TextField("patrons", "address", "Address:", &validate_generic_field);
   items = new TextField("patrons", "items", "Borrowed items:", &validate_generic_field); // Check if any items are overdue instead?
@@ -122,18 +138,20 @@ void MainWindow::create_info_widget()
   patron_fields = {name, address, mobile_num, landline_num, items};
 
   for (TextField* field : {title, author, genre, publication_date, isbn,
+	disc_title, directorOrSpeaker, length, year, type,
 	name, address, mobile_num, landline_num, items})
     {
       connect(field, SIGNAL(fieldChanged(QString, QString, QString)),
 	      this, SLOT(onFieldChanged(QString, QString, QString)));
-      info_widget->add_field(field);
     }
+  for (TextField *field : book_fields) { info_widget->add_field(field, "b"); }
+  for (TextField *field : disc_fields) { info_widget->add_field(field, "d"); }
+  for (TextField *field : patron_fields) { info_widget->add_field(field, "p"); }
 
-  // We hide the patron fields because the default tab is for the books
-  for (TextField* field : patron_fields)
-    {
-      field->hide();
-    }
+
+  // We hide the patron and disc fields because the default tab is for the books
+  for (TextField *field : patron_fields) { field->hide(); }
+  for (TextField *field : disc_fields) { field->hide(); }
 }
 
 void MainWindow::center_window()
@@ -152,6 +170,7 @@ void MainWindow::center_window()
 void MainWindow::update_statusbar()
 {
   statusBar()->showMessage(QString::number(books_widget->rowCount()) + " books, " +
+			   QString::number(discs_widget->rowCount()) + " discs, " +
 			   QString::number(patrons_widget->rowCount()) + " patrons.");
 }
 
@@ -197,12 +216,20 @@ void MainWindow::onTabChanged(int index)
 {
   if (index == 0)
     {
-      for (TextField* field : patron_fields) { field->hide(); }
-      for (TextField* field : book_fields) { field->show(); }
+      for (TextField *field : book_fields) { field->show(); }
+      for (TextField *field : disc_fields) { field->hide(); }
+      for (TextField *field : patron_fields) { field->hide(); }
     }
   else if (index == 1)
     {
-      for (TextField* field : book_fields) { field->hide(); }
-      for (TextField* field : patron_fields) { field->show(); }
+      for (TextField *field : book_fields) { field->hide(); }
+      for (TextField *field : disc_fields) { field->show(); }
+      for (TextField *field : patron_fields) { field->hide(); }
+    }
+  else if (index == 2)
+    {
+      for (TextField *field : book_fields) { field->hide(); }
+      for (TextField *field : disc_fields) { field->hide(); }
+      for (TextField *field : patron_fields) { field->show(); }
     }
 }

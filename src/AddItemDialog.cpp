@@ -44,6 +44,18 @@ AddItemDialog::AddItemDialog(QWidget *parent)
   setup_completion(author, "author");
   setup_completion(genre, "genre");
 
+  // Disc fields widget
+  disc_widget = new QWidget(this);
+  QVBoxLayout *disc_layout = new QVBoxLayout();
+  disc_title = new DLineEdit("Title", &validate_generic_field);
+  directorOrSpeaker = new DLineEdit("Director/Speaker", &validate_generic_field);
+  length = new DLineEdit("Length", &validate_generic_field);
+  year = new DLineEdit("Year", &validate_numeric_field);
+  type = new DLineEdit("Type (CD/DVD)", &validate_generic_field);
+  disc_fields = {disc_title, directorOrSpeaker, length, year, type};
+  for (DLineEdit *field : disc_fields) { disc_layout->addLayout(field); }
+  disc_widget->setLayout(disc_layout);
+
   // Patron fields widget
   patron_widget = new QWidget(this);
   QVBoxLayout *patron_layout = new QVBoxLayout();
@@ -58,8 +70,10 @@ AddItemDialog::AddItemDialog(QWidget *parent)
   selector_description = new QLabel("Add:");
   
   stacker->addWidget(book_widget);
+  stacker->addWidget(disc_widget);
   stacker->addWidget(patron_widget);
   item_selector->addItem("Book");
+  item_selector->addItem("Disc");
   item_selector->addItem("Patron");
   finish_button = new QPushButton("Finish");
   finish_button->setDefault(true);
@@ -104,6 +118,25 @@ void AddItemDialog::add_book()
   done(QDialog::Accepted);
 }
 
+void AddItemDialog::add_disc()
+{
+  std::random_device key_gen;
+  item_key = QString::number(key_gen()) + "d";
+
+  QSqlQuery insert(QSqlDatabase::database());
+  insert.prepare("INSERT INTO discs (key, title, directorOrSpeaker, length, year, type) "
+		 "VALUES (:key, :title, :directorOrSpeaker, :length, :year, :type);");
+  insert.bindValue(":key", item_key);
+  insert.bindValue(":title", disc_title->text());
+  insert.bindValue(":directorOrSpeaker", directorOrSpeaker->text());
+  insert.bindValue(":length", length->text());
+  insert.bindValue(":year", year->text());
+  insert.bindValue(":type", type->text());
+  insert.exec();
+
+  done(QDialog::Accepted);
+}
+
 void AddItemDialog::add_patron()
 {
   std::random_device key_gen;
@@ -131,12 +164,11 @@ QString AddItemDialog::getItemKey()
 void AddItemDialog::check_fields()
 {
   QStringList warnings;
-  for (DLineEdit *field : stacker->currentIndex() == 0 ? book_fields : patron_fields) {
-    if (!field->valid)
-      {
-	warnings << field->placeholderText();
-      }
-  }
+  std::vector<std::vector<DLineEdit*>> item_fields = {book_fields, disc_fields, patron_fields};
+  for (DLineEdit *field : item_fields[stacker->currentIndex()])
+    {
+      if (!field->valid) { warnings << field->placeholderText(); }
+    }
 
   if (!warnings.isEmpty())
     {
@@ -161,12 +193,16 @@ void AddItemDialog::check_fields()
 					 QMessageBox::Yes, QMessageBox::No);
       if (QMessageBox::Yes == confirm)
 	{
-	  stacker->currentIndex() == 0 ? add_book() : add_patron();
+	  if (stacker->currentIndex() == 0) { add_book(); }
+	  else if (stacker->currentIndex() == 1) { add_disc(); }
+	  else if (stacker->currentIndex() == 2) { add_patron(); }
 	}
     }
   else
     {
-      stacker->currentIndex() == 0 ? add_book() : add_patron();
+      if (stacker->currentIndex() == 0) { add_book(); }
+      else if (stacker->currentIndex() == 1) { add_disc(); }
+      else if (stacker->currentIndex() == 2) { add_patron(); }
     }
 }
 
