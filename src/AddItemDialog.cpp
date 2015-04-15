@@ -75,48 +75,6 @@ AddItemDialog::AddItemDialog(QWidget *parent)
   setLayout(main_layout);
 }
 
-void AddItemDialog::check_fields()
-{
-  QStringList warnings;
-  for (DLineEdit *field : stacker->currentIndex() == 0 ? book_fields : patron_fields) {
-    if (!field->valid)
-      {
-	warnings << field->placeholderText();
-      }
-  }
-
-  if (!warnings.isEmpty())
-    {
-      QString invalid_fields;
-      if (warnings.size() == 1)
-	{
-	  invalid_fields = warnings[0];
-	}
-      else if (warnings.size() == 2)
-	{
-	  invalid_fields = warnings.join(" and ");
-	}
-      else if (warnings.size() > 2)
-	{
-	  warnings[warnings.size() - 1].prepend("and ");
-	  invalid_fields = warnings.join(", ");
-	}
-
-      int confirm = QMessageBox::warning(this, "Warning",
-					 invalid_fields +
-					 " invalid, would you like to continue anyway?",
-					 QMessageBox::Yes, QMessageBox::No);
-      if (QMessageBox::Yes == confirm)
-	{
-	  add_book();
-	}
-    }
-  else
-    {
-      add_book();
-    }
-}
-
 void AddItemDialog::add_book()
 {
   // Generate hash of book data to be used as a key
@@ -162,6 +120,53 @@ void AddItemDialog::add_patron()
   insert.exec();
 
   done(QDialog::Accepted);
+}
+
+QString AddItemDialog::getItemKey()
+{
+  return item_key;
+}
+
+void AddItemDialog::check_fields()
+{
+  QStringList warnings;
+  for (DLineEdit *field : stacker->currentIndex() == 0 ? book_fields : patron_fields) {
+    if (!field->valid)
+      {
+	warnings << field->placeholderText();
+      }
+  }
+
+  if (!warnings.isEmpty())
+    {
+      QString invalid_fields;
+      if (warnings.size() == 1)
+	{
+	  invalid_fields = warnings[0];
+	}
+      else if (warnings.size() == 2)
+	{
+	  invalid_fields = warnings.join(" and ");
+	}
+      else if (warnings.size() > 2)
+	{
+	  warnings[warnings.size() - 1].prepend("and ");
+	  invalid_fields = warnings.join(", ");
+	}
+
+      int confirm = QMessageBox::warning(this, "Warning",
+					 invalid_fields +
+					 " invalid, would you like to continue anyway?",
+					 QMessageBox::Yes, QMessageBox::No);
+      if (QMessageBox::Yes == confirm)
+	{
+	  stacker->currentIndex() == 0 ? add_book() : add_patron();
+	}
+    }
+  else
+    {
+      stacker->currentIndex() == 0 ? add_book() : add_patron();
+    }
 }
 
 void AddItemDialog::setup_completions()

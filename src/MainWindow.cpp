@@ -27,7 +27,6 @@
 #include "InfoWidget.h"
 #include "miscellanea.h"
 #include "AddItemDialog.h"
-#include <iostream>
 
 MainWindow::MainWindow()
 {
@@ -95,9 +94,15 @@ void MainWindow::create_add_item_dialog()
   AddItemDialog add_item_dialog(this);
   if (QDialog::Accepted == add_item_dialog.exec())
     {
-      // books_widget->add_item(add_book_dialog.book_key);
-      // update_statusbar();
-      std::cout << add_item_dialog.item_key.toStdString() << std::endl;
+      if (add_item_dialog.getItemKey().endsWith("b"))
+	{
+	  books_widget->add_item(add_item_dialog.getItemKey());
+	}
+      else if (add_item_dialog.getItemKey().endsWith("p"))
+	{
+	  patrons_widget->add_item(add_item_dialog.getItemKey());
+	}
+      update_statusbar();
     }
 }
 

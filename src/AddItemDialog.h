@@ -37,12 +37,13 @@ class AddItemDialog : public QDialog
 
  public:
     AddItemDialog(QWidget *parent);
-    QString item_key;
     void setup_completions();
+    QString getItemKey();
 
  private:
     void add_book();
     void add_patron();
+    QString item_key;
     QLabel *selector_description;
     QStackedWidget *stacker;
     QVBoxLayout *main_layout;
