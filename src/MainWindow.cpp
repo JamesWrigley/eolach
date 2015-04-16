@@ -63,16 +63,16 @@ MainWindow::MainWindow()
   toolbar->addAction(add_item_action);
 
   connect(keys_tabwidget, SIGNAL(currentChanged(int)), this, SLOT(onTabChanged(int)));
-  connect(books_widget, SIGNAL(currentCellChanged(int, int, int, int)), this, SLOT(change_item()));
-  connect(discs_widget, SIGNAL(currentCellChanged(int, int, int, int)), this, SLOT(change_item()));
-  connect(patrons_widget, SIGNAL(currentCellChanged(int, int, int, int)), this, SLOT(change_item()));
-  connect(books_widget, SIGNAL(itemRemoved()), this, SLOT(onItemRemoved()));
-  connect(discs_widget, SIGNAL(itemRemoved()), this, SLOT(onItemRemoved()));
-  connect(patrons_widget, SIGNAL(itemRemoved()), this, SLOT(onItemRemoved()));
+
+  for (KeysWidget *widget : {books_widget, discs_widget, patrons_widget})
+    {
+      connect(widget, SIGNAL(cellClicked(int, int)), this, SLOT(change_item()));
+      connect(widget, SIGNAL(currentCellChanged(int, int, int, int)), this, SLOT(change_item()));
+      connect(widget, SIGNAL(itemRemoved()), this, SLOT(onItemRemoved()));
+    }
+
   connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
   connect(add_item_action, SIGNAL(triggered()), this, SLOT(create_add_item_dialog()));
-
-  if (books_widget->rowCount() > 0) { books_widget->selectRow(0); }
 
   update_statusbar();
   setCentralWidget(splitter);
