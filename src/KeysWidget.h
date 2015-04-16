@@ -23,8 +23,8 @@
 #include <QSqlDatabase>
 #include <QTableWidget>
 
-/* The QTableWidget subclass that displays a list of all the books currently in
-   the database. */
+/* The QTableWidget subclass that displays a list of all the items in a
+   table. */
 class KeysWidget : public QTableWidget
 {
   Q_OBJECT

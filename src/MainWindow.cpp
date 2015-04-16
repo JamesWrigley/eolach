@@ -164,8 +164,7 @@ void MainWindow::centerWindow()
   mainWindow->move(x,y);
 }
 
-/* Calculate the number of books in the DB (by counting the rows in booksWidget)
-   and displays them in the statusbar */
+/* Calculate the number of items in the DB display them in the statusbar */
 void MainWindow::updateStatusbar()
 {
   statusBar()->showMessage(QString::number(booksWidget->rowCount()) + " books, " +
@@ -195,7 +194,7 @@ void MainWindow::onItemRemoved()
   updateStatusbar();
 }
 
-/* Called when a books data is changed from the infoWidget */
+/* Called when an items data is changed from the infoWidget */
 void MainWindow::onFieldChanged(QString dbTable, QString sqlFieldName, QString newText)
 {
   KeysWidget* currentTab = static_cast<KeysWidget*>(keysTabwidget->currentWidget());
