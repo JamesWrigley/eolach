@@ -33,28 +33,28 @@ class KeysWidget : public QTableWidget
   void itemRemoved();
 
   private slots:
-    void create_item_context_menu(QPoint);
-    void create_header_context_menu(QPoint);
-    void modify_header(bool);
     void removeItem();
+    void modifyHeader(bool);
+    void createItemContextMenu(QPoint);
+    void createHeaderContextMenu(QPoint);
 
  public:
     KeysWidget(QString, QStringList, QWidget *parent = 0);
-    void add_item(QString);
-    void load_items();
-    void update_item(int, QString);
+    void loadItems();
+    void addItem(QString);
+    void updateItem(int, QString);
 
  private:
-    std::pair<int, Qt::SortOrder> disable_sorting();
-    void enable_sorting(int, Qt::SortOrder);
-    int visible_column_count;
-    QMenu *item_context_menu;
-    QMenu *header_context_menu;
-    QString db_table;
+    void enableSorting(int, Qt::SortOrder);
+    
+    int visibleColumnCount;
+    QMenu *itemContextMenu;
+    QMenu *headerContextMenu;
+    QAction *removeItemAction;
+    QString dbTable;
     QStringList headers;
     QSqlDatabase bookstore;
-
-    QAction *remove_item_action;
+    std::pair<int, Qt::SortOrder> disableSorting();
 };
 
 #endif // KEYSWIDGET_H

@@ -32,31 +32,31 @@ class TextField : public QHBoxLayout
 
   private slots:
     void onDoubleClicked();
-    void onTextModified(QString);
     void onTextChanged(QString);
+    void onTextModified(QString);
 
  signals:
-    // Arguments: the SQL field name and the changed text (from edit_box)
+    // Arguments: the SQL field name and the changed text (from editBox)
     void fieldChanged(QString, QString, QString);
 
  public:
-    // Constructor arguments: the SQL field name and the text to display in edit_box
+    // Constructor arguments: the SQL field name and the text to display in editBox
     TextField(QString, QString, QString, bool (*)(QString), QWidget *parent = 0);
-    void set_text(QString);
-    void enterEditMode();
     void hide();
     void show();
+    void enterEditMode();
+    void setText(QString);
 
  private:
+    bool (*checkFunction)(QString);
+
     bool visible;
     QLabel *icon;
     QLabel *label;
-    QString db_table;
-    QString field_name;
-    QAction *edit_text;
-    CLineEdit *edit_box;
-
-    bool (*check_function)(QString);
+    QString dbTable;
+    QString fieldName;
+    QAction *editText;
+    CLineEdit *editBox;
 };
 
 #endif // TEXTFIELD_H

@@ -29,23 +29,23 @@ DLineEdit::DLineEdit(QString placeholdertext, bool (*function)(QString), QWidget
   icon = new QLabel();
   icon->setPixmap(QIcon(":/invalid-icon").pixmap(20));
 
-  check_function = function;
+  checkFunction = function;
 
   addWidget(lineedit);
   addWidget(icon);
 }
 
-void DLineEdit::enable_completion(QStringListModel* completions)
+void DLineEdit::enableCompletion(QStringListModel* completions)
 {
   completer = new DCompleter(completions, this);
   completer->setCaseSensitivity(Qt::CaseInsensitive);
   lineedit->setCompleter(completer);
-  completion_enabled = true;
+  completionEnabled = true;
 }
 
-void DLineEdit::onTextChanged(QString field_text)
+void DLineEdit::onTextChanged(QString fieldText)
 {
-  if (check_function(field_text))
+  if (checkFunction(fieldText))
     {
       icon->setPixmap(QIcon(":/valid-icon").pixmap(20));
       valid = true;

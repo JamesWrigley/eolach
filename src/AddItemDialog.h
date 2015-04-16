@@ -33,47 +33,48 @@ class AddItemDialog : public QDialog
   Q_OBJECT
 
   private slots:
-    void check_fields();
+    void checkFields();
 
  public:
     AddItemDialog(QWidget *parent);
-    void setup_completion(DLineEdit*, QString);
     QString getItemKey();
+    void setupCompletion(DLineEdit*, QString);
 
  private:
-    void add_book();
-    void add_disc();
-    void add_patron();
-    QString item_key;
-    QLabel *selector_description;
+    void addBook();
+    void addDisc();
+    void addPatron();
+    QLabel *selectorDescription;
+    QString itemKey;
+    QComboBox *itemSelector;
+    QVBoxLayout *mainLayout;
+    QHBoxLayout *selectorHbox;
+    QPushButton *finishButton;
     QStackedWidget *stacker;
-    QVBoxLayout *main_layout;
-    QHBoxLayout *selector_hbox;
-    QPushButton *finish_button;
-    QComboBox *item_selector;
-    
-    DLineEdit *title;
-    DLineEdit *author;
-    DLineEdit *genre;
-    DLineEdit *isbn;
-    DLineEdit *publication_date;
-    QWidget *book_widget;
-    std::vector<DLineEdit*> book_fields;
 
-    DLineEdit *disc_title;
-    DLineEdit *directorOrSpeaker;
-    DLineEdit *length;
+    QWidget *bookWidget;
+    DLineEdit *isbn;
+    DLineEdit *title;
+    DLineEdit *genre;
+    DLineEdit *author;
+    DLineEdit *publicationDate;
+
+    QWidget *discWidget;
     DLineEdit *year;
     DLineEdit *type;
-    QWidget *disc_widget;
-    std::vector<DLineEdit*> disc_fields;
+    DLineEdit *length;
+    DLineEdit *discTitle;
+    DLineEdit *directorOrSpeaker;
 
+    QWidget *patronWidget;
     DLineEdit *name;
     DLineEdit *address;
-    DLineEdit *mobile_num;
-    DLineEdit *landline_num;
-    QWidget *patron_widget;
-    std::vector<DLineEdit*> patron_fields;
+    DLineEdit *mobileNum;
+    DLineEdit *landlineNum;
+
+    std::vector<DLineEdit*> bookFields;
+    std::vector<DLineEdit*> discFields;
+    std::vector<DLineEdit*> patronFields;
 };
 
 #endif // ADDITEMDIALOG_H

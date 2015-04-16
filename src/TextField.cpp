@@ -21,43 +21,43 @@
 #include <QApplication>
 #include "TextField.h"
 
-TextField::TextField(QString table, QString sql_field, QString label_name, bool (*function)(QString), QWidget *parent)
+TextField::TextField(QString table, QString sqlField, QString labelName, bool (*function)(QString), QWidget *parent)
 {
-  db_table = table;
-  field_name = sql_field;
-  check_function = function;
-  label = new QLabel(label_name);
+  dbTable = table;
+  fieldName = sqlField;
+  checkFunction = function;
+  label = new QLabel(labelName);
   icon = new QLabel();
   icon->setPixmap(QIcon(":/invalid-icon").pixmap(20));
-  edit_box = new CLineEdit();
-  connect(edit_box, SIGNAL(textModified(QString)), this, SLOT(onTextModified(QString)));
-  connect(edit_box, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));
-  connect(edit_box, SIGNAL(doubleClicked()), this, SLOT(onDoubleClicked()));
+  editBox = new CLineEdit();
+  connect(editBox, SIGNAL(textModified(QString)), this, SLOT(onTextModified(QString)));
+  connect(editBox, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));
+  connect(editBox, SIGNAL(doubleClicked()), this, SLOT(onDoubleClicked()));
 
   label->setMinimumWidth(120);
   addWidget(label);
-  addWidget(edit_box);
+  addWidget(editBox);
   addWidget(icon);
   icon->hide();
 }
 
 void TextField::enterEditMode()
 {
-  QMouseEvent double_click(QEvent::MouseButtonDblClick, QPointF(), Qt::LeftButton, 0, 0);
-  QApplication::sendEvent(edit_box, &double_click);
+  QMouseEvent doubleClick(QEvent::MouseButtonDblClick, QPointF(), Qt::LeftButton, 0, 0);
+  QApplication::sendEvent(editBox, &doubleClick);
 }
 
 void TextField::hide()
 {
   label->hide();
-  edit_box->hide();
+  editBox->hide();
   icon->hide();
   visible = false;
 }
 
-void TextField::onTextChanged(QString new_text)
+void TextField::onTextChanged(QString newText)
 {
-  if (check_function(new_text))
+  if (checkFunction(newText))
     {
       icon->setPixmap(QIcon(":/valid-icon").pixmap(20));
     }
@@ -67,9 +67,9 @@ void TextField::onTextChanged(QString new_text)
     }
 }
 
-void TextField::onTextModified(QString new_text)
+void TextField::onTextModified(QString newText)
 {
-  if (check_function(new_text))
+  if (checkFunction(newText))
     {
       icon->hide();
     }
@@ -78,7 +78,7 @@ void TextField::onTextModified(QString new_text)
       icon->show();
     }
 
-  emit fieldChanged(db_table, field_name, new_text);
+  emit fieldChanged(dbTable, fieldName, newText);
 }
 
 void TextField::onDoubleClicked()
@@ -86,11 +86,11 @@ void TextField::onDoubleClicked()
   icon->show();
 }
 
-void TextField::set_text(QString new_text)
+void TextField::setText(QString newText)
 {
-  edit_box->setText(new_text);
-  onTextChanged(new_text);
-  if (!check_function(new_text) && visible)
+  editBox->setText(newText);
+  onTextChanged(newText);
+  if (!checkFunction(newText) && visible)
     {
       icon->show();
     }
@@ -103,8 +103,8 @@ void TextField::set_text(QString new_text)
 void TextField::show()
 {
   label->show();
-  edit_box->show();
-  if (check_function(edit_box->text()))
+  editBox->show();
+  if (checkFunction(editBox->text()))
     {
       icon->hide();
     }
@@ -112,6 +112,6 @@ void TextField::show()
     {
       icon->show();
     }
-  
+
   visible = true;
 }

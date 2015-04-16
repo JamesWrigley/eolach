@@ -35,19 +35,19 @@ class DLineEdit : public QHBoxLayout
     void onTextChanged(QString);
 
  public:
-  bool valid;
-  QString text();
-  QString placeholderText();
-  void enable_completion(QStringListModel*);
-  DLineEdit(QString, bool (*)(QString), QWidget *parent = 0);
+    DLineEdit(QString, bool (*)(QString), QWidget *parent = 0);
+    void enableCompletion(QStringListModel*);
+    bool valid;
+    QString text();
+    QString placeholderText();
 
  private:
-  QLabel *icon;
-  QLineEdit *lineedit;
-  DCompleter *completer;
-  bool completion_enabled = false;
+    bool (*checkFunction)(QString);
 
-  bool (*check_function)(QString);
+    bool completionEnabled = false;
+    QLabel *icon;
+    QLineEdit *lineedit;
+    DCompleter *completer;
 };
 
 #endif // DLINEEDIT_H

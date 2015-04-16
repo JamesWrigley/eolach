@@ -31,53 +31,53 @@
 MainWindow::MainWindow()
 {
   // Set up GUI
-  keys_tabwidget = new QTabWidget();
-  create_info_widget();
-  books_widget = new KeysWidget("bookstore", (QStringList() << "Title" << "Author"
-					      << "Genre" << "Publication Date" << "ISBN"));
-  discs_widget = new KeysWidget("discs", (QStringList() << "Title" << "Director/Speaker"
-					  << "Length" << "Year" << "Type"));
-  patrons_widget = new KeysWidget("patrons", (QStringList() << "Name" << "Address" <<
-					      "Mobile No." << "Landline No."));
+  keysTabwidget = new QTabWidget();
+  createInfoWidget();
+  booksWidget = new KeysWidget("bookstore", (QStringList() << "Title" << "Author"
+					     << "Genre" << "Publication Date" << "ISBN"));
+  discsWidget = new KeysWidget("discs", (QStringList() << "Title" << "Director/Speaker"
+					 << "Length" << "Year" << "Type"));
+  patronsWidget = new KeysWidget("patrons", (QStringList() << "Name" << "Address" <<
+					     "Mobile No." << "Landline No."));
   splitter = new QSplitter(this);
 
-  keys_tabwidget->addTab(books_widget, "Books");
-  keys_tabwidget->addTab(discs_widget, "Discs");
-  keys_tabwidget->addTab(patrons_widget, "Patrons");
+  keysTabwidget->addTab(booksWidget, "Books");
+  keysTabwidget->addTab(discsWidget, "Discs");
+  keysTabwidget->addTab(patronsWidget, "Patrons");
 
-  splitter->addWidget(keys_tabwidget);
-  splitter->addWidget(info_widget);
+  splitter->addWidget(keysTabwidget);
+  splitter->addWidget(infoWidget);
   splitter->setStretchFactor(0, 2);
   splitter->setStretchFactor(1, 1);
 
   toolbar = addToolBar("");
-  file_menu = menuBar()->addMenu("File");
+  fileMenu = menuBar()->addMenu("File");
 
-  exit_action = new QAction("Exit", this);
-  exit_action->setShortcut(QKeySequence("Ctrl+Q"));
+  exitAction = new QAction("Exit", this);
+  exitAction->setShortcut(QKeySequence("Ctrl+Q"));
 
-  add_item_action = new QAction(QIcon(":/new-item-icon"), "", this);
-  add_item_action->setToolTip("Add new item");
+  addItemAction = new QAction(QIcon(":/new-item-icon"), "", this);
+  addItemAction->setToolTip("Add new item");
 
-  file_menu->addAction(exit_action);
-  toolbar->addAction(add_item_action);
+  fileMenu->addAction(exitAction);
+  toolbar->addAction(addItemAction);
 
-  connect(keys_tabwidget, SIGNAL(currentChanged(int)), this, SLOT(onTabChanged(int)));
+  connect(keysTabwidget, SIGNAL(currentChanged(int)), this, SLOT(onTabChanged(int)));
 
-  for (KeysWidget *widget : {books_widget, discs_widget, patrons_widget})
+  for (KeysWidget *widget : {booksWidget, discsWidget, patronsWidget})
     {
-      connect(widget, SIGNAL(cellClicked(int, int)), this, SLOT(change_item()));
-      connect(widget, SIGNAL(currentCellChanged(int, int, int, int)), this, SLOT(change_item()));
+      connect(widget, SIGNAL(cellClicked(int, int)), this, SLOT(changeItem()));
+      connect(widget, SIGNAL(currentCellChanged(int, int, int, int)), this, SLOT(changeItem()));
       connect(widget, SIGNAL(itemRemoved()), this, SLOT(onItemRemoved()));
     }
 
-  connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
-  connect(add_item_action, SIGNAL(triggered()), this, SLOT(create_add_item_dialog()));
+  connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
+  connect(addItemAction, SIGNAL(triggered()), this, SLOT(createAddItemDialog()));
 
-  update_statusbar();
+  updateStatusbar();
   setCentralWidget(splitter);
   setWindowState(Qt::WindowMaximized);
-  center_window();
+  centerWindow();
   setWindowTitle("Eolach");
 }
 
@@ -88,148 +88,147 @@ MainWindow::~MainWindow()
 
 /* General functions */
 
-void MainWindow::create_add_item_dialog()
+void MainWindow::createAddItemDialog()
 {
-  AddItemDialog add_item_dialog(this);
-  if (QDialog::Accepted == add_item_dialog.exec())
+  AddItemDialog addItemDialog(this);
+  if (QDialog::Accepted == addItemDialog.exec())
     {
-      if (add_item_dialog.getItemKey().endsWith("b"))
+      if (addItemDialog.getItemKey().endsWith("b"))
 	{
-	  books_widget->add_item(add_item_dialog.getItemKey());
+	  booksWidget->addItem(addItemDialog.getItemKey());
 	}
-      else if (add_item_dialog.getItemKey().endsWith("d"))
+      else if (addItemDialog.getItemKey().endsWith("d"))
 	{
-	  discs_widget->add_item(add_item_dialog.getItemKey());
+	  discsWidget->addItem(addItemDialog.getItemKey());
 	}
-      else if (add_item_dialog.getItemKey().endsWith("p"))
+      else if (addItemDialog.getItemKey().endsWith("p"))
 	{
-	  patrons_widget->add_item(add_item_dialog.getItemKey());
+	  patronsWidget->addItem(addItemDialog.getItemKey());
 	}
-      update_statusbar();
+      updateStatusbar();
     }
 }
 
-void MainWindow::create_info_widget()
+void MainWindow::createInfoWidget()
 {
-  info_widget = new InfoWidget();
+  infoWidget = new InfoWidget();
 
   // Book fields
-  isbn = new TextField("bookstore", "isbn", "ISBN:", &validate_isbn);
-  title = new TextField("bookstore", "title", "Title:", &validate_generic_field);
-  genre = new TextField("bookstore", "genre", "Genre:", &validate_generic_field);
-  author = new TextField("bookstore", "author", "Author:", &validate_generic_field);
-  publication_date = new TextField("bookstore", "publication_date", "Publication Date:", &validate_numeric_field);
-  book_fields = {title, author, genre, publication_date, isbn};
+  isbn = new TextField("bookstore", "isbn", "ISBN:", &validateIsbn);
+  title = new TextField("bookstore", "title", "Title:", &validateGenericField);
+  genre = new TextField("bookstore", "genre", "Genre:", &validateGenericField);
+  author = new TextField("bookstore", "author", "Author:", &validateGenericField);
+  publicationDate = new TextField("bookstore", "publication_date", "Publication Date:", &validateNumericField);
+  bookFields = {title, author, genre, publicationDate, isbn};
 
   // Disc fields
-  disc_title = new TextField("discs", "title", "Title:", &validate_generic_field);
-  directorOrSpeaker = new TextField("discs", "directorOrSpeaker", "Director/Speaker:", &validate_generic_field);
-  length = new TextField("discs", "length", "Length:", &validate_generic_field);
-  year = new TextField("discs", "year", "Year:", &validate_numeric_field);
-  type = new TextField("discs", "type", "Type:", &validate_generic_field);
-  disc_fields = {disc_title, directorOrSpeaker, length, year, type};
+  discTitle = new TextField("discs", "title", "Title:", &validateGenericField);
+  directorOrSpeaker = new TextField("discs", "directorOrSpeaker", "Director/Speaker:", &validateGenericField);
+  length = new TextField("discs", "length", "Length:", &validateGenericField);
+  year = new TextField("discs", "year", "Year:", &validateNumericField);
+  type = new TextField("discs", "type", "Type:", &validateGenericField);
+  discFields = {discTitle, directorOrSpeaker, length, year, type};
 
   // Patron fields
-  name = new TextField("patrons", "name", "Name:", &validate_generic_field);
-  address = new TextField("patrons", "address", "Address:", &validate_generic_field);
-  items = new TextField("patrons", "items", "Borrowed items:", &validate_generic_field); // Check if any items are overdue instead?
-  mobile_num = new TextField("patrons", "mobile_num", "Mobile No.", &validate_numeric_field);
-  landline_num = new TextField("patrons", "landline_num", "Landline No.", &validate_numeric_field);
-  patron_fields = {name, address, mobile_num, landline_num, items};
+  name = new TextField("patrons", "name", "Name:", &validateGenericField);
+  address = new TextField("patrons", "address", "Address:", &validateGenericField);
+  items = new TextField("patrons", "items", "Borrowed items:", &validateGenericField); // Check if any items are overdue instead?
+  mobileNum = new TextField("patrons", "mobile_num", "Mobile No.", &validateNumericField);
+  landlineNum = new TextField("patrons", "landline_num", "Landline No.", &validateNumericField);
+  patronFields = {name, address, mobileNum, landlineNum, items};
 
-  for (TextField* field : {title, author, genre, publication_date, isbn,
-	disc_title, directorOrSpeaker, length, year, type,
-	name, address, mobile_num, landline_num, items})
+  for (TextField* field : {title, author, genre, publicationDate, isbn,
+	discTitle, directorOrSpeaker, length, year, type,
+	name, address, mobileNum, landlineNum, items})
     {
       connect(field, SIGNAL(fieldChanged(QString, QString, QString)),
 	      this, SLOT(onFieldChanged(QString, QString, QString)));
     }
-  for (TextField *field : book_fields) { info_widget->add_field(field, "b"); }
-  for (TextField *field : disc_fields) { info_widget->add_field(field, "d"); }
-  for (TextField *field : patron_fields) { info_widget->add_field(field, "p"); }
-
+  for (TextField *field : bookFields) { infoWidget->addField(field, "b"); }
+  for (TextField *field : discFields) { infoWidget->addField(field, "d"); }
+  for (TextField *field : patronFields) { infoWidget->addField(field, "p"); }
 
   // We hide the patron and disc fields because the default tab is for the books
-  for (TextField *field : patron_fields) { field->hide(); }
-  for (TextField *field : disc_fields) { field->hide(); }
+  for (TextField *field : patronFields) { field->hide(); }
+  for (TextField *field : discFields) { field->hide(); }
 }
 
-void MainWindow::center_window()
+void MainWindow::centerWindow()
 {
-  QRect screen_geo = QApplication::desktop()->screenGeometry();
-  QWidget *main_window = QWidget::window();
+  QRect screenGeo = QApplication::desktop()->screenGeometry();
+  QWidget *mainWindow = QWidget::window();
 
-  int x = (screen_geo.width() - 800) / 2;
-  int y = (screen_geo.height() - 600) / 2;
+  int x = (screenGeo.width() - 800) / 2;
+  int y = (screenGeo.height() - 600) / 2;
 
-  main_window->move(x,y);
+  mainWindow->move(x,y);
 }
 
-/* Calculate the number of books in the DB (by counting the rows in books_widget)
+/* Calculate the number of books in the DB (by counting the rows in booksWidget)
    and displays them in the statusbar */
-void MainWindow::update_statusbar()
+void MainWindow::updateStatusbar()
 {
-  statusBar()->showMessage(QString::number(books_widget->rowCount()) + " books, " +
-			   QString::number(discs_widget->rowCount()) + " discs, " +
-			   QString::number(patrons_widget->rowCount()) + " patrons.");
+  statusBar()->showMessage(QString::number(booksWidget->rowCount()) + " books, " +
+			   QString::number(discsWidget->rowCount()) + " discs, " +
+			   QString::number(patronsWidget->rowCount()) + " patrons.");
 }
 
 /* Slots */
 
-void MainWindow::change_item()
+void MainWindow::changeItem()
 {
-  KeysWidget* current_tab = static_cast<KeysWidget*>(keys_tabwidget->currentWidget());
-  if (current_tab->currentRow() > -1)
+  KeysWidget* currentTab = static_cast<KeysWidget*>(keysTabwidget->currentWidget());
+  if (currentTab->currentRow() > -1)
     {
-      info_widget->set_item(current_tab->currentItem()->data(Qt::UserRole).toString());
+      infoWidget->setItem(currentTab->currentItem()->data(Qt::UserRole).toString());
     }
 }
 
 void MainWindow::onItemRemoved()
 {
-  KeysWidget* current_tab = static_cast<KeysWidget*>(keys_tabwidget->currentWidget());
-  if (1 == current_tab->rowCount())
+  KeysWidget* currentTab = static_cast<KeysWidget*>(keysTabwidget->currentWidget());
+  if (1 == currentTab->rowCount())
     {
-      info_widget->clear();
+      infoWidget->clear();
     }
-  current_tab->removeRow(current_tab->currentRow());
-  update_statusbar();
+  currentTab->removeRow(currentTab->currentRow());
+  updateStatusbar();
 }
 
-/* Called when a books data is changed from the info_widget */
-void MainWindow::onFieldChanged(QString db_table, QString sql_field_name, QString new_text)
+/* Called when a books data is changed from the infoWidget */
+void MainWindow::onFieldChanged(QString dbTable, QString sqlFieldName, QString newText)
 {
-  KeysWidget* current_tab = static_cast<KeysWidget*>(keys_tabwidget->currentWidget());
-  QString item_key = current_tab->currentItem()->data(Qt::UserRole).toString();
-  QSqlQuery update_book_info(bookstore);
-  update_book_info.prepare(QString("UPDATE %1 SET %2=:new_text WHERE key=:book_key;").arg(db_table, sql_field_name));
-  update_book_info.bindValue(":table", db_table);
-  update_book_info.bindValue(":new_text", new_text);
-  update_book_info.bindValue(":book_key", item_key);
-  update_book_info.exec();
+  KeysWidget* currentTab = static_cast<KeysWidget*>(keysTabwidget->currentWidget());
+  QString itemKey = currentTab->currentItem()->data(Qt::UserRole).toString();
+  QSqlQuery updateBookInfo(bookstore);
+  updateBookInfo.prepare(QString("UPDATE %1 SET %2=:newText WHERE key=:bookKey;").arg(dbTable, sqlFieldName));
+  updateBookInfo.bindValue(":table", dbTable);
+  updateBookInfo.bindValue(":newText", newText);
+  updateBookInfo.bindValue(":bookKey", itemKey);
+  updateBookInfo.exec();
 
-  info_widget->set_item(item_key);
-  current_tab->update_item(current_tab->currentRow(), item_key);
+  infoWidget->setItem(itemKey);
+  currentTab->updateItem(currentTab->currentRow(), itemKey);
 }
 
 void MainWindow::onTabChanged(int index)
 {
   if (index == 0)
     {
-      for (TextField *field : book_fields) { field->show(); }
-      for (TextField *field : disc_fields) { field->hide(); }
-      for (TextField *field : patron_fields) { field->hide(); }
+      for (TextField *field : bookFields) { field->show(); }
+      for (TextField *field : discFields) { field->hide(); }
+      for (TextField *field : patronFields) { field->hide(); }
     }
   else if (index == 1)
     {
-      for (TextField *field : book_fields) { field->hide(); }
-      for (TextField *field : disc_fields) { field->show(); }
-      for (TextField *field : patron_fields) { field->hide(); }
+      for (TextField *field : bookFields) { field->hide(); }
+      for (TextField *field : discFields) { field->show(); }
+      for (TextField *field : patronFields) { field->hide(); }
     }
   else if (index == 2)
     {
-      for (TextField *field : book_fields) { field->hide(); }
-      for (TextField *field : disc_fields) { field->hide(); }
-      for (TextField *field : patron_fields) { field->show(); }
+      for (TextField *field : bookFields) { field->hide(); }
+      for (TextField *field : discFields) { field->hide(); }
+      for (TextField *field : patronFields) { field->show(); }
     }
 }

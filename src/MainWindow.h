@@ -33,54 +33,54 @@ class MainWindow : public QMainWindow
   Q_OBJECT
 
   private slots:
-    void create_add_item_dialog();
-    void change_item();
-    void onFieldChanged(QString, QString, QString);
+    void changeItem();
     void onItemRemoved();
     void onTabChanged(int);
+    void createAddItemDialog();
+    void onFieldChanged(QString, QString, QString);
 
  public:
     MainWindow();
     ~MainWindow();
 
  private:
-    void center_window();
-    void create_info_widget();
-    void update_statusbar();
+    void centerWindow();
+    void updateStatusbar();
+    void createInfoWidget();
 
-    QSqlDatabase bookstore;
-    KeysWidget *books_widget;
-    KeysWidget *discs_widget;
-    KeysWidget *patrons_widget;
-    InfoWidget *info_widget;
-    QMenu *file_menu;
-    QSplitter *splitter;
-    QTabWidget *keys_tabwidget;
+    QMenu *fileMenu;
+    QAction *addItemAction;
+    QAction *exitAction;
     QToolBar *toolbar;
-    QAction *add_item_action;
-    QAction *exit_action;
+    QSplitter *splitter;
+    KeysWidget *booksWidget;
+    KeysWidget *discsWidget;
+    KeysWidget *patronsWidget;
+    InfoWidget *infoWidget;
+    QTabWidget *keysTabwidget;
+    QSqlDatabase bookstore;
 
     TextField *title;
-    TextField *author;
     TextField *genre;
-    TextField *publication_date;
-    
+    TextField *author;
+    TextField *publicationDate;
+
     TextField *isbn;
     TextField *name;
-    TextField *address;
-    TextField *mobile_num;
-    TextField *landline_num;
     TextField *items;
+    TextField *address;
+    TextField *mobileNum;
+    TextField *landlineNum;
 
-    TextField *disc_title;
-    TextField *directorOrSpeaker;
-    TextField *length;
     TextField *year;
     TextField *type;
+    TextField *length;
+    TextField *discTitle;
+    TextField *directorOrSpeaker;
 
-    std::vector<TextField*> book_fields;
-    std::vector<TextField*> disc_fields;
-    std::vector<TextField*> patron_fields;
+    std::vector<TextField*> bookFields;
+    std::vector<TextField*> discFields;
+    std::vector<TextField*> patronFields;
 };
 
 #endif // MAINWINDOW_H

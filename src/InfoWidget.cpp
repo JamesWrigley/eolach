@@ -23,68 +23,68 @@
 
 InfoWidget::InfoWidget()
 {
-  main_vbox = new QVBoxLayout(this);
-  main_vbox->addStretch();
+  mainVbox = new QVBoxLayout(this);
+  mainVbox->addStretch();
 
-  setLayout(main_vbox);
+  setLayout(mainVbox);
   setFrameShape(QFrame::StyledPanel);
   setObjectName("MainQFrame");
   setStyleSheet("QFrame#MainQFrame {border: 8px solid #909090; border-radius: 7px;}");
 }
 
-void InfoWidget::add_field(TextField *field, QString type)
+void InfoWidget::addField(TextField *field, QString type)
 {
-  if (type == "b") { book_fields.push_back(field); }
-  else if (type == "d") { disc_fields.push_back(field); }
-  else if (type == "p") { patron_fields.push_back(field); }
+  if (type == "b") { bookFields.push_back(field); }
+  else if (type == "d") { discFields.push_back(field); }
+  else if (type == "p") { patronFields.push_back(field); }
 
-  main_vbox->insertLayout(main_vbox->count() - 1, field);
+  mainVbox->insertLayout(mainVbox->count() - 1, field);
 }
 
 void InfoWidget::clear()
 {
-  for (std::vector<TextField*> item_fields : {book_fields, disc_fields, patron_fields})
+  for (std::vector<TextField*> itemFields : {bookFields, discFields, patronFields})
     {
-      for (TextField *field : item_fields)
+      for (TextField *field : itemFields)
 	{
-	  field->set_text("");
+	  field->setText("");
 	}
     }
 }
 
-void InfoWidget::remove_field(TextField *field)
+void InfoWidget::removeField(TextField *field)
 {
-  main_vbox->removeItem(field);
+  mainVbox->removeItem(field);
 }
 
-void InfoWidget::set_item(QString item_key)
+void InfoWidget::setItem(QString itemKey)
 {
   QSqlDatabase db = QSqlDatabase::database();
-  QSqlQuery get_item_info(db);
-  std::vector<TextField*> item_fields;
+  QSqlQuery getItemInfo(db);
+  std::vector<TextField*> itemFields;
 
-  if (item_key.endsWith("b"))
+  if (itemKey.endsWith("b"))
     {
-      get_item_info.prepare(get_book_info);
-      item_fields = book_fields;
+      getItemInfo.prepare(getBookInfo);
+      itemFields = bookFields;
     }
-  else if (item_key.endsWith("d"))
+  else if (itemKey.endsWith("d"))
     {
-      get_item_info.prepare(get_disc_info);
-      item_fields = disc_fields;
+      getItemInfo.prepare(getDiscInfo);
+      itemFields = discFields;
     }
-  else if (item_key.endsWith("p"))
+  else if (itemKey.endsWith("p"))
     {
-      get_item_info.prepare(get_patron_info);
-      item_fields = patron_fields;
+      getItemInfo.prepare(getPatronInfo);
+      itemFields = patronFields;
     }
 
-  get_item_info.bindValue(":key", item_key);
-  get_item_info.exec();
-  get_item_info.next();
+  getItemInfo.bindValue(":key", itemKey);
+  getItemInfo.exec();
+  getItemInfo.next();
 
-  for (unsigned int i = 0; i < item_fields.size(); ++i)
+  for (unsigned int i = 0; i < itemFields.size(); ++i)
     {
-      item_fields[i]->set_text(get_item_info.value(i).toString());
+      itemFields[i]->setText(getItemInfo.value(i).toString());
     }
 }

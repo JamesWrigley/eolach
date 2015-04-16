@@ -26,46 +26,46 @@ int main(int argc, char *argv[])
 {
   // Set up DB connection
   QSqlDatabase bookstore;
-  QString config_dir_path = QDir().homePath() + "/.eolach/";
-  QString db_path = config_dir_path + "bookstore.db";
+  QString configDirPath = QDir().homePath() + "/.eolach/";
+  QString dbPath = configDirPath + "bookstore.db";
 
-  if (QFile(db_path).exists())
+  if (QFile(dbPath).exists())
     {
       bookstore = QSqlDatabase::addDatabase("QSQLITE");
-      bookstore.setDatabaseName(db_path);
+      bookstore.setDatabaseName(dbPath);
       bookstore.open();
     }
   else
     {
-      QDir().mkdir(config_dir_path);
+      QDir().mkdir(configDirPath);
       bookstore = QSqlDatabase::addDatabase("QSQLITE");
-      bookstore.setDatabaseName(db_path);
+      bookstore.setDatabaseName(dbPath);
       bookstore.open();
 
-      QSqlQuery initialize_db(bookstore);
-      initialize_db.exec("CREATE TABLE bookstore ("
-			 "key TEXT PRIMARY KEY, "
-			 "isbn TEXT, "
-			 "title TEXT, "
-			 "author TEXT, "
-			 "publication_date TEXT, "
-			 "genre TEXT); "
-			 
-			 "CREATE TABLE patrons ("
-			 "key TEXT PRIMARY KEY, "
-			 "name TEXT, "
-			 "address TEXT, "
-			 "mobile_num TEXT, "
-			 "landline_num TEXT, "
-			 "items TEXT); "
+      QSqlQuery initializeDb(bookstore);
+      initializeDb.exec("CREATE TABLE bookstore ("
+			"key TEXT PRIMARY KEY, "
+			"isbn TEXT, "
+			"title TEXT, "
+			"author TEXT, "
+			"publication_date TEXT, "
+			"genre TEXT); "
 
-			 "CREATE TABLE discs ("
-			 "key TEXT PRIMARY KEY, "
-			 "title TEXT, "
-			 "directorOrSpeaker TEXT, "
-			 "length TEXT, "
-			 "year TEXT, "
-			 "type TEXT);");
+			"CREATE TABLE patrons ("
+			"key TEXT PRIMARY KEY, "
+			"name TEXT, "
+			"address TEXT, "
+			"mobile_num TEXT, "
+			"landline_num TEXT, "
+			"items TEXT); "
+
+			"CREATE TABLE discs ("
+			"key TEXT PRIMARY KEY, "
+			"title TEXT, "
+			"directorOrSpeaker TEXT, "
+			"length TEXT, "
+			"year TEXT, "
+			"type TEXT);");
     }
 
   // Start the application

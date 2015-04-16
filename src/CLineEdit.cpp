@@ -26,12 +26,12 @@ CLineEdit::CLineEdit(QWidget* parent)
   connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
   // We set this now to use in onEditingFinished since the window color will
   // have by then been changed by mouseDoubleClickEvent().
-  background_color = palette().color(QPalette::Window).name();
+  backgroundColor = palette().color(QPalette::Window).name();
   tooltip = "Double-click to edit";
 
   setReadOnly(true);
   setFrame(false);
-  setStyleSheet("QLineEdit { background: " + background_color + " }");
+  setStyleSheet("QLineEdit { background: " + backgroundColor + " }");
   setToolTip(tooltip);
   setToolTipDuration(3000);
 }
@@ -39,14 +39,14 @@ CLineEdit::CLineEdit(QWidget* parent)
 void CLineEdit::mouseDoubleClickEvent(QMouseEvent *event)
 {
   QSqlDatabase bookstore = QSqlDatabase::database();
-  QSqlQuery get_row_count;
-  get_row_count.exec("SELECT COUNT(*) FROM bookstore;");
-  get_row_count.next();
+  QSqlQuery getRowCount;
+  getRowCount.exec("SELECT COUNT(*) FROM bookstore;");
+  getRowCount.next();
 
   emit doubleClicked();
-  if (event->button() == Qt::LeftButton && 0 < get_row_count.value(0).toInt())
+  if (event->button() == Qt::LeftButton && 0 < getRowCount.value(0).toInt())
     {
-      current_text = text();
+      currentText = text();
       setReadOnly(false);
       setFrame(true);
       setStyleSheet("QLineEdit { background: #F7F7F7 }");
@@ -59,10 +59,10 @@ void CLineEdit::onEditingFinished()
 {
   setReadOnly(true);
   setFrame(false);
-  setStyleSheet("QLineEdit { background: " + background_color + " }");
+  setStyleSheet("QLineEdit { background: " + backgroundColor + " }");
   setToolTip(tooltip);
   deselect();
 
-  current_text = text();
-  emit textModified(current_text);
+  currentText = text();
+  emit textModified(currentText);
 }

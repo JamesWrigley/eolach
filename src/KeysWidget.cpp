@@ -25,19 +25,19 @@
 #include "KeysWidget.h"
 #include "miscellanea.h"
 
-KeysWidget::KeysWidget(QString table, QStringList header_list, QWidget *parent)
+KeysWidget::KeysWidget(QString table, QStringList headerList, QWidget *parent)
 {
-  db_table = table;
-  headers = header_list;
+  dbTable = table;
+  headers = headerList;
 
   setColumnCount(headers.length());
-  visible_column_count = headers.length();
+  visibleColumnCount = headers.length();
   setHorizontalHeaderLabels(headers);
-  header_context_menu = new QMenu(this);
+  headerContextMenu = new QMenu(this);
   horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
   horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
   connect(horizontalHeader(), SIGNAL(customContextMenuRequested(QPoint)),
-          this, SLOT(create_header_context_menu(QPoint)));
+	  this, SLOT(createHeaderContextMenu(QPoint)));
 
   for (QString text : headers)
     {
@@ -45,135 +45,135 @@ KeysWidget::KeysWidget(QString table, QStringList header_list, QWidget *parent)
       action->setCheckable(true);
       action->setChecked(true);
 
-      header_context_menu->addAction(action);
-      connect(action, SIGNAL(toggled(bool)), this, SLOT(modify_header(bool)));
+      headerContextMenu->addAction(action);
+      connect(action, SIGNAL(toggled(bool)), this, SLOT(modifyHeader(bool)));
     }
 
   // Set up cell context menus
   setContextMenuPolicy(Qt::CustomContextMenu);
-  connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(create_item_context_menu(QPoint)));
+  connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(createItemContextMenu(QPoint)));
 
-  item_context_menu = new QMenu(this);
-  remove_item_action = new QAction("Remove", this);
-  item_context_menu->addAction(remove_item_action);
-  connect(remove_item_action, SIGNAL(triggered()), this, SLOT(removeItem()));
+  itemContextMenu = new QMenu(this);
+  removeItemAction = new QAction("Remove", this);
+  itemContextMenu->addAction(removeItemAction);
+  connect(removeItemAction, SIGNAL(triggered()), this, SLOT(removeItem()));
 
   // Miscellanea
   bookstore = QSqlDatabase::database();
-  enable_sorting(0, Qt::AscendingOrder);
+  enableSorting(0, Qt::AscendingOrder);
   setEditTriggers(QAbstractItemView::NoEditTriggers);
   setSelectionMode(QAbstractItemView::SingleSelection);
   setSelectionBehavior(QAbstractItemView::SelectRows);
   setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
   verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
 
-  load_items();
+  loadItems();
 }
 
 /* General functions */
 
-void KeysWidget::add_item(QString item_key)
+void KeysWidget::addItem(QString itemKey)
 {
-  QSqlQuery get_item_info(bookstore);
+  QSqlQuery getItemInfo(bookstore);
 
-  if (item_key.endsWith("b")) { get_item_info.prepare(get_book_info); }
-  else if (item_key.endsWith("d")) { get_item_info.prepare(get_disc_info); }
-  else if (item_key.endsWith("p")) { get_item_info.prepare(get_patron_info); }
-  
-  get_item_info.bindValue(":key", item_key);
-  get_item_info.exec();
-  get_item_info.next();
+  if (itemKey.endsWith("b")) { getItemInfo.prepare(getBookInfo); }
+  else if (itemKey.endsWith("d")) { getItemInfo.prepare(getDiscInfo); }
+  else if (itemKey.endsWith("p")) { getItemInfo.prepare(getPatronInfo); }
+
+  getItemInfo.bindValue(":key", itemKey);
+  getItemInfo.exec();
+  getItemInfo.next();
 
   insertRow(rowCount());
   // We temporarily disable sorting because it causes indexing complications if
   // the row is sorted before we're finished populating its cells.
-  std::pair<int, Qt::SortOrder> sorting_info(disable_sorting());
+  std::pair<int, Qt::SortOrder> sortingInfo(disableSorting());
   for (int i = headers.length() - 1; i >= 0; --i)
     {
-      QTableWidgetItem *item = new QTableWidgetItem(get_item_info.value(i).toString());
-      item->setData(Qt::UserRole, QVariant(item_key));
+      QTableWidgetItem *item = new QTableWidgetItem(getItemInfo.value(i).toString());
+      item->setData(Qt::UserRole, QVariant(itemKey));
       setItem(rowCount() - 1, i, item);
     }
-  enable_sorting(sorting_info.first, sorting_info.second);
+  enableSorting(sortingInfo.first, sortingInfo.second);
 }
 
-std::pair<int, Qt::SortOrder> KeysWidget::disable_sorting()
+std::pair<int, Qt::SortOrder> KeysWidget::disableSorting()
 {
-  std::pair<int, Qt::SortOrder> sorting_info(horizontalHeader()->sortIndicatorSection(),
+  std::pair<int, Qt::SortOrder> sortingInfo(horizontalHeader()->sortIndicatorSection(),
 					     horizontalHeader()->sortIndicatorOrder());
   setSortingEnabled(false);
-  return(sorting_info);
+  return(sortingInfo);
 }
 
-void KeysWidget::enable_sorting(int sort_column, Qt::SortOrder sort_order)
+void KeysWidget::enableSorting(int sortColumn, Qt::SortOrder sortOrder)
 {
   setSortingEnabled(true);
-  sortByColumn(sort_column, sort_order);
+  sortByColumn(sortColumn, sortOrder);
 }
 
-void KeysWidget::load_items()
+void KeysWidget::loadItems()
 {
-  QSqlQuery get_item_keys(bookstore);
-  get_item_keys.exec(QString("SELECT key FROM %1;").arg(db_table));
+  QSqlQuery getItemKeys(bookstore);
+  getItemKeys.exec(QString("SELECT key FROM %1;").arg(dbTable));
 
-  while (get_item_keys.next())
+  while (getItemKeys.next())
     {
-      add_item(get_item_keys.value(0).toString());
+      addItem(getItemKeys.value(0).toString());
     }
 }
 
-void KeysWidget::update_item(int row, QString item_key)
+void KeysWidget::updateItem(int row, QString itemKey)
 {
-  QSqlQuery get_item_info(bookstore);
+  QSqlQuery getItemInfo(bookstore);
 
-  if (item_key.endsWith("b")) { get_item_info.prepare(get_book_info); }
-  else if (item_key.endsWith("d")) { get_item_info.prepare(get_disc_info); }
-  else if (item_key.endsWith("p")) { get_item_info.prepare(get_patron_info); }
+  if (itemKey.endsWith("b")) { getItemInfo.prepare(getBookInfo); }
+  else if (itemKey.endsWith("d")) { getItemInfo.prepare(getDiscInfo); }
+  else if (itemKey.endsWith("p")) { getItemInfo.prepare(getPatronInfo); }
 
-  get_item_info.bindValue(":key", item_key);
-  get_item_info.exec();
-  get_item_info.next();
+  getItemInfo.bindValue(":key", itemKey);
+  getItemInfo.exec();
+  getItemInfo.next();
 
-  std::pair<int, Qt::SortOrder> sorting_info(disable_sorting());
+  std::pair<int, Qt::SortOrder> sortingInfo(disableSorting());
   for (int i = 0; i < headers.length(); ++i)
     {
-      item(row, i)->setText(get_item_info.value(i).toString());
+      item(row, i)->setText(getItemInfo.value(i).toString());
     }
-  enable_sorting(sorting_info.first, sorting_info.second);
+  enableSorting(sortingInfo.first, sortingInfo.second);
 }
 
 /* Slots */
 
-void KeysWidget::create_item_context_menu(QPoint pos)
+void KeysWidget::createItemContextMenu(QPoint pos)
 {
   if (itemAt(pos) != 0)
     {
-      item_context_menu->popup(viewport()->mapToGlobal(pos));
+      itemContextMenu->popup(viewport()->mapToGlobal(pos));
     }
 }
 
-void KeysWidget::create_header_context_menu(QPoint pos)
+void KeysWidget::createHeaderContextMenu(QPoint pos)
 {
-  header_context_menu->popup(mapToGlobal(pos));
+  headerContextMenu->popup(mapToGlobal(pos));
 }
 
-void KeysWidget::modify_header(bool checked)
+void KeysWidget::modifyHeader(bool checked)
 {
-  int header_index = headers.indexOf(static_cast<QAction*>(sender())->text());
+  int headerIndex = headers.indexOf(static_cast<QAction*>(sender())->text());
   if (checked)
     {
-      showColumn(header_index);
-      ++visible_column_count;
+      showColumn(headerIndex);
+      ++visibleColumnCount;
     }
-  else if (!checked && visible_column_count > 1)
+  else if (!checked && visibleColumnCount > 1)
     {
-      hideColumn(header_index);
-      --visible_column_count;
+      hideColumn(headerIndex);
+      --visibleColumnCount;
     }
   else
     {
       static_cast<QAction*>(sender())->setChecked(true);
-      --visible_column_count;
+      --visibleColumnCount;
     }
 }
 
@@ -181,14 +181,14 @@ void KeysWidget::removeItem()
 {
   int confirm = QMessageBox::warning(this, "Confirm",
 				     QString("Are you sure you wish to remove this item?"),
-                                     QMessageBox::Yes, QMessageBox::No);
+				     QMessageBox::Yes, QMessageBox::No);
   if (QMessageBox::Yes == confirm)
     {
-      QString item_key = currentItem()->data(Qt::UserRole).toString();
-      QSqlQuery remove_item(bookstore);
-      remove_item.prepare(QString("DELETE FROM %1 WHERE key=:key;").arg(db_table));
-      remove_item.bindValue(":key", item_key);
-      remove_item.exec();
+      QString itemKey = currentItem()->data(Qt::UserRole).toString();
+      QSqlQuery removeItem(bookstore);
+      removeItem.prepare(QString("DELETE FROM %1 WHERE key=:key;").arg(dbTable));
+      removeItem.bindValue(":key", itemKey);
+      removeItem.exec();
 
       emit itemRemoved();
     }

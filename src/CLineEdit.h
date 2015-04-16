@@ -31,18 +31,18 @@ class CLineEdit : public QLineEdit
     void onEditingFinished();
 
  signals:
-    void textModified(QString);
     void doubleClicked();
+    void textModified(QString);
 
  public:
     CLineEdit(QWidget* parent = 0);
 
  private:
-    QString current_text;
-    QString tooltip;
-    QString background_color;
-
     void mouseDoubleClickEvent(QMouseEvent *event);
+
+    QString tooltip;
+    QString currentText;
+    QString backgroundColor;
 };
 
 #endif // CLINEEDIT_H

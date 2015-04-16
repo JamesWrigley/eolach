@@ -24,13 +24,13 @@
 /* Here we define some things that don't quite fit anywhere else */
 
 // SQL queries for getting all the columns for a row from a table.
-const QString get_book_info = "SELECT title, author, genre, publication_date, isbn FROM bookstore WHERE key=:key;";
-const QString get_disc_info = "SELECT title, directorOrSpeaker, length, year, type FROM discs WHERE key=:key;";
-const QString get_patron_info = "SELECT name, address, mobile_num, landline_num, items FROM patrons WHERE key=:key;";
+const QString getBookInfo = "SELECT title, author, genre, publication_date, isbn FROM bookstore WHERE key=:key;";
+const QString getDiscInfo = "SELECT title, directorOrSpeaker, length, year, type FROM discs WHERE key=:key;";
+const QString getPatronInfo = "SELECT name, address, mobile_num, landline_num, items FROM patrons WHERE key=:key;";
 
 // Validation functions
-bool validate_isbn(QString);
-bool validate_generic_field(QString);
-bool validate_numeric_field(QString);
+bool validateIsbn(QString);
+bool validateGenericField(QString);
+bool validateNumericField(QString);
 
 #endif // MISCELLANEA_H

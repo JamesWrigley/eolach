@@ -32,16 +32,15 @@ class InfoWidget : public QFrame
  public:
   InfoWidget();
   void clear();
-  void set_item(QString);
-  void add_field(TextField*, QString);
-  void remove_field(TextField*);
+  void setItem(QString);
+  void addField(TextField*, QString);
+  void removeField(TextField*);
 
  private:
-  std::vector<TextField*> book_fields;
-  std::vector<TextField*> disc_fields;
-  std::vector<TextField*> patron_fields;
-
-  QVBoxLayout *main_vbox;
+  QVBoxLayout *mainVbox;
+  std::vector<TextField*> bookFields;
+  std::vector<TextField*> discFields;
+  std::vector<TextField*> patronFields;
 };
 
 #endif // INFOWIDGET_H
