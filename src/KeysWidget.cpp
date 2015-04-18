@@ -21,175 +21,52 @@
 #include <QVariant>
 #include <QSqlQuery>
 #include <QHeaderView>
-#include <QMessageBox>
 #include "KeysWidget.h"
 #include "miscellanea.h"
 
 KeysWidget::KeysWidget(QString table, QStringList headerList, QWidget *parent)
 {
-  dbTable = table;
-  headers = headerList;
+  dbTableModel = new QSqlTableModel(0, QSqlDatabase::database());
+  dbTableModel->setTable(table);
+  dbTableModel->setEditStrategy(QSqlTableModel::OnFieldChange);
+  dbTableModel->select();
 
-  setColumnCount(headers.length());
-  visibleColumnCount = headers.length();
-  setHorizontalHeaderLabels(headers);
-  headerContextMenu = new QMenu(this);
-  horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-  horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
-  connect(horizontalHeader(), SIGNAL(customContextMenuRequested(QPoint)),
-	  this, SLOT(createHeaderContextMenu(QPoint)));
-
-  for (QString text : headers)
-    {
-      QAction *action = new QAction(text, this);
-      action->setCheckable(true);
-      action->setChecked(true);
-
-      headerContextMenu->addAction(action);
-      connect(action, SIGNAL(toggled(bool)), this, SLOT(modifyHeader(bool)));
-    }
-
-  // Set up cell context menus
-  setContextMenuPolicy(Qt::CustomContextMenu);
-  connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(createItemContextMenu(QPoint)));
-
-  itemContextMenu = new QMenu(this);
-  removeItemAction = new QAction("Remove", this);
-  itemContextMenu->addAction(removeItemAction);
-  connect(removeItemAction, SIGNAL(triggered()), this, SLOT(removeItem()));
-
-  // Miscellanea
-  bookstore = QSqlDatabase::database();
-  enableSorting(0, Qt::AscendingOrder);
-  setEditTriggers(QAbstractItemView::NoEditTriggers);
-  setSelectionMode(QAbstractItemView::SingleSelection);
-  setSelectionBehavior(QAbstractItemView::SelectRows);
-  setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-  verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-
-  loadItems();
+  setModel(dbTableModel);
+  show();
 }
-
-/* General functions */
 
 void KeysWidget::addItem(QString itemKey)
 {
-  QSqlQuery getItemInfo(bookstore);
-
-  if (itemKey.endsWith("b")) { getItemInfo.prepare(getBookInfo); }
-  else if (itemKey.endsWith("d")) { getItemInfo.prepare(getDiscInfo); }
-  else if (itemKey.endsWith("p")) { getItemInfo.prepare(getPatronInfo); }
-
-  getItemInfo.bindValue(":key", itemKey);
-  getItemInfo.exec();
-  getItemInfo.next();
-
-  insertRow(rowCount());
-  // We temporarily disable sorting because it causes indexing complications if
-  // the row is sorted before we're finished populating its cells.
-  std::pair<int, Qt::SortOrder> sortingInfo(disableSorting());
-  for (int i = headers.length() - 1; i >= 0; --i)
-    {
-      QTableWidgetItem *item = new QTableWidgetItem(getItemInfo.value(i).toString());
-      item->setData(Qt::UserRole, QVariant(itemKey));
-      setItem(rowCount() - 1, i, item);
-    }
-  enableSorting(sortingInfo.first, sortingInfo.second);
 }
 
-std::pair<int, Qt::SortOrder> KeysWidget::disableSorting()
+int KeysWidget::currentRow()
 {
-  std::pair<int, Qt::SortOrder> sortingInfo(horizontalHeader()->sortIndicatorSection(),
-					     horizontalHeader()->sortIndicatorOrder());
-  setSortingEnabled(false);
-  return(sortingInfo);
+  return currentIndex().row();
 }
 
-void KeysWidget::enableSorting(int sortColumn, Qt::SortOrder sortOrder)
+QString KeysWidget::currentItemKey()
 {
-  setSortingEnabled(true);
-  sortByColumn(sortColumn, sortOrder);
+  return dbTableModel->data(dbTableModel->index(currentRow(), 0)).toString();
 }
-
-void KeysWidget::loadItems()
-{
-  QSqlQuery getItemKeys(bookstore);
-  getItemKeys.exec(QString("SELECT key FROM %1;").arg(dbTable));
-
-  while (getItemKeys.next())
-    {
-      addItem(getItemKeys.value(0).toString());
-    }
-}
-
-void KeysWidget::updateItem(int row, QString itemKey)
-{
-  QSqlQuery getItemInfo(bookstore);
-
-  if (itemKey.endsWith("b")) { getItemInfo.prepare(getBookInfo); }
-  else if (itemKey.endsWith("d")) { getItemInfo.prepare(getDiscInfo); }
-  else if (itemKey.endsWith("p")) { getItemInfo.prepare(getPatronInfo); }
-
-  getItemInfo.bindValue(":key", itemKey);
-  getItemInfo.exec();
-  getItemInfo.next();
-
-  std::pair<int, Qt::SortOrder> sortingInfo(disableSorting());
-  for (int i = 0; i < headers.length(); ++i)
-    {
-      item(row, i)->setText(getItemInfo.value(i).toString());
-    }
-  enableSorting(sortingInfo.first, sortingInfo.second);
-}
-
-/* Slots */
 
 void KeysWidget::createItemContextMenu(QPoint pos)
 {
-  if (itemAt(pos) != 0)
-    {
-      itemContextMenu->popup(viewport()->mapToGlobal(pos));
-    }
+  // if (itemAt(pos) != 0)
+  //   {
+  //     itemContextMenu->popup(viewport()->mapToGlobal(pos));
+  //   }
 }
 
 void KeysWidget::createHeaderContextMenu(QPoint pos)
 {
-  headerContextMenu->popup(mapToGlobal(pos));
+  // headerContextMenu->popup(mapToGlobal(pos));
 }
 
-void KeysWidget::modifyHeader(bool checked)
+int KeysWidget::rowCount()
 {
-  int headerIndex = headers.indexOf(static_cast<QAction*>(sender())->text());
-  if (checked)
-    {
-      showColumn(headerIndex);
-      ++visibleColumnCount;
-    }
-  else if (!checked && visibleColumnCount > 1)
-    {
-      hideColumn(headerIndex);
-      --visibleColumnCount;
-    }
-  else
-    {
-      static_cast<QAction*>(sender())->setChecked(true);
-      --visibleColumnCount;
-    }
+  return dbTableModel->rowCount();
 }
 
-void KeysWidget::removeItem()
+void KeysWidget::updateItem(int itemIndex, QString itemKey)
 {
-  int confirm = QMessageBox::warning(this, "Confirm",
-				     QString("Are you sure you wish to remove this item?"),
-				     QMessageBox::Yes, QMessageBox::No);
-  if (QMessageBox::Yes == confirm)
-    {
-      QString itemKey = currentItem()->data(Qt::UserRole).toString();
-      QSqlQuery removeItem(bookstore);
-      removeItem.prepare(QString("DELETE FROM %1 WHERE key=:key;").arg(dbTable));
-      removeItem.bindValue(":key", itemKey);
-      removeItem.exec();
-
-      emit itemRemoved();
-    }
 }

@@ -179,7 +179,7 @@ void MainWindow::changeItem()
   KeysWidget* currentTab = static_cast<KeysWidget*>(keysTabwidget->currentWidget());
   if (currentTab->currentRow() > -1)
     {
-      infoWidget->setItem(currentTab->currentItem()->data(Qt::UserRole).toString());
+      infoWidget->setItem(currentTab->currentItemKey());
     }
 }
 
@@ -190,7 +190,7 @@ void MainWindow::onItemRemoved()
     {
       infoWidget->clear();
     }
-  currentTab->removeRow(currentTab->currentRow());
+  //  currentTab->removeRow(currentTab->currentRow());
   updateStatusbar();
 }
 
@@ -198,7 +198,7 @@ void MainWindow::onItemRemoved()
 void MainWindow::onFieldChanged(QString dbTable, QString sqlFieldName, QString newText)
 {
   KeysWidget* currentTab = static_cast<KeysWidget*>(keysTabwidget->currentWidget());
-  QString itemKey = currentTab->currentItem()->data(Qt::UserRole).toString();
+  QString itemKey = currentTab->currentItemKey();
   QSqlQuery updateBookInfo(bookstore);
   updateBookInfo.prepare(QString("UPDATE %1 SET %2=:newText WHERE key=:bookKey;").arg(dbTable, sqlFieldName));
   updateBookInfo.bindValue(":table", dbTable);

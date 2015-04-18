@@ -20,12 +20,13 @@
 #define KEYSWIDGET_H
 
 #include <utility>
+#include <QTableView>
 #include <QSqlDatabase>
-#include <QTableWidget>
+#include <QSqlTableModel>
 
 /* The QTableWidget subclass that displays a list of all the items in a
    table. */
-class KeysWidget : public QTableWidget
+class KeysWidget : public QTableView
 {
   Q_OBJECT
 
@@ -33,28 +34,26 @@ class KeysWidget : public QTableWidget
   void itemRemoved();
 
   private slots:
-    void removeItem();
-    void modifyHeader(bool);
     void createItemContextMenu(QPoint);
     void createHeaderContextMenu(QPoint);
 
  public:
     KeysWidget(QString, QStringList, QWidget *parent = 0);
-    void loadItems();
+    int rowCount();
+    int currentRow();
+    /* void loadItems(); */
     void addItem(QString);
     void updateItem(int, QString);
+    QString currentItemKey();
 
  private:
-    void enableSorting(int, Qt::SortOrder);
+    /* void enableSorting(int, Qt::SortOrder); */
     
-    int visibleColumnCount;
+    /* int visibleColumnCount; */
     QMenu *itemContextMenu;
     QMenu *headerContextMenu;
     QAction *removeItemAction;
-    QString dbTable;
-    QStringList headers;
-    QSqlDatabase bookstore;
-    std::pair<int, Qt::SortOrder> disableSorting();
+    QSqlTableModel *dbTableModel;
 };
 
 #endif // KEYSWIDGET_H
