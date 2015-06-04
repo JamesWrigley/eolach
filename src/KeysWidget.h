@@ -53,7 +53,7 @@ class KeysWidget : public QTableWidget
     QAction *removeItemAction;
     QString dbTable;
     QStringList headers;
-    QSqlDatabase bookstore;
+    QSqlDatabase database;
     std::pair<int, Qt::SortOrder> disableSorting();
 };
 

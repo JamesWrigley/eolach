@@ -33,7 +33,7 @@ MainWindow::MainWindow()
   // Set up GUI
   keysTabwidget = new QTabWidget();
   createInfoWidget();
-  booksWidget = new KeysWidget("bookstore", (QStringList() << "Title" << "Author"
+  booksWidget = new KeysWidget("books", (QStringList() << "Title" << "Author"
 					     << "Genre" << "Publication Date" << "ISBN"));
   discsWidget = new KeysWidget("discs", (QStringList() << "Title" << "Director/Speaker"
 					 << "Length" << "Year" << "Type"));
@@ -114,11 +114,11 @@ void MainWindow::createInfoWidget()
   infoWidget = new InfoWidget();
 
   // Book fields
-  isbn = new TextField("bookstore", "isbn", "ISBN:", &validateIsbn);
-  title = new TextField("bookstore", "title", "Title:", &validateGenericField);
-  genre = new TextField("bookstore", "genre", "Genre:", &validateGenericField);
-  author = new TextField("bookstore", "author", "Author:", &validateGenericField);
-  publicationDate = new TextField("bookstore", "publication_date", "Publication Date:", &validateNumericField);
+  isbn = new TextField("books", "isbn", "ISBN:", &validateIsbn);
+  title = new TextField("books", "title", "Title:", &validateGenericField);
+  genre = new TextField("books", "genre", "Genre:", &validateGenericField);
+  author = new TextField("books", "author", "Author:", &validateGenericField);
+  publicationDate = new TextField("books", "publication_date", "Publication Date:", &validateNumericField);
   bookFields = {title, author, genre, publicationDate, isbn};
 
   // Disc fields

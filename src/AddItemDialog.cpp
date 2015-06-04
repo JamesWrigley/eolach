@@ -105,7 +105,7 @@ void AddItemDialog::addBook()
   genresList.sort(Qt::CaseInsensitive);
 
   QSqlQuery insert(QSqlDatabase::database());
-  insert.prepare("INSERT INTO bookstore (key, isbn, title, author, publication_date, genre) "
+  insert.prepare("INSERT INTO books (key, isbn, title, author, publication_date, genre) "
 		 "VALUES (:key, :isbn, :title, :author, :publication_date, :genre)");
   insert.bindValue(":key", itemKey);
   insert.bindValue(":isbn", isbn->text());

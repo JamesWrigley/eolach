@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
       bookstore.open();
 
       QSqlQuery initializeDb(bookstore);
-      initializeDb.exec("CREATE TABLE bookstore ("
+      initializeDb.exec("CREATE TABLE books ("
 			"key TEXT PRIMARY KEY, "
 			"isbn TEXT, "
 			"title TEXT, "

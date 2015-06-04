@@ -24,7 +24,7 @@
 /* Here we define some things that don't quite fit anywhere else */
 
 // SQL queries for getting all the columns for a row from a table.
-const QString getBookInfo = "SELECT title, author, genre, publication_date, isbn FROM bookstore WHERE key=:key;";
+const QString getBookInfo = "SELECT title, author, genre, publication_date, isbn FROM books WHERE key=:key;";
 const QString getDiscInfo = "SELECT title, directorOrSpeaker, length, year, type FROM discs WHERE key=:key;";
 const QString getPatronInfo = "SELECT name, address, mobile_num, landline_num, items FROM patrons WHERE key=:key;";
 

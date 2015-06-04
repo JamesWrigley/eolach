@@ -40,7 +40,7 @@ void CLineEdit::mouseDoubleClickEvent(QMouseEvent *event)
 {
   QSqlDatabase bookstore = QSqlDatabase::database();
   QSqlQuery getRowCount;
-  getRowCount.exec("SELECT COUNT(*) FROM bookstore;");
+  getRowCount.exec("SELECT COUNT(*) FROM books;");
   getRowCount.next();
 
   emit doubleClicked();

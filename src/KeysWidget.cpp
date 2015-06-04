@@ -59,7 +59,7 @@ KeysWidget::KeysWidget(QString table, QStringList headerList, QWidget *parent)
   connect(removeItemAction, SIGNAL(triggered()), this, SLOT(removeItem()));
 
   // Miscellanea
-  bookstore = QSqlDatabase::database();
+  database = QSqlDatabase::database();
   enableSorting(0, Qt::AscendingOrder);
   setEditTriggers(QAbstractItemView::NoEditTriggers);
   setSelectionMode(QAbstractItemView::SingleSelection);
@@ -74,7 +74,7 @@ KeysWidget::KeysWidget(QString table, QStringList headerList, QWidget *parent)
 
 void KeysWidget::addItem(QString itemKey)
 {
-  QSqlQuery getItemInfo(bookstore);
+  QSqlQuery getItemInfo(database);
 
   if (itemKey.endsWith("b")) { getItemInfo.prepare(getBookInfo); }
   else if (itemKey.endsWith("d")) { getItemInfo.prepare(getDiscInfo); }
@@ -113,7 +113,7 @@ void KeysWidget::enableSorting(int sortColumn, Qt::SortOrder sortOrder)
 
 void KeysWidget::loadItems()
 {
-  QSqlQuery getItemKeys(bookstore);
+  QSqlQuery getItemKeys(database);
   getItemKeys.exec(QString("SELECT key FROM %1;").arg(dbTable));
 
   while (getItemKeys.next())
@@ -124,7 +124,7 @@ void KeysWidget::loadItems()
 
 void KeysWidget::updateItem(int row, QString itemKey)
 {
-  QSqlQuery getItemInfo(bookstore);
+  QSqlQuery getItemInfo(database);
 
   if (itemKey.endsWith("b")) { getItemInfo.prepare(getBookInfo); }
   else if (itemKey.endsWith("d")) { getItemInfo.prepare(getDiscInfo); }
@@ -185,7 +185,7 @@ void KeysWidget::removeItem()
   if (QMessageBox::Yes == confirm)
     {
       QString itemKey = currentItem()->data(Qt::UserRole).toString();
-      QSqlQuery removeItem(bookstore);
+      QSqlQuery removeItem(database);
       removeItem.prepare(QString("DELETE FROM %1 WHERE key=:key;").arg(dbTable));
       removeItem.bindValue(":key", itemKey);
       removeItem.exec();
