@@ -42,30 +42,33 @@ int main(int argc, char *argv[])
       bookstore.setDatabaseName(dbPath);
       bookstore.open();
 
-      QSqlQuery initializeDb(bookstore);
-      initializeDb.exec("CREATE TABLE books ("
-			"key TEXT PRIMARY KEY, "
-			"isbn TEXT, "
-			"title TEXT, "
-			"author TEXT, "
-			"publication_date TEXT, "
-			"genre TEXT); "
+      // QSqlQuery's can only handle one statement at a time, hence the split-up
+      QSqlQuery createBooksTable(bookstore);
+      QSqlQuery createPatronsTable(bookstore);
+      QSqlQuery createDiscsTable(bookstore);
+      createBooksTable.exec("CREATE TABLE books ("
+                              "key TEXT PRIMARY KEY, "
+                              "isbn TEXT, "
+                              "title TEXT, "
+                              "author TEXT, "
+                              "publication_date TEXT, "
+                              "genre TEXT);");
 
-			"CREATE TABLE patrons ("
-			"key TEXT PRIMARY KEY, "
-			"name TEXT, "
-			"address TEXT, "
-			"mobile_num TEXT, "
-			"landline_num TEXT, "
-			"items TEXT); "
+      createPatronsTable.exec("CREATE TABLE patrons ("
+                              "key TEXT PRIMARY KEY, "
+                              "name TEXT, "
+                              "address TEXT, "
+                              "mobile_num TEXT, "
+                              "landline_num TEXT, "
+                              "items TEXT);");
 
-			"CREATE TABLE discs ("
-			"key TEXT PRIMARY KEY, "
-			"title TEXT, "
-			"directorOrSpeaker TEXT, "
-			"length TEXT, "
-			"year TEXT, "
-			"type TEXT);");
+      createDiscsTable.exec("CREATE TABLE discs ("
+                            "key TEXT PRIMARY KEY, "
+                            "title TEXT, "
+                            "directorOrSpeaker TEXT, "
+                            "length TEXT, "
+                            "year TEXT, "
+                            "type TEXT);");
     }
 
   // Start the application
