@@ -20,15 +20,18 @@
 #include <QAction>
 #include <QVariant>
 #include <QSqlQuery>
+#include <QSqlRecord>
 #include <QHeaderView>
 #include <QMessageBox>
 #include "KeysWidget.h"
 #include "miscellanea.h"
 
-KeysWidget::KeysWidget(QString table, QStringList headerList, QWidget *parent)
+KeysWidget::KeysWidget(QString table, QString get_item_info_query,
+                       QStringList header_list, QWidget *parent)
 {
   dbTable = table;
-  headers = headerList;
+  headers = header_list;
+  getItemInfoQuery = get_item_info_query;
 
   setColumnCount(headers.length());
   visibleColumnCount = headers.length();
@@ -74,15 +77,7 @@ KeysWidget::KeysWidget(QString table, QStringList headerList, QWidget *parent)
 
 void KeysWidget::addItem(QString itemKey)
 {
-  QSqlQuery getItemInfo(database);
-
-  if (itemKey.endsWith("b")) { getItemInfo.prepare(getBookInfo); }
-  else if (itemKey.endsWith("d")) { getItemInfo.prepare(getDiscInfo); }
-  else if (itemKey.endsWith("p")) { getItemInfo.prepare(getPatronInfo); }
-
-  getItemInfo.bindValue(":key", itemKey);
-  getItemInfo.exec();
-  getItemInfo.next();
+  QStringList itemInfo = getItemInfo(itemKey);
 
   insertRow(rowCount());
   // We temporarily disable sorting because it causes indexing complications if
@@ -90,7 +85,7 @@ void KeysWidget::addItem(QString itemKey)
   std::pair<int, Qt::SortOrder> sortingInfo(disableSorting());
   for (int i = headers.length() - 1; i >= 0; --i)
     {
-      QTableWidgetItem *item = new QTableWidgetItem(getItemInfo.value(i).toString());
+      QTableWidgetItem *item = new QTableWidgetItem(itemInfo.at(i));
       item->setData(Qt::UserRole, QVariant(itemKey));
       setItem(rowCount() - 1, i, item);
     }
@@ -111,6 +106,23 @@ void KeysWidget::enableSorting(int sortColumn, Qt::SortOrder sortOrder)
   sortByColumn(sortColumn, sortOrder);
 }
 
+QStringList KeysWidget::getItemInfo(QString itemKey)
+{
+  QSqlQuery getInfo(database);
+  getInfo.prepare(getItemInfoQuery);
+  getInfo.bindValue(":key", itemKey);
+  getInfo.exec();
+  getInfo.next();
+
+  QStringList itemInfo;
+  for (int i = 0; i < getInfo.record().count(); ++i)
+    {
+      itemInfo << getInfo.value(i).toString();
+    }
+
+  return itemInfo;
+}
+
 void KeysWidget::loadItems()
 {
   QSqlQuery getItemKeys(database);
@@ -124,20 +136,12 @@ void KeysWidget::loadItems()
 
 void KeysWidget::updateItem(int row, QString itemKey)
 {
-  QSqlQuery getItemInfo(database);
-
-  if (itemKey.endsWith("b")) { getItemInfo.prepare(getBookInfo); }
-  else if (itemKey.endsWith("d")) { getItemInfo.prepare(getDiscInfo); }
-  else if (itemKey.endsWith("p")) { getItemInfo.prepare(getPatronInfo); }
-
-  getItemInfo.bindValue(":key", itemKey);
-  getItemInfo.exec();
-  getItemInfo.next();
+  QStringList itemInfo = getItemInfo(itemKey);
 
   std::pair<int, Qt::SortOrder> sortingInfo(disableSorting());
   for (int i = 0; i < headers.length(); ++i)
     {
-      item(row, i)->setText(getItemInfo.value(i).toString());
+      item(row, i)->setText(itemInfo.at(i));
     }
   enableSorting(sortingInfo.first, sortingInfo.second);
 }

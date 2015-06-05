@@ -33,12 +33,12 @@ MainWindow::MainWindow()
   // Set up GUI
   keysTabwidget = new QTabWidget();
   createInfoWidget();
-  booksWidget = new KeysWidget("books", (QStringList() << "Title" << "Author"
-					     << "Genre" << "Publication Date" << "ISBN"));
-  discsWidget = new KeysWidget("discs", (QStringList() << "Title" << "Director/Speaker"
-					 << "Length" << "Year" << "Type"));
-  patronsWidget = new KeysWidget("patrons", (QStringList() << "Name" << "Address" <<
-					     "Mobile No." << "Landline No."));
+  booksWidget = new KeysWidget("books", getBookInfo, (QStringList() << "Title" << "Author"
+                                                      << "Genre" << "Publication Date" << "ISBN"));
+  discsWidget = new KeysWidget("discs", getDiscInfo, (QStringList() << "Title" << "Director/Speaker"
+                                                      << "Length" << "Year" << "Type"));
+  patronsWidget = new KeysWidget("patrons", getPatronInfo, (QStringList() << "Name" << "Address" <<
+                                                            "Mobile No." << "Landline No."));
   splitter = new QSplitter(this);
 
   keysTabwidget->addTab(booksWidget, "Books");

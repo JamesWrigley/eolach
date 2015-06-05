@@ -39,19 +39,21 @@ class KeysWidget : public QTableWidget
     void createHeaderContextMenu(QPoint);
 
  public:
-    KeysWidget(QString, QStringList, QWidget *parent = 0);
+    KeysWidget(QString, QString, QStringList, QWidget *parent = 0);
     void loadItems();
     void addItem(QString);
     void updateItem(int, QString);
 
  private:
     void enableSorting(int, Qt::SortOrder);
+    QStringList getItemInfo(QString);
     
     int visibleColumnCount;
     QMenu *itemContextMenu;
     QMenu *headerContextMenu;
     QAction *removeItemAction;
     QString dbTable;
+    QString getItemInfoQuery;
     QStringList headers;
     QSqlDatabase database;
     std::pair<int, Qt::SortOrder> disableSorting();
