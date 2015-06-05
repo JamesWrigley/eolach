@@ -41,8 +41,8 @@ AddItemDialog::AddItemDialog(QWidget *parent)
   bookFields = {title, author, genre, publicationDate, isbn};
   for (DLineEdit *field : bookFields) { bookLayout->addLayout(field); }
   bookWidget->setLayout(bookLayout);
-  setupCompletion(author, "author");
-  setupCompletion(genre, "genre");
+  enableCompletion(author, "author", "books");
+  enableCompletion(genre, "genre", "books");
 
   // Disc fields widget
   discWidget = new QWidget(this);
@@ -206,14 +206,14 @@ void AddItemDialog::checkFields()
     }
 }
 
-void AddItemDialog::setupCompletion(DLineEdit *field, QString sqlField)
+// We assume the values are stored as CSV
+void AddItemDialog::enableCompletion(DLineEdit *widget, QString field, QString table)
 {
-  QStringListModel* completionModel = new QStringListModel(this);
   QStringList completionList;
-  QSqlDatabase bookstore = QSqlDatabase::database();
+  QStringListModel* completionModel = new QStringListModel(this);
 
-  QSqlQuery getColumn(bookstore);
-  getColumn.exec(QString("SELECT %1 FROM bookstore;").arg(sqlField));
+  QSqlQuery getColumn(QSqlDatabase::database());
+  getColumn.exec(QString("SELECT %1 FROM %2;").arg(field, table));
 
   while (getColumn.next())
     {
@@ -227,5 +227,5 @@ void AddItemDialog::setupCompletion(DLineEdit *field, QString sqlField)
 
   completionList.removeDuplicates();
   completionModel->setStringList(completionList);
-  field->enableCompletion(completionModel);
+  widget->enableCompletion(completionModel);
 }
