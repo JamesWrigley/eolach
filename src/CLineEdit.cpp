@@ -17,23 +17,40 @@
  *********************************************************************************/
 
 #include <QSqlQuery>
-#include <QSqlDatabase>
 #include <QMouseEvent>
+#include <QSqlDatabase>
 #include "CLineEdit.h"
 
 CLineEdit::CLineEdit(QWidget* parent)
 {
-  connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
   // We set this now to use in onEditingFinished since the window color will
   // have by then been changed by mouseDoubleClickEvent().
   backgroundColor = palette().color(QPalette::Window).name();
-  tooltip = "Double-click to edit";
+  mouseOverColor = palette().color(QPalette::Window).darker(110).name();
+
+  connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
 
   setReadOnly(true);
   setFrame(false);
   setStyleSheet("QLineEdit { background: " + backgroundColor + " }");
-  setToolTip(tooltip);
-  setToolTipDuration(3000);
+}
+
+void CLineEdit::enterEvent(QEvent* event)
+{
+  // We check isReadOnly() because it will be true whenever the user isn't
+  // editing, and we don't want to change the background during the edit.
+  if (text().length() > 0 && isReadOnly())
+    {
+      setStyleSheet("QLineEdit { background: " + mouseOverColor + " }");
+    }
+}
+
+void CLineEdit::leaveEvent(QEvent* event)
+{
+  if (text().length() > 0 && isReadOnly())
+    {
+      setStyleSheet("QLineEdit { background: " + backgroundColor + " }");
+    }
 }
 
 void CLineEdit::mouseDoubleClickEvent(QMouseEvent *event)
@@ -50,7 +67,6 @@ void CLineEdit::mouseDoubleClickEvent(QMouseEvent *event)
       setReadOnly(false);
       setFrame(true);
       setStyleSheet("QLineEdit { background: #F7F7F7 }");
-      setToolTip("");
       selectAll();
     }
 }
@@ -60,7 +76,6 @@ void CLineEdit::onEditingFinished()
   setReadOnly(true);
   setFrame(false);
   setStyleSheet("QLineEdit { background: " + backgroundColor + " }");
-  setToolTip(tooltip);
   deselect();
 
   currentText = text();

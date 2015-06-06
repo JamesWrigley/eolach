@@ -38,10 +38,12 @@ class CLineEdit : public QLineEdit
     CLineEdit(QWidget* parent = 0);
 
  private:
+    void enterEvent(QEvent*);
+    void leaveEvent(QEvent*);
     void mouseDoubleClickEvent(QMouseEvent *event);
 
-    QString tooltip;
     QString currentText;
+    QString mouseOverColor;
     QString backgroundColor;
 };
 
