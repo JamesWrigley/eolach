@@ -38,7 +38,6 @@ TextField::TextField(QString table, QString sqlField, QString labelName, bool (*
   addWidget(label);
   addWidget(editBox);
   addWidget(icon);
-  icon->hide();
 }
 
 void TextField::enterEditMode()
