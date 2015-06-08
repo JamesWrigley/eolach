@@ -37,9 +37,10 @@ class DLineEdit : public QHBoxLayout
  public:
     DLineEdit(QString, bool (*)(QString), QWidget *parent = 0);
     void enableCompletion(QStringListModel*);
-    bool valid;
-    QString text();
     QString placeholderText();
+    void setFocus();
+    QString text();
+    bool valid;
 
  private:
     bool (*checkFunction)(QString);

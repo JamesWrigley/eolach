@@ -34,6 +34,7 @@ class AddItemDialog : public QDialog
 
   private slots:
     void checkFields();
+    void changeLayout(int);
 
  public:
     AddItemDialog(QWidget *parent);

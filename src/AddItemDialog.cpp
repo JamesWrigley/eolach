@@ -79,7 +79,7 @@ AddItemDialog::AddItemDialog(QWidget *parent)
   finishButton->setDefault(true);
 
   connect(finishButton, SIGNAL(clicked(bool)), this, SLOT(checkFields()));
-  connect(itemSelector, SIGNAL(currentIndexChanged(int)), stacker, SLOT(setCurrentIndex(int)));
+  connect(itemSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(changeLayout(int)));
 
   selectorHbox->addWidget(selectorDescription);
   selectorHbox->addWidget(itemSelector);
@@ -88,6 +88,7 @@ AddItemDialog::AddItemDialog(QWidget *parent)
   mainLayout->addStretch();
   mainLayout->addWidget(finishButton);
   setLayout(mainLayout);
+  changeLayout(0);
 }
 
 void AddItemDialog::addBook()
@@ -159,6 +160,25 @@ void AddItemDialog::addPatron()
 QString AddItemDialog::getItemKey()
 {
   return itemKey;
+}
+
+void AddItemDialog::changeLayout(int index)
+{
+  stacker->setCurrentIndex(index);
+
+  // Set focus on the top widget
+  if (index == 0)
+    {
+      title->setFocus();
+    }
+  else if (index == 1)
+    {
+      discTitle->setFocus();
+    }
+  else if (index == 2)
+    {
+      name->setFocus();
+    }
 }
 
 void AddItemDialog::checkFields()

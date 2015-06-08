@@ -62,6 +62,11 @@ QString DLineEdit::placeholderText()
   return lineedit->placeholderText();
 }
 
+void DLineEdit::setFocus()
+{
+  lineedit->setFocus();
+}
+
 QString DLineEdit::text()
 {
   return lineedit->text();
