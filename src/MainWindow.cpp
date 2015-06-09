@@ -150,18 +150,26 @@ void MainWindow::onItemRemoved()
   updateStatusbar();
 }
 
-/* Called when an items data is changed from the infoWidget */
+/* Called when an items data is changed from the InfoWidget */
 void MainWindow::onFieldChanged(QString dbTable, QString sqlFieldName, QString newText)
 {
   KeysWidget* currentTab = static_cast<KeysWidget*>(keysTabwidget->currentWidget());
-  QString itemKey = currentTab->currentItem()->data(Qt::UserRole).toString();
-  QSqlQuery updateBookInfo(bookstore);
-  updateBookInfo.prepare(QString("UPDATE %1 SET %2=:newText WHERE key=:bookKey;").arg(dbTable, sqlFieldName));
-  updateBookInfo.bindValue(":table", dbTable);
-  updateBookInfo.bindValue(":newText", newText);
-  updateBookInfo.bindValue(":bookKey", itemKey);
-  updateBookInfo.exec();
 
-  infoWidget->setItem(itemKey);
-  currentTab->updateItem(currentTab->currentRow(), itemKey);
+  // Well, it's supposed to only be called when item data is changed. It also
+  // seems to be called when switching tabs, and if they're empty then
+  // currentRow() will be -1, causing a segfault when we try to get itemKey
+  // later on. Hence the check.
+  if (currentTab->currentRow() > -1)
+    {
+      QString itemKey = currentTab->currentItem()->data(Qt::UserRole).toString();
+      QSqlQuery updateBookInfo(bookstore);
+      updateBookInfo.prepare(QString("UPDATE %1 SET %2=:newText WHERE key=:bookKey;").arg(dbTable, sqlFieldName));
+      updateBookInfo.bindValue(":table", dbTable);
+      updateBookInfo.bindValue(":newText", newText);
+      updateBookInfo.bindValue(":bookKey", itemKey);
+      updateBookInfo.exec();
+
+      infoWidget->setItem(itemKey);
+      currentTab->updateItem(currentTab->currentRow(), itemKey);
+    }
 }
