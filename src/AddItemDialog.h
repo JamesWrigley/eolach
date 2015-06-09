@@ -39,10 +39,11 @@ class AddItemDialog : public QDialog
  public:
     AddItemDialog(QWidget *parent);
     QString getItemKey();
-    void enableCompletion(DLineEdit*, QString, QString);
 
  private:
     void addItem();
+    void enableCompletion(DLineEdit*, QString, QString);
+
     QLabel *selectorDescription;
     QString itemKey;
     QComboBox *itemSelector;
