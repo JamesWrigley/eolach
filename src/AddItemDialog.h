@@ -42,9 +42,7 @@ class AddItemDialog : public QDialog
     void enableCompletion(DLineEdit*, QString, QString);
 
  private:
-    void addBook();
-    void addDisc();
-    void addPatron();
+    void addItem();
     QLabel *selectorDescription;
     QString itemKey;
     QComboBox *itemSelector;

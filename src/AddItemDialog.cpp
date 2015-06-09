@@ -91,68 +91,62 @@ AddItemDialog::AddItemDialog(QWidget *parent)
   changeLayout(0);
 }
 
-void AddItemDialog::addBook()
+void AddItemDialog::addItem()
 {
-  // Generate hash of book data to be used as a key
+  // The keys are random numbers with the item type appended to them
   std::random_device keyGen;
-  itemKey = QString::number(keyGen()) + "b";
-
-  // Sort the authors and genres
-  QStringList authorsList = author->text().split(",", QString::SkipEmptyParts);
-  for (int i = 0; i < authorsList.size(); ++i) { authorsList[i] = authorsList[i].simplified(); }
-  authorsList.sort(Qt::CaseInsensitive);
-  QStringList genresList = genre->text().split(",", QString::SkipEmptyParts);
-  for (int i = 0; i < genresList.size(); ++i) { genresList[i] = genresList[i].simplified(); }
-  genresList.sort(Qt::CaseInsensitive);
-
   QSqlQuery insert(QSqlDatabase::database());
-  insert.prepare("INSERT INTO books (key, isbn, title, author, publication_date, genre) "
-		 "VALUES (:key, :isbn, :title, :author, :publication_date, :genre)");
-  insert.bindValue(":key", itemKey);
-  insert.bindValue(":isbn", isbn->text());
-  insert.bindValue(":title", title->text());
-  insert.bindValue(":author", authorsList.join(", "));
-  insert.bindValue(":publication_date", publicationDate->text());
-  insert.bindValue(":genre", genresList.join(", "));
-  insert.exec();
 
-  done(QDialog::Accepted);
-}
+  if (stacker->currentIndex() == 0) // Add book
+    {
+      itemKey = QString::number(keyGen()) + "b";
+      
+      // Sort the authors and genres
+      QStringList authorsList = author->text().split(",", QString::SkipEmptyParts);
+      for (int i = 0; i < authorsList.size(); ++i) { authorsList[i] = authorsList[i].simplified(); }
+      authorsList.sort(Qt::CaseInsensitive);
+      QStringList genresList = genre->text().split(",", QString::SkipEmptyParts);
+      for (int i = 0; i < genresList.size(); ++i) { genresList[i] = genresList[i].simplified(); }
+      genresList.sort(Qt::CaseInsensitive);
 
-void AddItemDialog::addDisc()
-{
-  std::random_device keyGen;
-  itemKey = QString::number(keyGen()) + "d";
+      insert.prepare("INSERT INTO books (key, isbn, title, author, publication_date, genre) "
+                     "VALUES (:key, :isbn, :title, :author, :publication_date, :genre)");
+      insert.bindValue(":key", itemKey);
+      insert.bindValue(":isbn", isbn->text());
+      insert.bindValue(":title", title->text());
+      insert.bindValue(":author", authorsList.join(", "));
+      insert.bindValue(":publication_date", publicationDate->text());
+      insert.bindValue(":genre", genresList.join(", "));
+      insert.exec();
+    }
+  else if (stacker->currentIndex() == 1) // Add disc
+    {
+      itemKey = QString::number(keyGen()) + "d";
 
-  QSqlQuery insert(QSqlDatabase::database());
-  insert.prepare("INSERT INTO discs (key, title, directorOrSpeaker, length, year, type) "
-		 "VALUES (:key, :title, :directorOrSpeaker, :length, :year, :type);");
-  insert.bindValue(":key", itemKey);
-  insert.bindValue(":title", discTitle->text());
-  insert.bindValue(":directorOrSpeaker", directorOrSpeaker->text());
-  insert.bindValue(":length", length->text());
-  insert.bindValue(":year", year->text());
-  insert.bindValue(":type", type->text());
-  insert.exec();
+      insert.prepare("INSERT INTO discs (key, title, directorOrSpeaker, length, year, type) "
+                     "VALUES (:key, :title, :directorOrSpeaker, :length, :year, :type);");
+      insert.bindValue(":key", itemKey);
+      insert.bindValue(":title", discTitle->text());
+      insert.bindValue(":directorOrSpeaker", directorOrSpeaker->text());
+      insert.bindValue(":length", length->text());
+      insert.bindValue(":year", year->text());
+      insert.bindValue(":type", type->text());
+      insert.exec();
+    }
+  else if (stacker->currentIndex() == 2) // Add patron
+    {
+      itemKey = QString::number(keyGen()) + "p";
 
-  done(QDialog::Accepted);
-}
-
-void AddItemDialog::addPatron()
-{
-  std::random_device keyGen;
-  itemKey = QString::number(keyGen()) + "p";
-
-  QSqlQuery insert(QSqlDatabase::database());
-  insert.prepare("INSERT INTO patrons (key, name, address, mobile_num, landline_num, items) "
-		 "VALUES (:key, :name, :address, :mobile_num, :landline_num, :items);");
-  insert.bindValue(":key", itemKey);
-  insert.bindValue(":name", name->text());
-  insert.bindValue(":address", address->text());
-  insert.bindValue(":mobile_num", mobileNum->text());
-  insert.bindValue(":landline_num", landlineNum->text());
-  insert.bindValue(":items", "");
-  insert.exec();
+      insert.prepare("INSERT INTO patrons (key, name, address, mobile_num, landline_num, items) "
+                     "VALUES (:key, :name, :address, :mobile_num, :landline_num, :items);");
+      insert.bindValue(":key", itemKey);
+      insert.bindValue(":name", name->text());
+      insert.bindValue(":address", address->text());
+      insert.bindValue(":mobile_num", mobileNum->text());
+      insert.bindValue(":landline_num", landlineNum->text());
+      insert.bindValue(":items", "");
+      insert.exec();
+    }
 
   done(QDialog::Accepted);
 }
@@ -211,18 +205,12 @@ void AddItemDialog::checkFields()
 					 invalidFields +
 					 " invalid, would you like to continue anyway?",
 					 QMessageBox::Yes, QMessageBox::No);
-      if (QMessageBox::Yes == confirm)
-	{
-	  if (stacker->currentIndex() == 0) { addBook(); }
-	  else if (stacker->currentIndex() == 1) { addDisc(); }
-	  else if (stacker->currentIndex() == 2) { addPatron(); }
-	}
+
+      if (QMessageBox::Yes == confirm) { addItem(); }
     }
   else
     {
-      if (stacker->currentIndex() == 0) { addBook(); }
-      else if (stacker->currentIndex() == 1) { addDisc(); }
-      else if (stacker->currentIndex() == 2) { addPatron(); }
+      addItem();
     }
 }
 
