@@ -32,7 +32,7 @@ MainWindow::MainWindow()
 {
   // Set up GUI
   keysTabwidget = new QTabWidget();
-  createInfoWidget();
+  infoWidget = new InfoWidget(this);
   booksWidget = new KeysWidget("books", getBookInfo, (QStringList() << "Title" << "Author"
                                                       << "Genre" << "Publication Date" << "ISBN"));
   discsWidget = new KeysWidget("discs", getDiscInfo, (QStringList() << "Title" << "Director/Speaker"
@@ -62,7 +62,7 @@ MainWindow::MainWindow()
   fileMenu->addAction(exitAction);
   toolbar->addAction(addItemAction);
 
-  connect(keysTabwidget, SIGNAL(currentChanged(int)), this, SLOT(onTabChanged(int)));
+  connect(keysTabwidget, SIGNAL(currentChanged(int)), infoWidget, SLOT(changeLayout(int)));
 
   for (KeysWidget *widget : {booksWidget, discsWidget, patronsWidget})
     {
@@ -107,50 +107,6 @@ void MainWindow::createAddItemDialog()
 	}
       updateStatusbar();
     }
-}
-
-void MainWindow::createInfoWidget()
-{
-  infoWidget = new InfoWidget();
-
-  // Book fields
-  isbn = new TextField("books", "isbn", "ISBN:", &validateIsbn);
-  title = new TextField("books", "title", "Title:", &validateGenericField);
-  genre = new TextField("books", "genre", "Genre:", &validateGenericField);
-  author = new TextField("books", "author", "Author:", &validateGenericField);
-  publicationDate = new TextField("books", "publication_date", "Publication Date:", &validateNumericField);
-  bookFields = {title, author, genre, publicationDate, isbn};
-
-  // Disc fields
-  discTitle = new TextField("discs", "title", "Title:", &validateGenericField);
-  directorOrSpeaker = new TextField("discs", "directorOrSpeaker", "Director/Speaker:", &validateGenericField);
-  length = new TextField("discs", "length", "Length:", &validateGenericField);
-  year = new TextField("discs", "year", "Year:", &validateNumericField);
-  type = new TextField("discs", "type", "Type:", &validateGenericField);
-  discFields = {discTitle, directorOrSpeaker, length, year, type};
-
-  // Patron fields
-  name = new TextField("patrons", "name", "Name:", &validateGenericField);
-  address = new TextField("patrons", "address", "Address:", &validateGenericField);
-  items = new TextField("patrons", "items", "Borrowed items:", &validateGenericField); // Check if any items are overdue instead?
-  mobileNum = new TextField("patrons", "mobile_num", "Mobile No.", &validateNumericField);
-  landlineNum = new TextField("patrons", "landline_num", "Landline No.", &validateNumericField);
-  patronFields = {name, address, mobileNum, landlineNum, items};
-
-  for (TextField* field : {title, author, genre, publicationDate, isbn,
-	discTitle, directorOrSpeaker, length, year, type,
-	name, address, mobileNum, landlineNum, items})
-    {
-      connect(field, SIGNAL(fieldChanged(QString, QString, QString)),
-	      this, SLOT(onFieldChanged(QString, QString, QString)));
-    }
-  for (TextField *field : bookFields) { infoWidget->addField(field, "b"); }
-  for (TextField *field : discFields) { infoWidget->addField(field, "d"); }
-  for (TextField *field : patronFields) { infoWidget->addField(field, "p"); }
-
-  // We hide the patron and disc fields because the default tab is for the books
-  for (TextField *field : patronFields) { field->hide(); }
-  for (TextField *field : discFields) { field->hide(); }
 }
 
 void MainWindow::centerWindow()
@@ -208,26 +164,4 @@ void MainWindow::onFieldChanged(QString dbTable, QString sqlFieldName, QString n
 
   infoWidget->setItem(itemKey);
   currentTab->updateItem(currentTab->currentRow(), itemKey);
-}
-
-void MainWindow::onTabChanged(int index)
-{
-  if (index == 0)
-    {
-      for (TextField *field : bookFields) { field->show(); }
-      for (TextField *field : discFields) { field->hide(); }
-      for (TextField *field : patronFields) { field->hide(); }
-    }
-  else if (index == 1)
-    {
-      for (TextField *field : bookFields) { field->hide(); }
-      for (TextField *field : discFields) { field->show(); }
-      for (TextField *field : patronFields) { field->hide(); }
-    }
-  else if (index == 2)
-    {
-      for (TextField *field : bookFields) { field->hide(); }
-      for (TextField *field : discFields) { field->hide(); }
-      for (TextField *field : patronFields) { field->show(); }
-    }
 }

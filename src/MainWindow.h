@@ -32,13 +32,14 @@ class MainWindow : public QMainWindow
 {
   Q_OBJECT
 
-  private slots:
-    void changeItem();
-    void onItemRemoved();
-    void onTabChanged(int);
-    void createAddItemDialog();
-    void onFieldChanged(QString, QString, QString);
+ private slots:
+   void changeItem();
+   void onItemRemoved();
+   void createAddItemDialog();
 
+ public slots:
+   void onFieldChanged(QString, QString, QString);
+   
  public:
     MainWindow();
     ~MainWindow();
@@ -59,28 +60,6 @@ class MainWindow : public QMainWindow
     InfoWidget *infoWidget;
     QTabWidget *keysTabwidget;
     QSqlDatabase bookstore;
-
-    TextField *title;
-    TextField *genre;
-    TextField *author;
-    TextField *publicationDate;
-
-    TextField *isbn;
-    TextField *name;
-    TextField *items;
-    TextField *address;
-    TextField *mobileNum;
-    TextField *landlineNum;
-
-    TextField *year;
-    TextField *type;
-    TextField *length;
-    TextField *discTitle;
-    TextField *directorOrSpeaker;
-
-    std::vector<TextField*> bookFields;
-    std::vector<TextField*> discFields;
-    std::vector<TextField*> patronFields;
 };
 
 #endif // MAINWINDOW_H

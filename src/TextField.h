@@ -30,10 +30,10 @@ class TextField : public QHBoxLayout
 {
   Q_OBJECT
 
-  private slots:
-    void onDoubleClicked();
-    void onTextChanged(QString);
-    void onTextModified(QString);
+ private slots:
+   void onDoubleClicked();
+   void onTextChanged(QString);
+   void onTextModified(QString);
 
  signals:
     // Arguments: the SQL field name and the changed text (from editBox)
@@ -42,15 +42,12 @@ class TextField : public QHBoxLayout
  public:
     // Constructor arguments: the SQL field name and the text to display in editBox
     TextField(QString, QString, QString, bool (*)(QString), QWidget *parent = 0);
-    void hide();
-    void show();
     void enterEditMode();
     void setText(QString);
 
  private:
     bool (*checkFunction)(QString);
 
-    bool visible;
     QLabel *icon;
     QLabel *label;
     QString dbTable;

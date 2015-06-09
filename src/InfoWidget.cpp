@@ -21,24 +21,78 @@
 #include "InfoWidget.h"
 #include "miscellanea.h"
 
-InfoWidget::InfoWidget()
+InfoWidget::InfoWidget(QWidget* mainWindow)
 {
+  stacker = new QStackedWidget();
   mainVbox = new QVBoxLayout(this);
-  mainVbox->addStretch();
 
+  // Book fields widget
+  bookLayout = new QVBoxLayout();
+  QWidget* bookWidget = new QWidget();
+  TextField* isbn = new TextField("books", "isbn", "ISBN:", &validateIsbn);
+  TextField* title = new TextField("books", "title", "Title:", &validateGenericField);
+  TextField* genre = new TextField("books", "genre", "Genre:", &validateGenericField);
+  TextField* author = new TextField("books", "author", "Author:", &validateGenericField);
+  TextField* publicationDate = new TextField("books", "publication_date", "Publication Date:", &validateNumericField);
+  for (TextField* field : {title, genre, author, publicationDate, isbn}) // Careful here, order is important
+    {
+      bookFields.push_back(field);
+      bookLayout->addLayout(field);
+      connect(field, SIGNAL(fieldChanged(QString, QString, QString)),
+              mainWindow, SLOT(onFieldChanged(QString, QString, QString)));
+    }
+  bookLayout->addStretch();
+  bookWidget->setLayout(bookLayout);
+
+  discLayout = new QVBoxLayout();
+  QWidget* discWidget = new QWidget();
+  TextField* discTitle = new TextField("discs", "title", "Title:", &validateGenericField);
+  TextField* directorOrSpeaker = new TextField("discs", "directorOrSpeaker", "Director/Speaker:", &validateGenericField);
+  TextField* length = new TextField("discs", "length", "Length:", &validateGenericField);
+  TextField* year = new TextField("discs", "year", "Year:", &validateNumericField);
+  TextField* type = new TextField("discs", "type", "Type:", &validateGenericField);
+  for (TextField* field : {discTitle, directorOrSpeaker, length, year, type})
+    {
+      discFields.push_back(field);
+      discLayout->addLayout(field);
+      connect(field, SIGNAL(fieldChanged(QString, QString, QString)),
+              mainWindow, SLOT(onFieldChanged(QString, QString, QString)));
+    }
+  discLayout->addStretch();
+  discWidget->setLayout(discLayout);
+
+  patronLayout = new QVBoxLayout();
+  QWidget* patronWidget = new QWidget();
+  TextField* name = new TextField("patrons", "name", "Name:", &validateGenericField);
+  TextField* address = new TextField("patrons", "address", "Address:", &validateGenericField);
+  TextField* items = new TextField("patrons", "items", "Borrowed items:", &validateGenericField); // Check if any items are overdue instead?
+  TextField* mobileNum = new TextField("patrons", "mobile_num", "Mobile No.", &validateNumericField);
+  TextField* landlineNum = new TextField("patrons", "landline_num", "Landline No.", &validateNumericField);
+  for (TextField* field : {name, address, mobileNum, landlineNum, items})
+    {
+      patronFields.push_back(field);
+      patronLayout->addLayout(field);
+      connect(field, SIGNAL(fieldChanged(QString, QString, QString)),
+              mainWindow, SLOT(onFieldChanged(QString, QString, QString)));
+    }
+  patronLayout->addStretch();
+  patronWidget->setLayout(patronLayout);
+
+  stacker->addWidget(bookWidget);
+  stacker->addWidget(discWidget);
+  stacker->addWidget(patronWidget);
+
+  mainVbox->addWidget(stacker);
+  mainVbox->addStretch();
   setLayout(mainVbox);
   setFrameShape(QFrame::StyledPanel);
   setObjectName("MainQFrame");
   setStyleSheet("QFrame#MainQFrame {border: 8px solid #909090; border-radius: 7px;}");
 }
 
-void InfoWidget::addField(TextField *field, QString type)
+void InfoWidget::changeLayout(int index)
 {
-  if (type == "b") { bookFields.push_back(field); }
-  else if (type == "d") { discFields.push_back(field); }
-  else if (type == "p") { patronFields.push_back(field); }
-
-  mainVbox->insertLayout(mainVbox->count() - 1, field);
+  stacker->setCurrentIndex(index);
 }
 
 void InfoWidget::clear()
@@ -52,15 +106,9 @@ void InfoWidget::clear()
     }
 }
 
-void InfoWidget::removeField(TextField *field)
-{
-  mainVbox->removeItem(field);
-}
-
 void InfoWidget::setItem(QString itemKey)
 {
-  QSqlDatabase db = QSqlDatabase::database();
-  QSqlQuery getItemInfo(db);
+  QSqlQuery getItemInfo(QSqlDatabase::database());
   std::vector<TextField*> itemFields;
 
   if (itemKey.endsWith("b"))

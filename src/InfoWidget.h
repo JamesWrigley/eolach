@@ -21,23 +21,30 @@
 
 #include <QFrame>
 #include <QVBoxLayout>
+#include <QStackedWidget>
 #include "TextField.h"
 
 /* The widget that holds all the item info. Basically a QFrame with a bunch of
-   labels. */
+   labels for each info field. */
 class InfoWidget : public QFrame
 {
   Q_OBJECT
 
+ public slots:
+  void changeLayout(int);
+  
  public:
-  InfoWidget();
+  InfoWidget(QWidget*);
   void clear();
   void setItem(QString);
-  void addField(TextField*, QString);
-  void removeField(TextField*);
 
  private:
-  QVBoxLayout *mainVbox;
+  QVBoxLayout* mainVbox;
+  QVBoxLayout* bookLayout;
+  QVBoxLayout* discLayout;
+  QVBoxLayout* patronLayout;
+  QStackedWidget* stacker;
+
   std::vector<TextField*> bookFields;
   std::vector<TextField*> discFields;
   std::vector<TextField*> patronFields;

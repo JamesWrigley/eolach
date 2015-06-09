@@ -21,7 +21,8 @@
 #include <QApplication>
 #include "TextField.h"
 
-TextField::TextField(QString table, QString sqlField, QString labelName, bool (*function)(QString), QWidget *parent)
+TextField::TextField(QString table, QString sqlField, QString labelName,
+                     bool (*function)(QString), QWidget *parent)
 {
   dbTable = table;
   fieldName = sqlField;
@@ -30,9 +31,9 @@ TextField::TextField(QString table, QString sqlField, QString labelName, bool (*
   icon = new QLabel();
   icon->setPixmap(QIcon(":/invalid-icon").pixmap(20));
   editBox = new CLineEdit();
-  connect(editBox, SIGNAL(textModified(QString)), this, SLOT(onTextModified(QString)));
-  connect(editBox, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));
   connect(editBox, SIGNAL(doubleClicked()), this, SLOT(onDoubleClicked()));
+  connect(editBox, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));
+  connect(editBox, SIGNAL(textModified(QString)), this, SLOT(onTextModified(QString)));
 
   label->setMinimumWidth(120);
   addWidget(label);
@@ -44,14 +45,6 @@ void TextField::enterEditMode()
 {
   QMouseEvent doubleClick(QEvent::MouseButtonDblClick, QPointF(), Qt::LeftButton, 0, 0);
   QApplication::sendEvent(editBox, &doubleClick);
-}
-
-void TextField::hide()
-{
-  label->hide();
-  editBox->hide();
-  icon->hide();
-  visible = false;
 }
 
 void TextField::onTextChanged(QString newText)
@@ -89,21 +82,7 @@ void TextField::setText(QString newText)
 {
   editBox->setText(newText);
   onTextChanged(newText);
-  if (!checkFunction(newText) && visible)
-    {
-      icon->show();
-    }
-  else
-    {
-      icon->hide();
-    }
-}
-
-void TextField::show()
-{
-  label->show();
-  editBox->show();
-  if (checkFunction(editBox->text()))
+  if (checkFunction(newText))
     {
       icon->hide();
     }
@@ -111,6 +90,4 @@ void TextField::show()
     {
       icon->show();
     }
-
-  visible = true;
 }
