@@ -46,13 +46,14 @@ int main(int argc, char *argv[])
       QSqlQuery createBooksTable(bookstore);
       QSqlQuery createPatronsTable(bookstore);
       QSqlQuery createDiscsTable(bookstore);
+      QSqlQuery createBorrowedTable(bookstore);
       createBooksTable.exec("CREATE TABLE books ("
-                              "key TEXT PRIMARY KEY, "
-                              "isbn TEXT, "
-                              "title TEXT, "
-                              "author TEXT, "
-                              "publication_date TEXT, "
-                              "genre TEXT);");
+                            "key TEXT PRIMARY KEY, "
+                            "isbn TEXT, "
+                            "title TEXT, "
+                            "author TEXT, "
+                            "publication_date TEXT, "
+                            "genre TEXT);");
 
       createPatronsTable.exec("CREATE TABLE patrons ("
                               "key TEXT PRIMARY KEY, "
@@ -69,6 +70,12 @@ int main(int argc, char *argv[])
                             "length TEXT, "
                             "year TEXT, "
                             "type TEXT);");
+
+      createBorrowedTable.exec("CREATE TABLE borrowed ("
+                               "Pkey TEXT, "
+                               "Ikey TEXT, "
+                               "PRIMARY KEY (Pkey, Ikey), "
+                               "FOREIGN KEY (Pkey) REFERENCES patrons (key));");
     }
 
   // Start the application

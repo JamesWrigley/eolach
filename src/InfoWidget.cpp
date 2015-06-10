@@ -21,6 +21,7 @@
 #include <QVBoxLayout>
 #include "InfoWidget.h"
 #include "miscellanea.h"
+#include "PatronHistory.h"
 
 InfoWidget::InfoWidget(QWidget* mainWindow)
 {
@@ -70,6 +71,7 @@ InfoWidget::InfoWidget(QWidget* mainWindow)
   TextField* address = new TextField("patrons", "address", "Address:", &validateGenericField);
   TextField* mobileNum = new TextField("patrons", "mobile_num", "Mobile No.", &validateNumericField);
   TextField* landlineNum = new TextField("patrons", "landline_num", "Landline No.", &validateNumericField);
+
   for (TextField* field : {name, address, mobileNum, landlineNum})
     {
       patronFields.push_back(field);
@@ -77,7 +79,13 @@ InfoWidget::InfoWidget(QWidget* mainWindow)
       connect(field, SIGNAL(fieldChanged(QString, QString, QString)),
               mainWindow, SLOT(onFieldChanged(QString, QString, QString)));
     }
-  patronLayout->addStretch();
+  PatronHistory* history = new PatronHistory();
+  QFrame* separator = new QFrame();
+  separator->setFrameShape(QFrame::HLine);
+  separator->setFrameShadow(QFrame::Sunken);
+  patronLayout->addSpacing(30);
+  patronLayout->addWidget(separator);
+  patronLayout->addLayout(history);
   patronWidget->setLayout(patronLayout);
 
   stacker->addWidget(bookWidget);

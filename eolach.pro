@@ -19,6 +19,7 @@ HEADERS += src/AddItemDialog.h \
            src/KeysWidget.h \
            src/MainWindow.h \
            src/miscellanea.h \
+           src/PatronHistory.h \
            src/TextField.h
 SOURCES += src/AddItemDialog.cpp \
            src/CLineEdit.cpp \
@@ -29,4 +30,5 @@ SOURCES += src/AddItemDialog.cpp \
            src/main.cpp \
            src/MainWindow.cpp \
            src/miscellanea.cpp \
+           src/PatronHistory.cpp \
            src/TextField.cpp
