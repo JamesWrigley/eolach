@@ -18,16 +18,17 @@
 
 #include <QVariant>
 #include <QSqlQuery>
+#include <QVBoxLayout>
 #include "InfoWidget.h"
 #include "miscellanea.h"
 
 InfoWidget::InfoWidget(QWidget* mainWindow)
 {
   stacker = new QStackedWidget();
-  mainVbox = new QVBoxLayout(this);
+  QVBoxLayout* mainVbox = new QVBoxLayout(this);
 
   // Book fields widget
-  bookLayout = new QVBoxLayout();
+  QVBoxLayout* bookLayout = new QVBoxLayout();
   QWidget* bookWidget = new QWidget();
   TextField* isbn = new TextField("books", "isbn", "ISBN:", &validateIsbn);
   TextField* title = new TextField("books", "title", "Title:", &validateGenericField);
@@ -44,7 +45,8 @@ InfoWidget::InfoWidget(QWidget* mainWindow)
   bookLayout->addStretch();
   bookWidget->setLayout(bookLayout);
 
-  discLayout = new QVBoxLayout();
+  // Disc fields widget
+  QVBoxLayout* discLayout = new QVBoxLayout();
   QWidget* discWidget = new QWidget();
   TextField* discTitle = new TextField("discs", "title", "Title:", &validateGenericField);
   TextField* directorOrSpeaker = new TextField("discs", "directorOrSpeaker", "Director/Speaker:", &validateGenericField);
@@ -61,14 +63,14 @@ InfoWidget::InfoWidget(QWidget* mainWindow)
   discLayout->addStretch();
   discWidget->setLayout(discLayout);
 
-  patronLayout = new QVBoxLayout();
+  // Patron fields widget
+  QVBoxLayout* patronLayout = new QVBoxLayout();
   QWidget* patronWidget = new QWidget();
   TextField* name = new TextField("patrons", "name", "Name:", &validateGenericField);
   TextField* address = new TextField("patrons", "address", "Address:", &validateGenericField);
-  TextField* items = new TextField("patrons", "items", "Borrowed items:", &validateGenericField); // Check if any items are overdue instead?
   TextField* mobileNum = new TextField("patrons", "mobile_num", "Mobile No.", &validateNumericField);
   TextField* landlineNum = new TextField("patrons", "landline_num", "Landline No.", &validateNumericField);
-  for (TextField* field : {name, address, mobileNum, landlineNum, items})
+  for (TextField* field : {name, address, mobileNum, landlineNum})
     {
       patronFields.push_back(field);
       patronLayout->addLayout(field);
@@ -100,9 +102,9 @@ void InfoWidget::clear()
   for (std::vector<TextField*> itemFields : {bookFields, discFields, patronFields})
     {
       for (TextField *field : itemFields)
-	{
-	  field->setText("");
-	}
+        {
+          field->setText("");
+        }
     }
 }
 

@@ -20,7 +20,6 @@
 #define INFOWIDGET_H
 
 #include <QFrame>
-#include <QVBoxLayout>
 #include <QStackedWidget>
 #include "TextField.h"
 
@@ -39,10 +38,6 @@ class InfoWidget : public QFrame
   void setItem(QString);
 
  private:
-  QVBoxLayout* mainVbox;
-  QVBoxLayout* bookLayout;
-  QVBoxLayout* discLayout;
-  QVBoxLayout* patronLayout;
   QStackedWidget* stacker;
 
   std::vector<TextField*> bookFields;
