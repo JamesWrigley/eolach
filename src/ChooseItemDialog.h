@@ -19,10 +19,12 @@
 #ifndef CHOOSEITEMDIALOG_H
 #define CHOOSEITEMDIALOG_H
 
+#include <QHash>
 #include <QDialog>
 #include <QLineEdit>
-#include <QStringList>
 #include <QListWidget>
+#include <QPushButton>
+#include <QStringList>
 
 class ChooseItemDialog : public QDialog
 {
@@ -30,13 +32,21 @@ class ChooseItemDialog : public QDialog
 
  private slots:
    void addToList(QString);
+   void applyItems();
+   void removeFromList();
+
  public:
-  ChooseItemDialog(QStringList);
+  ChooseItemDialog();
 
  private:
+  void loadItems();
+  void resetCompleter();
+
   QListWidget* list;
   QLineEdit* textBox;
+  QPushButton* removeButton;
   QStringList completerItems;
+  QHash<QString, QString> itemMap;
 };
 
 #endif // CHOOSEITEMDIALOG_H

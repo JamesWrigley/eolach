@@ -79,6 +79,7 @@ InfoWidget::InfoWidget(QWidget* mainWindow)
       connect(field, SIGNAL(fieldChanged(QString, QString, QString)),
               mainWindow, SLOT(onFieldChanged(QString, QString, QString)));
     }
+
   PatronHistory* history = new PatronHistory();
   QFrame* separator = new QFrame();
   separator->setFrameShape(QFrame::HLine);

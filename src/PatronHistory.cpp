@@ -45,23 +45,6 @@ PatronHistory::PatronHistory()
 
 void PatronHistory::addItem()
 {
-  // Create completions list to pass into ChooseItemDialog
-  QHash<QString, QString> itemMap;
-  QStringList completions;
-  QSqlQuery getBooks("SELECT key, title FROM books;", QSqlDatabase::database());
-  QSqlQuery getDiscs("SELECT key, title FROM discs;", QSqlDatabase::database());
-
-  while (getBooks.next())
-    {
-      itemMap.insert(getBooks.value(1).toString(), getBooks.value(0).toString());
-      completions.append(getBooks.value(1).toString());
-    }
-  while (getDiscs.next())
-    {
-      itemMap.insert(getDiscs.value(1).toString(), getDiscs.value(0).toString());
-      completions.append(getDiscs.value(1).toString());
-    }
-
-  ChooseItemDialog chooseItemDialog(completions);
+  ChooseItemDialog chooseItemDialog;
   chooseItemDialog.exec();
 }

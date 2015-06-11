@@ -16,26 +16,43 @@
  *                                                                                *
  *********************************************************************************/
 
+#include <QSqlQuery>
+#include <QHBoxLayout>
+#include <QStringList>
 #include <QVBoxLayout>
 #include "DCompleter.h"
 #include "ChooseItemDialog.h"
 
-ChooseItemDialog::ChooseItemDialog(QStringList completer_items)
+ChooseItemDialog::ChooseItemDialog()
 {
+  loadItems();
   list = new QListWidget();
   textBox = new QLineEdit();
-  completerItems = completer_items;
+  removeButton = new QPushButton(QIcon(":/remove-icon"), "");
+  QHBoxLayout* topHbox = new QHBoxLayout();
   QVBoxLayout* mainVbox = new QVBoxLayout(this);
   DCompleter* completer = new DCompleter(completerItems);
+  QPushButton* finishButton = new QPushButton("Finish");
 
   completer->setCaseSensitivity(Qt::CaseInsensitive);
   textBox->setCompleter(completer);
   textBox->setPlaceholderText("Item Name");
-  // The Qt::QueuedConnection bit is to ensure that the textBox is cleared
-  connect(textBox->completer(), SIGNAL(activated(QString)), this, SLOT(addToList(QString)), Qt::QueuedConnection);
+  removeButton->setDisabled(true);
+  finishButton->setDefault(true);
 
-  mainVbox->addWidget(textBox);
+  // The Qt::QueuedConnection bit is to ensure that the textBox is cleared
+  connect(textBox->completer(), SIGNAL(activated(QString)), this,
+          SLOT(addToList(QString)), Qt::QueuedConnection);
+  connect(list, &QListWidget::itemSelectionChanged, [=] () { removeButton->setDisabled(false); });
+  connect(removeButton, SIGNAL(clicked()), this, SLOT(removeFromList()));
+  connect(finishButton, SIGNAL(clicked()), this, SLOT(applyItems()));
+
+  topHbox->addWidget(textBox);
+  topHbox->addWidget(removeButton);
+
+  mainVbox->addLayout(topHbox);
   mainVbox->addWidget(list);
+  mainVbox->addWidget(finishButton);
 
   setLayout(mainVbox);
 }
@@ -47,11 +64,46 @@ void ChooseItemDialog::addToList(QString item)
   if (completerItems.contains(item))
     {
       list->addItem(item);
-      completerItems.removeOne(item);
-
-      // We need to cast to get access to the overload of setModel(QString)
-      DCompleter* completer = static_cast<DCompleter*>(textBox->completer());
-      completer->setModel(completerItems);
+      completerItems.removeAll(item);
+      resetCompleter();
       textBox->clear();
     }
+}
+
+void ChooseItemDialog::applyItems()
+{
+  
+}
+
+void ChooseItemDialog::loadItems()
+{
+  QSqlQuery getBooks("SELECT key, title FROM books WHERE onLoan = 0;", QSqlDatabase::database());
+  QSqlQuery getDiscs("SELECT key, title FROM discs WHERE onLoan = 0;", QSqlDatabase::database());
+
+  while (getBooks.next()) {
+      itemMap.insert(getBooks.value(1).toString(), getBooks.value(0).toString());
+    }
+  while (getDiscs.next())
+    {
+      itemMap.insert(getDiscs.value(1).toString(), getDiscs.value(0).toString());
+    }
+
+  completerItems = QStringList(itemMap.keys());
+}
+
+void ChooseItemDialog::removeFromList()
+{
+  removeButton->setDisabled(false);
+  completerItems << list->currentItem()->text();
+  resetCompleter();
+  // We need to delete the item manually, since items removed from a QListWidget
+  // will not be managed by Qt.
+  delete list->takeItem(list->currentRow());
+}
+
+void ChooseItemDialog::resetCompleter()
+{
+  // We need a cast to DCompleter to get access to its overload of setModel(QStringList)
+  DCompleter* completer = static_cast<DCompleter*>(textBox->completer());
+  completer->setModel(completerItems);
 }
