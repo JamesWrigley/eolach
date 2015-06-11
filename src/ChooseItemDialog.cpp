@@ -16,23 +16,42 @@
  *                                                                                *
  *********************************************************************************/
 
-#ifndef DCOMPLETER_H
-#define DCOMPLETER_H
+#include <QVBoxLayout>
+#include "DCompleter.h"
+#include "ChooseItemDialog.h"
 
-#include <QLineEdit>
-#include <QCompleter>
-#include <QStringList>
-
-class DCompleter : public QCompleter
+ChooseItemDialog::ChooseItemDialog(QStringList completer_items)
 {
-  Q_OBJECT
+  list = new QListWidget();
+  textBox = new QLineEdit();
+  completerItems = completer_items;
+  QVBoxLayout* mainVbox = new QVBoxLayout(this);
+  DCompleter* completer = new DCompleter(completerItems);
 
-  using QCompleter::QCompleter;
+  completer->setCaseSensitivity(Qt::CaseInsensitive);
+  textBox->setCompleter(completer);
+  textBox->setPlaceholderText("Item Name");
+  // The Qt::QueuedConnection bit is to ensure that the textBox is cleared
+  connect(textBox->completer(), SIGNAL(activated(QString)), this, SLOT(addToList(QString)), Qt::QueuedConnection);
 
- public:
-  void setModel(QStringList);
-  QString pathFromIndex(const QModelIndex&) const;
-  QStringList splitPath(const QString&) const;
-};
+  mainVbox->addWidget(textBox);
+  mainVbox->addWidget(list);
 
-#endif // DCOMPLETER_H
+  setLayout(mainVbox);
+}
+
+/* Add the text in textBox as an item in the list, and remove from the list of
+   completions */
+void ChooseItemDialog::addToList(QString item)
+{
+  if (completerItems.contains(item))
+    {
+      list->addItem(item);
+      completerItems.removeOne(item);
+
+      // We need to cast to get access to the overload of setModel(QString)
+      DCompleter* completer = static_cast<DCompleter*>(textBox->completer());
+      completer->setModel(completerItems);
+      textBox->clear();
+    }
+}

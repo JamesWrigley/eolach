@@ -16,6 +16,7 @@
  *                                                                                *
  *********************************************************************************/
 
+#include <QStringListModel>
 #include "DCompleter.h"
 
 QString DCompleter::pathFromIndex(const QModelIndex& index) const
@@ -30,6 +31,13 @@ QString DCompleter::pathFromIndex(const QModelIndex& index) const
     }
 
   return path;
+}
+
+/* An overload for convenience */
+void DCompleter::setModel(QStringList items)
+{
+  QStringListModel* model = new QStringListModel(items);
+  QCompleter::setModel(model);
 }
 
 QStringList DCompleter::splitPath(const QString& path) const

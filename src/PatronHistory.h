@@ -23,9 +23,13 @@
 #include <QListWidget>
 #include <QVBoxLayout>
 
+/* A class providing the interface to show and modify a patrons history. */
 class PatronHistory : public QVBoxLayout
 {
   Q_OBJECT
+
+ public slots:
+  void addItem();
 
  public:
   PatronHistory();

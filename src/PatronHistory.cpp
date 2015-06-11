@@ -18,7 +18,9 @@
 
 #include <QAction>
 #include <QToolBar>
+#include <QSqlQuery>
 #include "PatronHistory.h"
+#include "ChooseItemDialog.h"
 
 PatronHistory::PatronHistory()
 {
@@ -26,16 +28,40 @@ PatronHistory::PatronHistory()
   QToolBar* toolbar = new QToolBar();
   QAction* addItemAction = new QAction(QIcon(":/add-icon"), "", this);
   QAction* removeItemAction = new QAction(QIcon(":/remove-icon"), "", this);
+  connect(addItemAction, SIGNAL(triggered()), this, SLOT(addItem()));
   toolbar->addAction(addItemAction);
   toolbar->addAction(removeItemAction);
 
   // Set up the tabwidget
-  currentBorrowedList = new QListWidget();
-  pastBorrowedList = new QListWidget();
   tabWidget = new QTabWidget();
+  pastBorrowedList = new QListWidget();
+  currentBorrowedList = new QListWidget();
   tabWidget->addTab(currentBorrowedList, "Current Items");
   tabWidget->addTab(pastBorrowedList, "Past Items");
 
   addWidget(toolbar);
   addWidget(tabWidget);
+}
+
+void PatronHistory::addItem()
+{
+  // Create completions list to pass into ChooseItemDialog
+  QHash<QString, QString> itemMap;
+  QStringList completions;
+  QSqlQuery getBooks("SELECT key, title FROM books;", QSqlDatabase::database());
+  QSqlQuery getDiscs("SELECT key, title FROM discs;", QSqlDatabase::database());
+
+  while (getBooks.next())
+    {
+      itemMap.insert(getBooks.value(1).toString(), getBooks.value(0).toString());
+      completions.append(getBooks.value(1).toString());
+    }
+  while (getDiscs.next())
+    {
+      itemMap.insert(getDiscs.value(1).toString(), getDiscs.value(0).toString());
+      completions.append(getDiscs.value(1).toString());
+    }
+
+  ChooseItemDialog chooseItemDialog(completions);
+  chooseItemDialog.exec();
 }

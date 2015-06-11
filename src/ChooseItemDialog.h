@@ -16,23 +16,27 @@
  *                                                                                *
  *********************************************************************************/
 
-#ifndef DCOMPLETER_H
-#define DCOMPLETER_H
+#ifndef CHOOSEITEMDIALOG_H
+#define CHOOSEITEMDIALOG_H
 
+#include <QDialog>
 #include <QLineEdit>
-#include <QCompleter>
 #include <QStringList>
+#include <QListWidget>
 
-class DCompleter : public QCompleter
+class ChooseItemDialog : public QDialog
 {
   Q_OBJECT
 
-  using QCompleter::QCompleter;
-
+ private slots:
+   void addToList(QString);
  public:
-  void setModel(QStringList);
-  QString pathFromIndex(const QModelIndex&) const;
-  QStringList splitPath(const QString&) const;
+  ChooseItemDialog(QStringList);
+
+ private:
+  QListWidget* list;
+  QLineEdit* textBox;
+  QStringList completerItems;
 };
 
-#endif // DCOMPLETER_H
+#endif // CHOOSEITEMDIALOG_H
