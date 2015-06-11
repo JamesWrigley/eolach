@@ -33,8 +33,12 @@ class PatronHistory : public QVBoxLayout
 
  public:
   PatronHistory();
+  void setPatron(QString);
 
  private:
+  void reload();
+
+  QString currentPatron;
   QTabWidget* tabWidget;
   QListWidget* pastBorrowedList;
   QListWidget* currentBorrowedList;

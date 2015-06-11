@@ -23,9 +23,10 @@
 #include "DCompleter.h"
 #include "ChooseItemDialog.h"
 
-ChooseItemDialog::ChooseItemDialog()
+ChooseItemDialog::ChooseItemDialog(QString patron_key)
 {
   loadItems();
+  patronKey = patron_key;
   list = new QListWidget();
   textBox = new QLineEdit();
   removeButton = new QPushButton(QIcon(":/remove-icon"), "");
@@ -72,7 +73,27 @@ void ChooseItemDialog::addToList(QString item)
 
 void ChooseItemDialog::applyItems()
 {
-  
+  for (int i = 0; i < list->count(); ++i)
+    {
+      QString key = itemMap.value(list->item(i)->text());
+      QString table = key.endsWith("b") ? "books" : "discs";
+
+      // Update the items 'onLoan' status in its table
+      QSqlQuery updateStatus(QSqlDatabase::database());
+      updateStatus.prepare(QString("UPDATE %1 SET onLoan = 1 WHERE key = :key").arg(table));
+      updateStatus.bindValue(":key", key);
+      updateStatus.exec();
+
+      // Create an entry for it in the borrowed table
+      QSqlQuery createRecord(QSqlDatabase::database());
+      createRecord.prepare("INSERT INTO borrowed (Pkey, Ikey) "
+                           "VALUES (:pkey, :ikey);");
+      createRecord.bindValue(":pkey", patronKey);
+      createRecord.bindValue(":ikey", key);
+      createRecord.exec();
+    }
+
+  done(QDialog::Accepted);
 }
 
 void ChooseItemDialog::loadItems()

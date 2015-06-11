@@ -72,10 +72,10 @@ int main(int argc, char *argv[])
                               "landline_num TEXT);");
 
       createBorrowedTable.exec("CREATE TABLE borrowed ("
-                               "Pkey TEXT, "
-                               "Ikey TEXT, "
+                               "Pkey TEXT, " // Patron key
+                               "Ikey TEXT, " // Item key
                                "PRIMARY KEY (Pkey, Ikey), "
-                               "FOREIGN KEY (Pkey) REFERENCES patrons (key));");
+                               "FOREIGN KEY (Pkey) REFERENCES patrons (key));"); // While Ikey is a foreign key, it could reference either books or discs
     }
 
   // Start the application

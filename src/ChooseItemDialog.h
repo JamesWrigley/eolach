@@ -36,12 +36,13 @@ class ChooseItemDialog : public QDialog
    void removeFromList();
 
  public:
-  ChooseItemDialog();
+  ChooseItemDialog(QString);
 
  private:
   void loadItems();
   void resetCompleter();
 
+  QString patronKey;
   QListWidget* list;
   QLineEdit* textBox;
   QPushButton* removeButton;
