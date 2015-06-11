@@ -109,28 +109,30 @@ void AddItemDialog::addItem()
       for (int i = 0; i < genresList.size(); ++i) { genresList[i] = genresList[i].simplified(); }
       genresList.sort(Qt::CaseInsensitive);
 
-      insert.prepare("INSERT INTO books (key, isbn, title, author, publication_date, genre) "
-                     "VALUES (:key, :isbn, :title, :author, :publication_date, :genre)");
+      insert.prepare("INSERT INTO books (key, isbn, title, author, publication_date, genre, onLoan) "
+                     "VALUES (:key, :isbn, :title, :author, :publication_date, :genre, :onLoan)");
       insert.bindValue(":key", itemKey);
       insert.bindValue(":isbn", isbn->text());
       insert.bindValue(":title", title->text());
       insert.bindValue(":author", authorsList.join(", "));
       insert.bindValue(":publication_date", publicationDate->text());
       insert.bindValue(":genre", genresList.join(", "));
+      insert.bindValue(":onLoan", 0);
       insert.exec();
     }
   else if (stacker->currentIndex() == 1) // Add disc
     {
       itemKey = QString::number(keyGen()) + "d";
 
-      insert.prepare("INSERT INTO discs (key, title, directorOrSpeaker, length, year, type) "
-                     "VALUES (:key, :title, :directorOrSpeaker, :length, :year, :type);");
+      insert.prepare("INSERT INTO discs (key, title, directorOrSpeaker, length, year, type, onLoan) "
+                     "VALUES (:key, :title, :directorOrSpeaker, :length, :year, :type, :onLoan);");
       insert.bindValue(":key", itemKey);
       insert.bindValue(":title", discTitle->text());
       insert.bindValue(":directorOrSpeaker", directorOrSpeaker->text());
       insert.bindValue(":length", length->text());
       insert.bindValue(":year", year->text());
       insert.bindValue(":type", type->text());
+      insert.bindValue(":onLoan", 0);
       insert.exec();
     }
   else if (stacker->currentIndex() == 2) // Add patron

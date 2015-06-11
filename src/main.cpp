@@ -19,7 +19,6 @@
 #include <QDir>
 #include <QSqlQuery>
 #include <QApplication>
-#include <QStyleFactory>
 #include "MainWindow.h"
 
 int main(int argc, char *argv[])
@@ -53,15 +52,8 @@ int main(int argc, char *argv[])
                             "title TEXT, "
                             "author TEXT, "
                             "publication_date TEXT, "
-                            "genre TEXT);");
-
-      createPatronsTable.exec("CREATE TABLE patrons ("
-                              "key TEXT PRIMARY KEY, "
-                              "name TEXT, "
-                              "address TEXT, "
-                              "mobile_num TEXT, "
-                              "landline_num TEXT, "
-                              "items TEXT);");
+                            "genre TEXT, "
+                            "onLoan BOOLEAN);"); // Note that BOOLEAN is just an affinity for NUMERIC
 
       createDiscsTable.exec("CREATE TABLE discs ("
                             "key TEXT PRIMARY KEY, "
@@ -69,7 +61,15 @@ int main(int argc, char *argv[])
                             "directorOrSpeaker TEXT, "
                             "length TEXT, "
                             "year TEXT, "
-                            "type TEXT);");
+                            "type TEXT, "
+                            "onLoan BOOLEAN);");
+
+      createPatronsTable.exec("CREATE TABLE patrons ("
+                              "key TEXT PRIMARY KEY, "
+                              "name TEXT, "
+                              "address TEXT, "
+                              "mobile_num TEXT, "
+                              "landline_num TEXT);");
 
       createBorrowedTable.exec("CREATE TABLE borrowed ("
                                "Pkey TEXT, "
@@ -80,7 +80,6 @@ int main(int argc, char *argv[])
 
   // Start the application
   QApplication app(argc, argv);
-  QApplication::setStyle(QStyleFactory::create("gtk"));
   MainWindow mainwindow;
   mainwindow.show();
 
