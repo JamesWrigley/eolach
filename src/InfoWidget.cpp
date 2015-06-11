@@ -21,7 +21,6 @@
 #include <QVBoxLayout>
 #include "InfoWidget.h"
 #include "miscellanea.h"
-#include "PatronHistory.h"
 
 InfoWidget::InfoWidget(QWidget* mainWindow)
 {
@@ -80,7 +79,7 @@ InfoWidget::InfoWidget(QWidget* mainWindow)
               mainWindow, SLOT(onFieldChanged(QString, QString, QString)));
     }
 
-  PatronHistory* history = new PatronHistory();
+  history = new PatronHistory();
   QFrame* separator = new QFrame();
   separator->setFrameShape(QFrame::HLine);
   separator->setFrameShadow(QFrame::Sunken);
@@ -135,6 +134,7 @@ void InfoWidget::setItem(QString itemKey)
   else if (itemKey.endsWith("p"))
     {
       getItemInfo.prepare(getPatronInfo);
+      history->setPatron(itemKey);
       itemFields = patronFields;
     }
 

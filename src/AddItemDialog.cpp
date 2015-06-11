@@ -139,14 +139,13 @@ void AddItemDialog::addItem()
     {
       itemKey = QString::number(keyGen()) + "p";
 
-      insert.prepare("INSERT INTO patrons (key, name, address, mobile_num, landline_num, items) "
-                     "VALUES (:key, :name, :address, :mobile_num, :landline_num, :items);");
+      insert.prepare("INSERT INTO patrons (key, name, address, mobile_num, landline_num) "
+                     "VALUES (:key, :name, :address, :mobile_num, :landline_num);");
       insert.bindValue(":key", itemKey);
       insert.bindValue(":name", name->text());
       insert.bindValue(":address", address->text());
       insert.bindValue(":mobile_num", mobileNum->text());
       insert.bindValue(":landline_num", landlineNum->text());
-      insert.bindValue(":items", "");
       insert.exec();
     }
 

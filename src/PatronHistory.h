@@ -19,6 +19,7 @@
 #ifndef PATRONHISTORY_H
 #define PATRONHISTORY_H
 
+#include <QToolBar>
 #include <QTabWidget>
 #include <QListWidget>
 #include <QVBoxLayout>
@@ -38,6 +39,7 @@ class PatronHistory : public QVBoxLayout
  private:
   void reload();
 
+  QToolBar* toolbar;
   QString currentPatron;
   QTabWidget* tabWidget;
   QListWidget* pastBorrowedList;

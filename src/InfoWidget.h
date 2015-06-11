@@ -22,6 +22,7 @@
 #include <QFrame>
 #include <QStackedWidget>
 #include "TextField.h"
+#include "PatronHistory.h"
 
 /* The widget that holds all the item info. Basically a QFrame with a bunch of
    labels for each info field. */
@@ -39,6 +40,7 @@ class InfoWidget : public QFrame
 
  private:
   QStackedWidget* stacker;
+  PatronHistory* history;
 
   std::vector<TextField*> bookFields;
   std::vector<TextField*> discFields;

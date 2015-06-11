@@ -17,7 +17,6 @@
  *********************************************************************************/
 
 #include <QAction>
-#include <QToolBar>
 #include <QSqlQuery>
 #include "PatronHistory.h"
 #include "ChooseItemDialog.h"
@@ -25,12 +24,13 @@
 PatronHistory::PatronHistory()
 {
   // Set up the toolbar
-  QToolBar* toolbar = new QToolBar();
+  toolbar = new QToolBar();
   QAction* addItemAction = new QAction(QIcon(":/add-icon"), "", this);
   QAction* removeItemAction = new QAction(QIcon(":/remove-icon"), "", this);
   connect(addItemAction, SIGNAL(triggered()), this, SLOT(addItem()));
   toolbar->addAction(addItemAction);
   toolbar->addAction(removeItemAction);
+  toolbar->setDisabled(true);
 
   // Set up the tabwidget
   tabWidget = new QTabWidget();
@@ -38,6 +38,7 @@ PatronHistory::PatronHistory()
   currentBorrowedList = new QListWidget();
   tabWidget->addTab(currentBorrowedList, "Current Items");
   tabWidget->addTab(pastBorrowedList, "Past Items");
+  tabWidget->setDisabled(true);
 
   addWidget(toolbar);
   addWidget(tabWidget);
@@ -78,5 +79,8 @@ void PatronHistory::reload()
 
 void PatronHistory::setPatron(QString patron_key)
 {
+  toolbar->setDisabled(false);
+  tabWidget->setDisabled(false);
   currentPatron = patron_key;
+  reload();
 }
