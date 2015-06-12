@@ -56,6 +56,7 @@ ChooseItemDialog::ChooseItemDialog(QString patron_key)
   mainVbox->addWidget(finishButton);
 
   setLayout(mainVbox);
+  setWindowTitle("Modify History");
 }
 
 /* Add the text in textBox as an item in the list, and remove from the list of

@@ -88,6 +88,7 @@ AddItemDialog::AddItemDialog(int typeIndex)
   mainLayout->addStretch();
   mainLayout->addWidget(finishButton);
   setLayout(mainLayout);
+  setWindowTitle("Add Item");
 
   changeLayout(typeIndex);
   itemSelector->setCurrentIndex(typeIndex);
