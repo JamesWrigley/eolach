@@ -35,7 +35,7 @@ class DLineEdit : public QHBoxLayout
     void onTextChanged(QString);
 
  public:
-    DLineEdit(QString, bool (*)(QString), QWidget *parent = 0);
+    DLineEdit(QString, bool (*)(QString));
     void enableCompletion(QStringListModel*);
     QString placeholderText();
     void setFocus();

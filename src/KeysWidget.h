@@ -39,7 +39,7 @@ class KeysWidget : public QTableWidget
     void createHeaderContextMenu(QPoint);
 
  public:
-    KeysWidget(QString, QString, QStringList, QWidget *parent = 0);
+    KeysWidget(QString, QString, QStringList);
     void loadItems();
     void addItem(QString);
     void updateItem(int, QString);

@@ -19,7 +19,7 @@
 #include <QIcon>
 #include "DLineEdit.h"
 
-DLineEdit::DLineEdit(QString placeholdertext, bool (*function)(QString), QWidget *parent)
+DLineEdit::DLineEdit(QString placeholdertext, bool (*function)(QString))
 {
   lineedit = new QLineEdit();
   lineedit->setPlaceholderText(placeholdertext);

@@ -89,7 +89,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::createAddItemDialog()
 {
-  AddItemDialog addItemDialog(this, keysTabwidget->currentIndex());
+  AddItemDialog addItemDialog(keysTabwidget->currentIndex());
   if (QDialog::Accepted == addItemDialog.exec())
     {
       if (addItemDialog.getItemKey().endsWith("b"))

@@ -35,7 +35,7 @@ class CLineEdit : public QLineEdit
     void textModified(QString);
 
  public:
-    CLineEdit(QWidget* parent = 0);
+    CLineEdit();
 
  private:
     void enterEvent(QEvent*);

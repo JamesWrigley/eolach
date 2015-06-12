@@ -21,8 +21,8 @@
 #include <QApplication>
 #include "TextField.h"
 
-TextField::TextField(QString table, QString sqlField, QString labelName,
-                     bool (*function)(QString), QWidget *parent)
+TextField::TextField(QString table, QString sqlField,
+                     QString labelName, bool (*function)(QString))
 {
   dbTable = table;
   fieldName = sqlField;

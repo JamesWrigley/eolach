@@ -37,7 +37,7 @@ class AddItemDialog : public QDialog
     void changeLayout(int);
 
  public:
-    AddItemDialog(QWidget *parent, int = 0);
+    AddItemDialog(int = 0);
     QString getItemKey();
 
  private:

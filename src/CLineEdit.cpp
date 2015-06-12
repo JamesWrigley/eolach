@@ -21,7 +21,7 @@
 #include <QSqlDatabase>
 #include "CLineEdit.h"
 
-CLineEdit::CLineEdit(QWidget* parent)
+CLineEdit::CLineEdit()
 {
   // We set this now to use in onEditingFinished since the window color will
   // have by then been changed by mouseDoubleClickEvent().

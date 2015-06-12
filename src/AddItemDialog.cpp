@@ -23,7 +23,7 @@
 #include "miscellanea.h"
 #include "AddItemDialog.h"
 
-AddItemDialog::AddItemDialog(QWidget *parent, int typeIndex)
+AddItemDialog::AddItemDialog(int typeIndex)
 {
   mainLayout = new QVBoxLayout(this);
   stacker = new QStackedWidget();

@@ -26,8 +26,7 @@
 #include "KeysWidget.h"
 #include "miscellanea.h"
 
-KeysWidget::KeysWidget(QString table, QString get_item_info_query,
-                       QStringList header_list, QWidget *parent)
+KeysWidget::KeysWidget(QString table, QString get_item_info_query, QStringList header_list)
 {
   dbTable = table;
   headers = header_list;
