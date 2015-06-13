@@ -16,7 +16,6 @@
  *                                                                                *
  *********************************************************************************/
 
-#include <QAction>
 #include <QSqlQuery>
 #include "PatronHistory.h"
 #include "ChooseItemDialog.h"
@@ -26,8 +25,8 @@ PatronHistory::PatronHistory()
   // Set up the toolbar
   toolbar = new QToolBar();
   QAction* addItemAction = new QAction(QIcon(":/add-icon"), "", this);
-  QAction* removeItemAction = new QAction(QIcon(":/remove-icon"), "", this);
-  connect(addItemAction, SIGNAL(triggered()), this, SLOT(addItem()));
+  removeItemAction = new QAction(QIcon(":/remove-icon"), "", this);
+  removeItemAction->setDisabled(true);
   toolbar->addAction(addItemAction);
   toolbar->addAction(removeItemAction);
   toolbar->setDisabled(true);
@@ -40,6 +39,10 @@ PatronHistory::PatronHistory()
   tabWidget->addTab(pastBorrowedList, "Past Items");
   tabWidget->setDisabled(true);
 
+  connect(addItemAction, SIGNAL(triggered()), this, SLOT(addItem()));
+  connect(removeItemAction, SIGNAL(triggered()), this, SLOT(removeItem()));
+  connect(currentBorrowedList, &QListWidget::itemClicked, [=] { removeItemAction->setDisabled(false); });
+
   addWidget(toolbar);
   addWidget(tabWidget);
 }
@@ -47,7 +50,7 @@ PatronHistory::PatronHistory()
 void PatronHistory::addItem()
 {
   ChooseItemDialog chooseItemDialog(currentPatron);
-  if (chooseItemDialog.exec() == QDialog::Accepted) { reload(); }
+  if (chooseItemDialog.exec() == QDialog::Accepted) { reload(); removeItemAction->setDisabled(false); }
 }
 
 void PatronHistory::reload()
@@ -73,14 +76,37 @@ void PatronHistory::reload()
       getItemTitle.exec();
       getItemTitle.next();
 
-      currentBorrowedList->addItem(getItemTitle.value(0).toString());
+      QListWidgetItem* item = new QListWidgetItem(getItemTitle.value(0).toString());
+      item->setData(Qt::UserRole, QVariant(key));
+      currentBorrowedList->addItem(item);
     }
+}
+
+void PatronHistory::removeItem()
+{
+  QString key = currentBorrowedList->currentItem()->data(Qt::UserRole).toString();
+  QString table = key.endsWith("b") ? "books" : "discs";
+
+  // Update database
+  QSqlQuery removeFromBorrowed(QSqlDatabase::database());
+  removeFromBorrowed.prepare("DELETE FROM borrowed WHERE Ikey = :key;");
+  removeFromBorrowed.bindValue(":key", key);
+  removeFromBorrowed.exec();
+
+  QSqlQuery updateStatus(QSqlDatabase::database());
+  updateStatus.prepare(QString("UPDATE %1 SET onLoan = 0 WHERE key = :key;").arg(table));
+  updateStatus.bindValue(":key", key);
+  updateStatus.exec();
+
+  delete currentBorrowedList->takeItem(currentBorrowedList->currentRow());
+  removeItemAction->setDisabled(true);
+  reload();
 }
 
 void PatronHistory::setPatron(QString patron_key)
 {
-  toolbar->setDisabled(false);
   tabWidget->setDisabled(false);
+  toolbar->setDisabled(false);
   currentPatron = patron_key;
   reload();
 }

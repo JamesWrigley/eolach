@@ -29,6 +29,7 @@ ChooseItemDialog::ChooseItemDialog(QString patron_key)
   patronKey = patron_key;
   list = new QListWidget();
   textBox = new QLineEdit();
+  completerItems = QStringList(itemMap.keys());
   removeButton = new QPushButton(QIcon(":/remove-icon"), "");
   QHBoxLayout* topHbox = new QHBoxLayout();
   QVBoxLayout* mainVbox = new QVBoxLayout(this);
@@ -102,7 +103,8 @@ void ChooseItemDialog::loadItems()
   QSqlQuery getBooks("SELECT key, title FROM books WHERE onLoan = 0;", QSqlDatabase::database());
   QSqlQuery getDiscs("SELECT key, title FROM discs WHERE onLoan = 0;", QSqlDatabase::database());
 
-  while (getBooks.next()) {
+  while (getBooks.next())
+    {
       itemMap.insert(getBooks.value(1).toString(), getBooks.value(0).toString());
     }
   while (getDiscs.next())
