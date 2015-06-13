@@ -109,4 +109,6 @@ void PatronHistory::setPatron(QString patron_key)
   toolbar->setDisabled(false);
   currentPatron = patron_key;
   reload();
+
+  if (currentBorrowedList->count() == 0) { removeItemAction->setDisabled(true); }
 }
