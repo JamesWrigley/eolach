@@ -67,7 +67,7 @@ MainWindow::MainWindow()
   for (KeysWidget *widget : {booksWidget, discsWidget, patronsWidget})
     {
       connect(widget, SIGNAL(itemRemoved()), this, SLOT(onItemRemoved()));
-      connect(widget, SIGNAL(itemSelectionChanged()), this, SLOT(changeItem()));
+      connect(widget, SIGNAL(itemSelectionChanged()), this, SLOT(changeItem()), Qt::QueuedConnection);
     }
 
   connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
