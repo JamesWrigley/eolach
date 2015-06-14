@@ -23,6 +23,7 @@
 #include <QSqlRecord>
 #include <QHeaderView>
 #include <QMessageBox>
+#include <QSqlDatabase>
 #include "KeysWidget.h"
 #include "miscellanea.h"
 
@@ -61,7 +62,6 @@ KeysWidget::KeysWidget(QString table, QString get_item_info_query, QStringList h
   connect(removeItemAction, SIGNAL(triggered()), this, SLOT(removeItem()));
 
   // Miscellanea
-  database = QSqlDatabase::database();
   enableSorting(0, Qt::AscendingOrder);
   setEditTriggers(QAbstractItemView::NoEditTriggers);
   setSelectionMode(QAbstractItemView::SingleSelection);
@@ -107,7 +107,7 @@ void KeysWidget::enableSorting(int sortColumn, Qt::SortOrder sortOrder)
 
 QStringList KeysWidget::getItemInfo(QString itemKey)
 {
-  QSqlQuery getInfo(database);
+  QSqlQuery getInfo(QSqlDatabase::database());
   getInfo.prepare(getItemInfoQuery);
   getInfo.bindValue(":key", itemKey);
   getInfo.exec();
@@ -124,7 +124,7 @@ QStringList KeysWidget::getItemInfo(QString itemKey)
 
 void KeysWidget::loadItems()
 {
-  QSqlQuery getItemKeys(database);
+  QSqlQuery getItemKeys(QSqlDatabase::database());
   getItemKeys.exec(QString("SELECT key FROM %1;").arg(dbTable));
 
   while (getItemKeys.next())
@@ -188,12 +188,12 @@ void KeysWidget::removeItem()
   if (QMessageBox::Yes == confirm)
     {
       QString itemKey = currentItem()->data(Qt::UserRole).toString();
-      QSqlQuery removeItem(database);
+      QSqlQuery removeItem(QSqlDatabase::database());
       removeItem.prepare(QString("DELETE FROM %1 WHERE key=:key;").arg(dbTable));
       removeItem.bindValue(":key", itemKey);
       removeItem.exec();
 
-      QSqlQuery removeFromBorrowed(database);
+      QSqlQuery removeFromBorrowed(QSqlDatabase::database());
       removeFromBorrowed.prepare("DELETE FROM borrowed WHERE Ikey = :key;");
       removeFromBorrowed.bindValue(":key", itemKey);
       removeFromBorrowed.exec();

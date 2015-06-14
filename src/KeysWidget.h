@@ -20,7 +20,6 @@
 #define KEYSWIDGET_H
 
 #include <utility>
-#include <QSqlDatabase>
 #include <QTableWidget>
 
 /* The QTableWidget subclass that displays a list of all the items in a
@@ -55,7 +54,6 @@ class KeysWidget : public QTableWidget
     QString dbTable;
     QString getItemInfoQuery;
     QStringList headers;
-    QSqlDatabase database;
     std::pair<int, Qt::SortOrder> disableSorting();
 };
 
