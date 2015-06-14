@@ -41,7 +41,14 @@ PatronHistory::PatronHistory()
 
   connect(addItemAction, SIGNAL(triggered()), this, SLOT(addItem()));
   connect(removeItemAction, SIGNAL(triggered()), this, SLOT(removeItem()));
-  connect(currentBorrowedList, &QListWidget::itemClicked, [=] { removeItemAction->setDisabled(false); });
+
+  // This sucks.
+  connect(currentBorrowedList->model(), &QAbstractItemModel::rowsInserted,
+          [=] { removeItemAction->setDisabled(true); });
+  connect(currentBorrowedList->model(), &QAbstractItemModel::rowsRemoved,
+          [=] { removeItemAction->setDisabled(true); });
+  connect(currentBorrowedList, &QListWidget::itemClicked,
+          [=] { removeItemAction->setDisabled(false); });
 
   addWidget(toolbar);
   addWidget(tabWidget);
@@ -50,7 +57,7 @@ PatronHistory::PatronHistory()
 void PatronHistory::addItem()
 {
   ChooseItemDialog chooseItemDialog(currentPatron);
-  if (chooseItemDialog.exec() == QDialog::Accepted) { reload(); removeItemAction->setDisabled(false); }
+  if (chooseItemDialog.exec() == QDialog::Accepted) { reload(); }
 }
 
 void PatronHistory::reload()
@@ -99,7 +106,6 @@ void PatronHistory::removeItem()
   updateStatus.exec();
 
   delete currentBorrowedList->takeItem(currentBorrowedList->currentRow());
-  removeItemAction->setDisabled(true);
   reload();
 }
 
