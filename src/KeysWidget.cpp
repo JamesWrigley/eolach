@@ -193,6 +193,11 @@ void KeysWidget::removeItem()
       removeItem.bindValue(":key", itemKey);
       removeItem.exec();
 
+      QSqlQuery removeFromBorrowed(database);
+      removeFromBorrowed.prepare("DELETE FROM borrowed WHERE Ikey = :key;");
+      removeFromBorrowed.bindValue(":key", itemKey);
+      removeFromBorrowed.exec();
+
       emit itemRemoved();
     }
 }

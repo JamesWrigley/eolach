@@ -102,6 +102,14 @@ InfoWidget::InfoWidget(QWidget* mainWindow)
 
 void InfoWidget::changeLayout(int index)
 {
+  // Reload the patrons widget in case an item has been deleted that
+  // someone had borrowed (who knows why that would happen, but better
+  // safe than sorry).
+  if (index == 2)
+    {
+      history->reload();
+    }
+
   stacker->setCurrentIndex(index);
 }
 

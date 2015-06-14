@@ -62,30 +62,33 @@ void PatronHistory::addItem()
 
 void PatronHistory::reload()
 {
-  currentBorrowedList->clear();
-
-  // Get the keys of all items borrowed by the patron
-  QStringList itemKeys;
-  QSqlQuery getKeys(QSqlDatabase::database());
-  getKeys.prepare("SELECT Ikey FROM borrowed WHERE Pkey = :key;");
-  getKeys.bindValue(":key", currentPatron);
-  getKeys.exec();
-  while (getKeys.next()) { itemKeys << getKeys.value(0).toString(); }
-
-  // Load items into the currentBorrowedList widget
-  for (int i = 0; i < itemKeys.size(); ++i)
+  if (!currentPatron.isEmpty())
     {
-      QString key = itemKeys.at(i);
-      QString table = key.endsWith("b") ? "books" : "discs";
-      QSqlQuery getItemTitle(QSqlDatabase::database());
-      getItemTitle.prepare(QString("SELECT title FROM %1 WHERE key = :key;").arg(table));
-      getItemTitle.bindValue(":key", key);
-      getItemTitle.exec();
-      getItemTitle.next();
+      currentBorrowedList->clear();
 
-      QListWidgetItem* item = new QListWidgetItem(getItemTitle.value(0).toString());
-      item->setData(Qt::UserRole, QVariant(key));
-      currentBorrowedList->addItem(item);
+      // Get the keys of all items borrowed by the patron
+      QStringList itemKeys;
+      QSqlQuery getKeys(QSqlDatabase::database());
+      getKeys.prepare("SELECT Ikey FROM borrowed WHERE Pkey = :key;");
+      getKeys.bindValue(":key", currentPatron);
+      getKeys.exec();
+      while (getKeys.next()) { itemKeys << getKeys.value(0).toString(); }
+
+      // Load items into the currentBorrowedList widget
+      for (int i = 0; i < itemKeys.size(); ++i)
+        {
+          QString key = itemKeys.at(i);
+          QString table = key.endsWith("b") ? "books" : "discs";
+          QSqlQuery getItemTitle(QSqlDatabase::database());
+          getItemTitle.prepare(QString("SELECT title FROM %1 WHERE key = :key;").arg(table));
+          getItemTitle.bindValue(":key", key);
+          getItemTitle.exec();
+          getItemTitle.next();
+
+          QListWidgetItem* item = new QListWidgetItem(getItemTitle.value(0).toString());
+          item->setData(Qt::UserRole, QVariant(key));
+          currentBorrowedList->addItem(item);
+        }
     }
 }
 

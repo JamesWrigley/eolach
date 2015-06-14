@@ -36,11 +36,10 @@ class PatronHistory : public QVBoxLayout
 
  public:
   PatronHistory();
+  void reload();
   void setPatron(QString);
 
  private:
-  void reload();
-
   QToolBar* toolbar;
   QString currentPatron;
   QTabWidget* tabWidget;
