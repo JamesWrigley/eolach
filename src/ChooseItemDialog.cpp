@@ -17,10 +17,11 @@
  *********************************************************************************/
 
 #include <QSqlQuery>
+#include <QCompleter>
 #include <QHBoxLayout>
 #include <QStringList>
 #include <QVBoxLayout>
-#include "DCompleter.h"
+#include <QStringListModel>
 #include "ChooseItemDialog.h"
 
 ChooseItemDialog::ChooseItemDialog(QString patron_key)
@@ -33,7 +34,7 @@ ChooseItemDialog::ChooseItemDialog(QString patron_key)
   removeButton = new QPushButton(QIcon(":/remove-icon"), "");
   QHBoxLayout* topHbox = new QHBoxLayout();
   QVBoxLayout* mainVbox = new QVBoxLayout(this);
-  DCompleter* completer = new DCompleter(completerItems);
+  QCompleter* completer = new QCompleter(completerItems);
   QPushButton* finishButton = new QPushButton("Finish");
 
   completer->setCaseSensitivity(Qt::CaseInsensitive);
@@ -127,7 +128,5 @@ void ChooseItemDialog::removeFromList()
 
 void ChooseItemDialog::resetCompleter()
 {
-  // We need a cast to DCompleter to get access to its overload of setModel(QStringList)
-  DCompleter* completer = static_cast<DCompleter*>(textBox->completer());
-  completer->setModel(completerItems);
+  textBox->completer()->setModel(new QStringListModel(completerItems));
 }

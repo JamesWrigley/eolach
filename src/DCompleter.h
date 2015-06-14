@@ -30,7 +30,6 @@ class DCompleter : public QCompleter
   using QCompleter::QCompleter;
 
  public:
-  void setModel(QStringList);
   QString pathFromIndex(const QModelIndex&) const;
   QStringList splitPath(const QString&) const;
 };
