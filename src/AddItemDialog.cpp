@@ -51,9 +51,12 @@ AddItemDialog::AddItemDialog(int typeIndex)
   directorOrSpeaker = new DLineEdit("Director/Speaker", &validateGenericField);
   length = new DLineEdit("Length", &validateGenericField);
   year = new DLineEdit("Year", &validateNumericField);
-  type = new DLineEdit("Type (CD/DVD)", &validateGenericField);
-  discFields = {discTitle, directorOrSpeaker, length, year, type};
+  type = new QComboBox();
+  type->addItem("DVD");
+  type->addItem("CD");
+  discFields = {discTitle, directorOrSpeaker, length, year};
   for (DLineEdit *field : discFields) { discLayout->addLayout(field); }
+  discLayout->addWidget(type);
   discWidget->setLayout(discLayout);
 
   // Patron fields widget
@@ -134,7 +137,7 @@ void AddItemDialog::addItem()
       insert.bindValue(":directorOrSpeaker", directorOrSpeaker->text());
       insert.bindValue(":length", length->text());
       insert.bindValue(":year", year->text());
-      insert.bindValue(":type", type->text());
+      insert.bindValue(":type", type->currentText());
       insert.bindValue(":onLoan", 0);
       insert.exec();
     }

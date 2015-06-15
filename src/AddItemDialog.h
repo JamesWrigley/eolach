@@ -61,7 +61,7 @@ class AddItemDialog : public QDialog
 
     QWidget *discWidget;
     DLineEdit *year;
-    DLineEdit *type;
+    QComboBox *type;
     DLineEdit *length;
     DLineEdit *discTitle;
     DLineEdit *directorOrSpeaker;
