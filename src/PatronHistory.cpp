@@ -24,7 +24,7 @@ PatronHistory::PatronHistory()
 {
   // Set up the toolbar
   toolbar = new QToolBar();
-  QAction* addItemAction = new QAction(QIcon(":/add-icon"), "", this);
+  addItemAction = new QAction(QIcon(":/add-icon"), "", this);
   removeItemAction = new QAction(QIcon(":/remove-icon"), "", this);
   removeItemAction->setDisabled(true);
   toolbar->addAction(addItemAction);
@@ -41,6 +41,7 @@ PatronHistory::PatronHistory()
 
   connect(addItemAction, SIGNAL(triggered()), this, SLOT(addItem()));
   connect(removeItemAction, SIGNAL(triggered()), this, SLOT(removeItem()));
+  connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(onTabChanged(int)));
 
   // This sucks.
   connect(currentBorrowedList->model(), &QAbstractItemModel::rowsInserted,
@@ -58,6 +59,21 @@ void PatronHistory::addItem()
 {
   ChooseItemDialog chooseItemDialog(currentPatron);
   if (chooseItemDialog.exec() == QDialog::Accepted) { reload(); }
+}
+
+void PatronHistory::onTabChanged(int index)
+{
+  if (index == 0)
+    {
+      addItemAction->setDisabled(false);
+      removeItemAction->setDisabled(true);
+      currentBorrowedList->setCurrentRow(-1);
+    }
+  else
+    {
+      addItemAction->setDisabled(true);
+      removeItemAction->setDisabled(true);
+    }
 }
 
 void PatronHistory::reload()
