@@ -33,7 +33,7 @@ class PatronHistory : public QVBoxLayout
  public slots:
   void addItem();
   void onTabChanged(int);
-  void removeItem();
+  void setItemReturned();
 
  public:
   PatronHistory();
@@ -41,6 +41,8 @@ class PatronHistory : public QVBoxLayout
   void setPatron(QString);
 
  private:
+  QListWidgetItem* createListWidgetItem(QString);
+
   QToolBar* toolbar;
   QString currentPatron;
   QTabWidget* tabWidget;

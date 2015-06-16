@@ -194,7 +194,7 @@ void KeysWidget::removeItem()
       removeItem.exec();
 
       QSqlQuery removeFromBorrowed(QSqlDatabase::database());
-      removeFromBorrowed.prepare("DELETE FROM borrowed WHERE Ikey = :key;");
+      removeFromBorrowed.prepare("DELETE FROM currentBorrowed WHERE Ikey = :key;");
       removeFromBorrowed.bindValue(":key", itemKey);
       removeFromBorrowed.exec();
 

@@ -43,9 +43,11 @@ int main(int argc, char *argv[])
 
       // QSqlQuery's can only handle one statement at a time, hence the split-up
       QSqlQuery createBooksTable(bookstore);
-      QSqlQuery createPatronsTable(bookstore);
       QSqlQuery createDiscsTable(bookstore);
-      QSqlQuery createBorrowedTable(bookstore);
+      QSqlQuery createPatronsTable(bookstore);
+      QSqlQuery createPastBorrowedTable(bookstore);
+      QSqlQuery createCurrentBorrowedTable(bookstore);
+
       createBooksTable.exec("CREATE TABLE books ("
                             "key TEXT PRIMARY KEY, "
                             "isbn TEXT, "
@@ -71,11 +73,17 @@ int main(int argc, char *argv[])
                               "mobile_num TEXT, "
                               "landline_num TEXT);");
 
-      createBorrowedTable.exec("CREATE TABLE borrowed ("
-                               "Pkey TEXT, " // Patron key
-                               "Ikey TEXT, " // Item key
-                               "PRIMARY KEY (Pkey, Ikey), "
-                               "FOREIGN KEY (Pkey) REFERENCES patrons (key));"); // While Ikey is a foreign key, it could reference either books or discs
+      createPastBorrowedTable.exec("CREATE TABLE pastBorrowed ("
+                                   "Ikey TEXT, " // Item key
+                                   "Pkey TEXT, " // Patron key
+                                   "borrowedCount INTEGER(9), "
+                                   "PRIMARY KEY (Pkey, Ikey), "
+                                   "FOREIGN KEY (Pkey) REFERENCES patrons (key));"); // While Ikey is a foreign key, it could reference either books or discs
+
+      createCurrentBorrowedTable.exec("CREATE TABLE currentBorrowed ("
+                                      "Ikey TEXT PRIMARY KEY, "
+                                      "Pkey TEXT, "
+                                      "FOREIGN KEY (Pkey) REFERENCES patrons (key));");
     }
 
   // Start the application

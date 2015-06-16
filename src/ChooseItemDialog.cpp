@@ -89,7 +89,7 @@ void ChooseItemDialog::applyItems()
 
       // Create an entry for it in the borrowed table
       QSqlQuery createRecord(QSqlDatabase::database());
-      createRecord.prepare("INSERT INTO borrowed (Pkey, Ikey) "
+      createRecord.prepare("INSERT INTO currentBorrowed (Pkey, Ikey) "
                            "VALUES (:pkey, :ikey);");
       createRecord.bindValue(":pkey", patronKey);
       createRecord.bindValue(":ikey", key);

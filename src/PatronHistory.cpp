@@ -17,6 +17,7 @@
  *********************************************************************************/
 
 #include <QSqlQuery>
+#include <QStringList>
 #include "PatronHistory.h"
 #include "ChooseItemDialog.h"
 
@@ -40,7 +41,7 @@ PatronHistory::PatronHistory()
   tabWidget->setDisabled(true);
 
   connect(addItemAction, SIGNAL(triggered()), this, SLOT(addItem()));
-  connect(removeItemAction, SIGNAL(triggered()), this, SLOT(removeItem()));
+  connect(removeItemAction, SIGNAL(triggered()), this, SLOT(setItemReturned()));
   connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(onTabChanged(int)));
 
   // This sucks.
@@ -59,6 +60,20 @@ void PatronHistory::addItem()
 {
   ChooseItemDialog chooseItemDialog(currentPatron);
   if (chooseItemDialog.exec() == QDialog::Accepted) { reload(); }
+}
+
+QListWidgetItem* PatronHistory::createListWidgetItem(QString key)
+{
+  QString table = key.endsWith("b") ? "books" : "discs";
+  QSqlQuery getItemTitle(QSqlDatabase::database());
+  getItemTitle.prepare(QString("SELECT title FROM %1 WHERE key = :key;").arg(table));
+  getItemTitle.bindValue(":key", key);
+  getItemTitle.exec();
+  getItemTitle.next();
+
+  QListWidgetItem* item = new QListWidgetItem(getItemTitle.value(0).toString());
+  item->setData(Qt::UserRole, QVariant(key));
+  return item;
 }
 
 void PatronHistory::onTabChanged(int index)
@@ -80,51 +95,83 @@ void PatronHistory::reload()
 {
   if (!currentPatron.isEmpty())
     {
+      pastBorrowedList->clear();
       currentBorrowedList->clear();
 
-      // Get the keys of all items borrowed by the patron
-      QStringList itemKeys;
-      QSqlQuery getKeys(QSqlDatabase::database());
-      getKeys.prepare("SELECT Ikey FROM borrowed WHERE Pkey = :key;");
-      getKeys.bindValue(":key", currentPatron);
-      getKeys.exec();
-      while (getKeys.next()) { itemKeys << getKeys.value(0).toString(); }
+      // Get the keys of all items borrowed by the patron (past and present)
+      QStringList pastItemKeys;
+      QStringList currentItemKeys;
+      QSqlQuery getPastKeys(QSqlDatabase::database());
+      QSqlQuery getCurrentKeys(QSqlDatabase::database());
+      getPastKeys.prepare("SELECT Ikey FROM pastBorrowed WHERE Pkey = :key;");
+      getCurrentKeys.prepare("SELECT Ikey FROM currentBorrowed WHERE Pkey = :key;");
+      getCurrentKeys.bindValue(":key", currentPatron);
+      getPastKeys.bindValue(":key", currentPatron);
+      getCurrentKeys.exec();
+      getPastKeys.exec();
 
-      // Load items into the currentBorrowedList widget
-      for (int i = 0; i < itemKeys.size(); ++i)
+      while (getPastKeys.next()) { pastItemKeys << getPastKeys.value(0).toString(); }
+      while (getCurrentKeys.next()) { currentItemKeys << getCurrentKeys.value(0).toString(); }
+
+      // Load items into the QListWidget's
+      for (int i = 0; i < currentItemKeys.size(); ++i)
         {
-          QString key = itemKeys.at(i);
-          QString table = key.endsWith("b") ? "books" : "discs";
-          QSqlQuery getItemTitle(QSqlDatabase::database());
-          getItemTitle.prepare(QString("SELECT title FROM %1 WHERE key = :key;").arg(table));
-          getItemTitle.bindValue(":key", key);
-          getItemTitle.exec();
-          getItemTitle.next();
+          currentBorrowedList->addItem(createListWidgetItem(currentItemKeys.at(i)));
+        }
 
-          QListWidgetItem* item = new QListWidgetItem(getItemTitle.value(0).toString());
-          item->setData(Qt::UserRole, QVariant(key));
-          currentBorrowedList->addItem(item);
+      for (int i = 0; i < pastItemKeys.size(); ++i)
+        {
+          pastBorrowedList->addItem(createListWidgetItem(pastItemKeys.at(i)));
         }
     }
 }
 
-void PatronHistory::removeItem()
+void PatronHistory::setItemReturned()
 {
-  QString key = currentBorrowedList->currentItem()->data(Qt::UserRole).toString();
+  QListWidgetItem* item = currentBorrowedList->takeItem(currentBorrowedList->currentRow());
+  QString key = item->data(Qt::UserRole).toString();
   QString table = key.endsWith("b") ? "books" : "discs";
 
-  // Update database
-  QSqlQuery removeFromBorrowed(QSqlDatabase::database());
-  removeFromBorrowed.prepare("DELETE FROM borrowed WHERE Ikey = :key;");
-  removeFromBorrowed.bindValue(":key", key);
-  removeFromBorrowed.exec();
+  // Remove from currentBorrowed
+  QSqlQuery removeFromCurrentBorrowed(QSqlDatabase::database());
+  removeFromCurrentBorrowed.prepare("DELETE FROM currentBorrowed WHERE Ikey = :key;");
+  removeFromCurrentBorrowed.bindValue(":key", key);
+  removeFromCurrentBorrowed.exec();
 
+  // Mark the item as available in it's table
   QSqlQuery updateStatus(QSqlDatabase::database());
   updateStatus.prepare(QString("UPDATE %1 SET onLoan = 0 WHERE key = :key;").arg(table));
   updateStatus.bindValue(":key", key);
   updateStatus.exec();
 
-  delete currentBorrowedList->takeItem(currentBorrowedList->currentRow());
+  // Check if the item was taken out previously by the same person,
+  // and create/update the record as needed.
+  QSqlQuery checkExists(QSqlDatabase::database());
+  checkExists.prepare("SELECT COUNT(*) FROM pastBorrowed WHERE Pkey = :pkey AND Ikey = :ikey");
+  checkExists.bindValue(":pkey", currentPatron);
+  checkExists.bindValue(":ikey", key);
+  checkExists.exec();
+  checkExists.next();
+
+  if (checkExists.value(0).toInt() == 0)
+    {
+      QSqlQuery createEntry(QSqlDatabase::database());
+      createEntry.prepare("INSERT INTO pastBorrowed (Pkey, Ikey, borrowedCount) "
+                          "VALUES(:pkey, :ikey, 1);");
+      createEntry.bindValue(":pkey", currentPatron);
+      createEntry.bindValue(":ikey", key);
+      createEntry.exec();
+    }
+  else
+    {
+      QSqlQuery updateEntry(QSqlDatabase::database());
+      updateEntry.prepare("UPDATE pastBorrowed SET borrowedCount = borrowedCount + 1"
+                          "WHERE Pkey = :pkey AND Ikey = :ikey;");
+      updateEntry.bindValue(":pkey", currentPatron);
+      updateEntry.bindValue(":ikey", key);
+      updateEntry.exec();
+    }
+
   reload();
 }
 
