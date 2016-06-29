@@ -28,23 +28,23 @@ class CLineEdit : public QLineEdit
   Q_OBJECT
 
   private slots:
-    void onEditingFinished();
+      void onEditingFinished();
 
- signals:
-    void doubleClicked();
-    void textModified(QString);
+  signals:
+      void doubleClicked();
+      void textModified(QString);
 
- public:
-    CLineEdit();
+  public:
+      CLineEdit();
 
- private:
-    void enterEvent(QEvent*);
-    void leaveEvent(QEvent*);
-    void mouseDoubleClickEvent(QMouseEvent *event);
+  private:
+      void enterEvent(QEvent*);
+      void leaveEvent(QEvent*);
+      void mouseDoubleClickEvent(QMouseEvent *event);
 
-    QString currentText;
-    QString mouseOverColor;
-    QString backgroundColor;
+      QString currentText;
+      QString mouseOverColor;
+      QString backgroundColor;
 };
 
 #endif // CLINEEDIT_H

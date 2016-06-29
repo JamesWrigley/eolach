@@ -21,27 +21,30 @@
 
 QString DCompleter::pathFromIndex(const QModelIndex& index) const
 {
-  QString path = QCompleter::pathFromIndex(index);
-  QString text = static_cast<QLineEdit*>(widget())->text();
+    QString path = QCompleter::pathFromIndex(index);
+    QString text = static_cast<QLineEdit*>(widget())->text();
 
-  int pos = text.lastIndexOf(",");
-  if (pos >= 0)
-    {
-      path = text.left(pos) + ", " + path;
+    int pos = text.lastIndexOf(",");
+    if (pos >= 0) {
+        path = text.left(pos) + ", " + path;
     }
 
-  return path;
+    return path;
+}
+
+void DCompleter::removeCompletion(QModelIndex index)
+{
+    model()->removeRow(index.row());
 }
 
 QStringList DCompleter::splitPath(const QString& path) const
 {
-  int pos = path.lastIndexOf(",") + 1;
+    int pos = path.lastIndexOf(",") + 1;
 
-  while (pos < path.length() && QString(path.at(pos)) == QString(" "))
-    {
-      pos++;
+    while (pos < path.length() && QString(path.at(pos)) == QString(" ")) {
+        pos++;
     }
 
-  QStringList value = QStringList(path.mid(pos));
-  return value;
+    QStringList value = QStringList(path.mid(pos));
+    return value;
 }

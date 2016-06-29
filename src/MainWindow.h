@@ -32,34 +32,34 @@ class MainWindow : public QMainWindow
 {
   Q_OBJECT
 
- private slots:
-   void changeItem();
-   void onItemRemoved();
-   void createAddItemDialog();
+  private slots:
+      void changeItem();
+      void onItemRemoved();
+      void createAddItemDialog();
 
- public slots:
-   void onFieldChanged(QString, QString, QString);
+  public slots:
+      void onFieldChanged(QString, QString, QString);
    
- public:
-    MainWindow();
-    ~MainWindow();
+  public:
+      MainWindow();
+      ~MainWindow();
 
- private:
-    void centerWindow();
-    void updateStatusbar();
-    void createInfoWidget();
+  private:
+      void centerWindow();
+      void updateStatusbar();
+      void createInfoWidget();
 
-    QMenu *fileMenu;
-    QAction *addItemAction;
-    QAction *exitAction;
-    QToolBar *toolbar;
-    QSplitter *splitter;
-    KeysWidget *booksWidget;
-    KeysWidget *discsWidget;
-    KeysWidget *patronsWidget;
-    InfoWidget *infoWidget;
-    QTabWidget *keysTabwidget;
-    QSqlDatabase bookstore;
+      QMenu *fileMenu;
+      QAction *addItemAction;
+      QAction *exitAction;
+      QToolBar *toolbar;
+      QSplitter *splitter;
+      KeysWidget *booksWidget;
+      KeysWidget *discsWidget;
+      KeysWidget *patronsWidget;
+      InfoWidget *infoWidget;
+      QTabWidget *keysTabwidget;
+      QSqlDatabase bookstore;
 };
 
 #endif // MAINWINDOW_H

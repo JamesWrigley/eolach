@@ -17,57 +17,57 @@
  *********************************************************************************/
 
 #include <QIcon>
+#include <QStringListModel>
 #include "DLineEdit.h"
 
 DLineEdit::DLineEdit(QString placeholdertext, bool (*function)(QString))
 {
-  lineedit = new QLineEdit();
-  lineedit->setPlaceholderText(placeholdertext);
-  connect(lineedit, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));
+    lineedit = new QLineEdit();
+    lineedit->setPlaceholderText(placeholdertext);
+    connect(lineedit, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));
 
-  valid = false;
-  icon = new QLabel();
-  icon->setPixmap(QIcon(":/invalid-icon").pixmap(20));
+    valid = false;
+    icon = new QLabel();
+    icon->setPixmap(QIcon(":/invalid-icon").pixmap(20));
 
-  checkFunction = function;
+    checkFunction = function;
 
-  addWidget(lineedit);
-  addWidget(icon);
+    addWidget(lineedit);
+    addWidget(icon);
 }
 
-void DLineEdit::enableCompletion(QStringListModel* completions)
+void DLineEdit::enableCompletion(QStringList completion_list)
 {
-  completer = new DCompleter(completions, this);
-  completer->setCaseSensitivity(Qt::CaseInsensitive);
-  lineedit->setCompleter(completer);
-  completionEnabled = true;
+    completer = new DCompleter(new QStringListModel(completion_list), this);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    lineedit->setCompleter(completer);
+    completionEnabled = true;
+
+    connect(completer, SIGNAL(activated(QModelIndex)), completer, SLOT(removeCompletion(QModelIndex)));
 }
 
 void DLineEdit::onTextChanged(QString fieldText)
 {
-  if (checkFunction(fieldText))
-    {
-      icon->setPixmap(QIcon(":/valid-icon").pixmap(20));
-      valid = true;
-    }
-  else
-    {
-      icon->setPixmap(QIcon(":/invalid-icon").pixmap(20));
-      valid = false;
+    if (checkFunction(fieldText)) {
+        icon->setPixmap(QIcon(":/valid-icon").pixmap(20));
+        valid = true;
+    } else {
+        icon->setPixmap(QIcon(":/invalid-icon").pixmap(20));
+        valid = false;
     }
 }
 
 QString DLineEdit::placeholderText()
 {
-  return lineedit->placeholderText();
+    return lineedit->placeholderText();
 }
 
 void DLineEdit::setFocus()
 {
-  lineedit->setFocus();
+    lineedit->setFocus();
 }
 
 QString DLineEdit::text()
 {
-  return lineedit->text();
+    return lineedit->text();
 }

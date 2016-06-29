@@ -33,48 +33,48 @@ class AddItemDialog : public QDialog
   Q_OBJECT
 
   private slots:
-    void checkFields();
-    void changeLayout(int);
+      void checkFields();
+      void changeLayout(int);
 
- public:
-    AddItemDialog(int = 0);
-    QString getItemKey();
+  public:
+      AddItemDialog(int = 0);
+      QString getItemKey();
 
- private:
-    void addItem();
-    void enableCompletion(DLineEdit*, QString, QString);
+  private:
+      void addItem();
+      void enableCompletion(DLineEdit*, QString, QString);
 
-    QLabel *selectorDescription;
-    QString itemKey;
-    QComboBox *itemSelector;
-    QVBoxLayout *mainLayout;
-    QHBoxLayout *selectorHbox;
-    QPushButton *finishButton;
-    QStackedWidget *stacker;
+      QLabel *selectorDescription;
+      QString itemKey;
+      QComboBox *itemSelector;
+      QVBoxLayout *mainLayout;
+      QHBoxLayout *selectorHbox;
+      QPushButton *finishButton;
+      QStackedWidget *stacker;
 
-    QWidget *bookWidget;
-    DLineEdit *isbn;
-    DLineEdit *title;
-    DLineEdit *genre;
-    DLineEdit *author;
-    DLineEdit *publicationDate;
+      QWidget *bookWidget;
+      DLineEdit *isbn;
+      DLineEdit *title;
+      DLineEdit *genre;
+      DLineEdit *author;
+      DLineEdit *publicationDate;
 
-    QWidget *discWidget;
-    DLineEdit *year;
-    QComboBox *type;
-    DLineEdit *length;
-    DLineEdit *discTitle;
-    DLineEdit *directorOrSpeaker;
+      QWidget *discWidget;
+      DLineEdit *year;
+      QComboBox *type;
+      DLineEdit *length;
+      DLineEdit *discTitle;
+      DLineEdit *directorOrSpeaker;
 
-    QWidget *patronWidget;
-    DLineEdit *name;
-    DLineEdit *address;
-    DLineEdit *mobileNum;
-    DLineEdit *landlineNum;
+      QWidget *patronWidget;
+      DLineEdit *name;
+      DLineEdit *address;
+      DLineEdit *mobileNum;
+      DLineEdit *landlineNum;
 
-    std::vector<DLineEdit*> bookFields;
-    std::vector<DLineEdit*> discFields;
-    std::vector<DLineEdit*> patronFields;
+      std::vector<DLineEdit*> bookFields;
+      std::vector<DLineEdit*> discFields;
+      std::vector<DLineEdit*> patronFields;
 };
 
 #endif // ADDITEMDIALOG_H

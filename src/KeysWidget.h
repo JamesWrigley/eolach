@@ -28,33 +28,33 @@ class KeysWidget : public QTableWidget
 {
   Q_OBJECT
 
- signals:
-  void itemRemoved();
+  signals:
+      void itemRemoved();
 
   private slots:
-    void removeItem();
-    void modifyHeader(bool);
-    void createItemContextMenu(QPoint);
-    void createHeaderContextMenu(QPoint);
+      void removeItem();
+      void modifyHeader(bool);
+      void createItemContextMenu(QPoint);
+      void createHeaderContextMenu(QPoint);
 
- public:
-    KeysWidget(QString, QString, QStringList);
-    void loadItems();
-    void addItem(QString);
-    void updateItem(int, QString);
+  public:
+      KeysWidget(QString, QString, QStringList);
+      void loadItems();
+      void addItem(QString);
+      void updateItem(int, QString);
 
- private:
-    void enableSorting(int, Qt::SortOrder);
-    QStringList getItemInfo(QString);
+  private:
+      void enableSorting(int, Qt::SortOrder);
+      QStringList getItemInfo(QString);
     
-    int visibleColumnCount;
-    QMenu *itemContextMenu;
-    QMenu *headerContextMenu;
-    QAction *removeItemAction;
-    QString dbTable;
-    QString getItemInfoQuery;
-    QStringList headers;
-    std::pair<int, Qt::SortOrder> disableSorting();
+      int visibleColumnCount;
+      QMenu *itemContextMenu;
+      QMenu *headerContextMenu;
+      QAction *removeItemAction;
+      QString dbTable;
+      QString getItemInfoQuery;
+      QStringList headers;
+      std::pair<int, Qt::SortOrder> disableSorting();
 };
 
 #endif // KEYSWIDGET_H

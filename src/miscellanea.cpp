@@ -20,38 +20,33 @@
 
 bool validateGenericField(QString fieldText)
 {
-  return fieldText.length() > 0;
+    return fieldText.length() > 0;
 }
 
 bool validateNumericField(QString fieldText)
 {
-  bool success = false;
-  fieldText.toFloat(&success);
-  return success;
+    bool success = false;
+    fieldText.toFloat(&success);
+    return success;
 }
 
 bool validateIsbn(QString isbnValue)
 { // Implements the checksumming algorithm for 10 and 13 digit ISBN's
-  int sum = 0;
-  int checkDigit = 10;
+    int sum = 0;
+    int checkDigit = 10;
 
-  if (10 == isbnValue.length())
-    {
-      for (int i = 0; i < isbnValue.length() - 1; ++i)
-	{
-	  sum += isbnValue[i].digitValue() * (10 - i);
+    if (10 == isbnValue.length()) {
+        for (int i = 0; i < isbnValue.length() - 1; ++i) {
+            sum += isbnValue[i].digitValue() * (10 - i);
 	}
-      checkDigit = (11 - (sum % 11)) % 11;
-    }
-  else if (13 == isbnValue.length())
-    {
-      for (int i = 1; i < isbnValue.length(); i += 2)
-	{
-	  sum += isbnValue[i].digitValue() * 3;
-	  sum += isbnValue[i - 1].digitValue();
+        checkDigit = (11 - (sum % 11)) % 11;
+    } else if (13 == isbnValue.length()) {
+        for (int i = 1; i < isbnValue.length(); i += 2) {
+            sum += isbnValue[i].digitValue() * 3;
+            sum += isbnValue[i - 1].digitValue();
 	}
-      checkDigit = (10 - (sum % 10)) % 10;
+        checkDigit = (10 - (sum % 10)) % 10;
     }
 
-  return isbnValue.endsWith(QString::number(checkDigit));
+    return isbnValue.endsWith(QString::number(checkDigit));
 }

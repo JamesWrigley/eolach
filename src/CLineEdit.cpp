@@ -23,61 +23,58 @@
 
 CLineEdit::CLineEdit()
 {
-  // We set this now to use in onEditingFinished since the window color will
-  // have by then been changed by mouseDoubleClickEvent().
-  backgroundColor = palette().color(QPalette::Window).name();
-  mouseOverColor = palette().color(QPalette::Window).darker(110).name();
+    // We set this now to use in onEditingFinished since the window color will
+    // have by then been changed by mouseDoubleClickEvent().
+    backgroundColor = palette().color(QPalette::Window).name();
+    mouseOverColor = palette().color(QPalette::Window).darker(110).name();
 
-  connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
+    connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
 
-  setReadOnly(true);
-  setFrame(false);
-  setStyleSheet("QLineEdit { background: " + backgroundColor + " }");
+    setReadOnly(true);
+    setFrame(false);
+    setStyleSheet("QLineEdit { background: " + backgroundColor + " }");
 }
 
 void CLineEdit::enterEvent(QEvent* event)
 {
-  // We check isReadOnly() because it will be true whenever the user isn't
-  // editing, and we don't want to change the background during the edit.
-  if (text().length() > 0 && isReadOnly())
-    {
-      setStyleSheet("QLineEdit { background: " + mouseOverColor + " }");
+    // We check isReadOnly() because it will be true whenever the user isn't
+    // editing, and we don't want to change the background during the edit.
+    if (text().length() > 0 && isReadOnly()) {
+        setStyleSheet("QLineEdit { background: " + mouseOverColor + " }");
     }
 }
 
 void CLineEdit::leaveEvent(QEvent* event)
 {
-  if (text().length() > 0 && isReadOnly())
-    {
-      setStyleSheet("QLineEdit { background: " + backgroundColor + " }");
+    if (text().length() > 0 && isReadOnly()) {
+        setStyleSheet("QLineEdit { background: " + backgroundColor + " }");
     }
 }
 
 void CLineEdit::mouseDoubleClickEvent(QMouseEvent *event)
 {
-  QSqlDatabase bookstore = QSqlDatabase::database();
-  QSqlQuery getRowCount;
-  getRowCount.exec("SELECT COUNT(*) FROM books;");
-  getRowCount.next();
+    QSqlDatabase bookstore = QSqlDatabase::database();
+    QSqlQuery getRowCount;
+    getRowCount.exec("SELECT COUNT(*) FROM books;");
+    getRowCount.next();
 
-  emit doubleClicked();
-  if (event->button() == Qt::LeftButton && 0 < getRowCount.value(0).toInt())
-    {
-      currentText = text();
-      setReadOnly(false);
-      setFrame(true);
-      setStyleSheet("QLineEdit { background: #F7F7F7 }");
-      selectAll();
+    emit doubleClicked();
+    if (event->button() == Qt::LeftButton && 0 < getRowCount.value(0).toInt()) {
+        currentText = text();
+        setReadOnly(false);
+        setFrame(true);
+        setStyleSheet("QLineEdit { background: #F7F7F7 }");
+        selectAll();
     }
 }
 
 void CLineEdit::onEditingFinished()
 {
-  setReadOnly(true);
-  setFrame(false);
-  setStyleSheet("QLineEdit { background: " + backgroundColor + " }");
-  deselect();
+    setReadOnly(true);
+    setFrame(false);
+    setStyleSheet("QLineEdit { background: " + backgroundColor + " }");
+    deselect();
 
-  currentText = text();
-  emit textModified(currentText);
+    currentText = text();
+    emit textModified(currentText);
 }

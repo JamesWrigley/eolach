@@ -22,7 +22,6 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QHBoxLayout>
-#include <QStringListModel>
 #include "DCompleter.h"
 
 /* The layout that holds a QLineEdit and icon (in a QLabel) to use in an AddItemDialog.
@@ -32,23 +31,23 @@ class DLineEdit : public QHBoxLayout
   Q_OBJECT
 
   private slots:
-    void onTextChanged(QString);
+      void onTextChanged(QString);
 
- public:
-    DLineEdit(QString, bool (*)(QString));
-    void enableCompletion(QStringListModel*);
-    QString placeholderText();
-    void setFocus();
-    QString text();
-    bool valid;
+  public:
+      DLineEdit(QString, bool (*)(QString));
+      void enableCompletion(QStringList);
+      QString placeholderText();
+      void setFocus();
+      QString text();
+      bool valid;
 
- private:
-    bool (*checkFunction)(QString);
+  private:
+      bool (*checkFunction)(QString);
 
-    bool completionEnabled = false;
-    QLabel *icon;
-    QLineEdit *lineedit;
-    DCompleter *completer;
+      bool completionEnabled = false;
+      QLabel *icon;
+      QLineEdit *lineedit;
+      DCompleter *completer;
 };
 
 #endif // DLINEEDIT_H

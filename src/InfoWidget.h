@@ -30,21 +30,21 @@ class InfoWidget : public QFrame
 {
   Q_OBJECT
 
- public slots:
-  void changeLayout(int);
+  public slots:
+      void changeLayout(int);
   
- public:
-  InfoWidget(QWidget*);
-  void clear();
-  void setItem(QString);
+  public:
+      InfoWidget(QWidget*);
+      void clear();
+      void setItem(QString);
 
- private:
-  QStackedWidget* stacker;
-  PatronHistory* history;
+  private:
+      QStackedWidget* stacker;
+      PatronHistory* history;
 
-  std::vector<TextField*> bookFields;
-  std::vector<TextField*> discFields;
-  std::vector<TextField*> patronFields;
+      std::vector<TextField*> bookFields;
+      std::vector<TextField*> discFields;
+      std::vector<TextField*> patronFields;
 };
 
 #endif // INFOWIDGET_H

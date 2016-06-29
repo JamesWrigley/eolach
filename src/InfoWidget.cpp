@@ -24,134 +24,124 @@
 
 InfoWidget::InfoWidget(QWidget* mainWindow)
 {
-  stacker = new QStackedWidget();
-  QVBoxLayout* mainVbox = new QVBoxLayout(this);
+    stacker = new QStackedWidget();
+    QVBoxLayout* mainVbox = new QVBoxLayout(this);
 
-  // Book fields widget
-  QVBoxLayout* bookLayout = new QVBoxLayout();
-  QWidget* bookWidget = new QWidget();
-  TextField* isbn = new TextField("books", "isbn", "ISBN:", &validateIsbn);
-  TextField* title = new TextField("books", "title", "Title:", &validateGenericField);
-  TextField* genre = new TextField("books", "genre", "Genre:", &validateGenericField);
-  TextField* author = new TextField("books", "author", "Author:", &validateGenericField);
-  TextField* publicationDate = new TextField("books", "publication_date", "Publication Date:", &validateNumericField);
-  for (TextField* field : {title, genre, author, publicationDate, isbn}) // Careful here, order is important
-    {
-      bookFields.push_back(field);
-      bookLayout->addLayout(field);
-      connect(field, SIGNAL(fieldChanged(QString, QString, QString)),
-              mainWindow, SLOT(onFieldChanged(QString, QString, QString)));
-    }
-  bookLayout->addStretch();
-  bookWidget->setLayout(bookLayout);
+    // Book fields widget
+    QVBoxLayout* bookLayout = new QVBoxLayout();
+    QWidget* bookWidget = new QWidget();
+    TextField* isbn = new TextField("books", "isbn", "ISBN:", &validateIsbn);
+    TextField* title = new TextField("books", "title", "Title:", &validateGenericField);
+    TextField* genre = new TextField("books", "genre", "Genre:", &validateGenericField);
+    TextField* author = new TextField("books", "author", "Author:", &validateGenericField);
+    TextField* publicationDate = new TextField("books", "publication_date", "Publication Date:", &validateNumericField);
+    for (TextField* field : {title, genre, author, publicationDate, isbn}) { // Careful here, order is important
 
-  // Disc fields widget
-  QVBoxLayout* discLayout = new QVBoxLayout();
-  QWidget* discWidget = new QWidget();
-  TextField* discTitle = new TextField("discs", "title", "Title:", &validateGenericField);
-  TextField* directorOrSpeaker = new TextField("discs", "directorOrSpeaker", "Director/Speaker:", &validateGenericField);
-  TextField* length = new TextField("discs", "length", "Length:", &validateGenericField);
-  TextField* year = new TextField("discs", "year", "Year:", &validateNumericField);
-  TextField* type = new TextField("discs", "type", "Type:", &validateGenericField);
-  for (TextField* field : {discTitle, directorOrSpeaker, length, year, type})
-    {
-      discFields.push_back(field);
-      discLayout->addLayout(field);
-      connect(field, SIGNAL(fieldChanged(QString, QString, QString)),
-              mainWindow, SLOT(onFieldChanged(QString, QString, QString)));
-    }
-  discLayout->addStretch();
-  discWidget->setLayout(discLayout);
-
-  // Patron fields widget
-  QVBoxLayout* patronLayout = new QVBoxLayout();
-  QWidget* patronWidget = new QWidget();
-  TextField* name = new TextField("patrons", "name", "Name:", &validateGenericField);
-  TextField* address = new TextField("patrons", "address", "Address:", &validateGenericField);
-  TextField* mobileNum = new TextField("patrons", "mobile_num", "Mobile No.", &validateNumericField);
-  TextField* landlineNum = new TextField("patrons", "landline_num", "Landline No.", &validateNumericField);
-
-  for (TextField* field : {name, address, mobileNum, landlineNum})
-    {
-      patronFields.push_back(field);
-      patronLayout->addLayout(field);
-      connect(field, SIGNAL(fieldChanged(QString, QString, QString)),
-              mainWindow, SLOT(onFieldChanged(QString, QString, QString)));
+        bookFields.push_back(field);
+        bookLayout->addLayout(field);
+        connect(field, SIGNAL(fieldChanged(QString, QString, QString)),
+                mainWindow, SLOT(onFieldChanged(QString, QString, QString)));
     }
 
-  history = new PatronHistory();
-  QFrame* separator = new QFrame();
-  separator->setFrameShape(QFrame::HLine);
-  separator->setFrameShadow(QFrame::Sunken);
-  patronLayout->addSpacing(30);
-  patronLayout->addWidget(separator);
-  patronLayout->addLayout(history);
-  patronWidget->setLayout(patronLayout);
+    bookLayout->addStretch();
+    bookWidget->setLayout(bookLayout);
 
-  stacker->addWidget(bookWidget);
-  stacker->addWidget(discWidget);
-  stacker->addWidget(patronWidget);
+    // Disc fields widget
+    QVBoxLayout* discLayout = new QVBoxLayout();
+    QWidget* discWidget = new QWidget();
+    TextField* discTitle = new TextField("discs", "title", "Title:", &validateGenericField);
+    TextField* directorOrSpeaker = new TextField("discs", "directorOrSpeaker", "Director/Speaker:", &validateGenericField);
+    TextField* length = new TextField("discs", "length", "Length:", &validateGenericField);
+    TextField* year = new TextField("discs", "year", "Year:", &validateNumericField);
+    TextField* type = new TextField("discs", "type", "Type:", &validateGenericField);
+    for (TextField* field : {discTitle, directorOrSpeaker, length, year, type}) {
+        discFields.push_back(field);
+        discLayout->addLayout(field);
+        connect(field, SIGNAL(fieldChanged(QString, QString, QString)),
+                mainWindow, SLOT(onFieldChanged(QString, QString, QString)));
+    }
+    discLayout->addStretch();
+    discWidget->setLayout(discLayout);
 
-  mainVbox->addWidget(stacker);
-  mainVbox->addStretch();
-  setLayout(mainVbox);
-  setFrameShape(QFrame::StyledPanel);
-  setObjectName("MainQFrame");
-  setStyleSheet("QFrame#MainQFrame {border: 8px solid #909090; border-radius: 7px;}");
+    // Patron fields widget
+    QVBoxLayout* patronLayout = new QVBoxLayout();
+    QWidget* patronWidget = new QWidget();
+    TextField* name = new TextField("patrons", "name", "Name:", &validateGenericField);
+    TextField* address = new TextField("patrons", "address", "Address:", &validateGenericField);
+    TextField* mobileNum = new TextField("patrons", "mobile_num", "Mobile No.", &validateNumericField);
+    TextField* landlineNum = new TextField("patrons", "landline_num", "Landline No.", &validateNumericField);
+
+    for (TextField* field : {name, address, mobileNum, landlineNum}) {
+        patronFields.push_back(field);
+        patronLayout->addLayout(field);
+        connect(field, SIGNAL(fieldChanged(QString, QString, QString)),
+                mainWindow, SLOT(onFieldChanged(QString, QString, QString)));
+    }
+
+    history = new PatronHistory();
+    QFrame* separator = new QFrame();
+    separator->setFrameShape(QFrame::HLine);
+    separator->setFrameShadow(QFrame::Sunken);
+    patronLayout->addSpacing(30);
+    patronLayout->addWidget(separator);
+    patronLayout->addLayout(history);
+    patronWidget->setLayout(patronLayout);
+
+    stacker->addWidget(bookWidget);
+    stacker->addWidget(discWidget);
+    stacker->addWidget(patronWidget);
+
+    mainVbox->addWidget(stacker);
+    mainVbox->addStretch();
+    setLayout(mainVbox);
+    setFrameShape(QFrame::StyledPanel);
+    setObjectName("MainQFrame");
+    setStyleSheet("QFrame#MainQFrame {border: 8px solid #909090; border-radius: 7px;}");
 }
 
 void InfoWidget::changeLayout(int index)
 {
-  // Reload the patrons widget in case an item has been deleted that
-  // someone had borrowed (who knows why that would happen, but better
-  // safe than sorry).
-  if (index == 2)
-    {
-      history->reload();
+    // Reload the patrons widget in case an item has been deleted that
+    // someone had borrowed (who knows why that would happen, but better
+    // safe than sorry).
+    if (index == 2) {
+        history->reload();
     }
 
-  stacker->setCurrentIndex(index);
+    stacker->setCurrentIndex(index);
 }
 
 void InfoWidget::clear()
 {
-  for (std::vector<TextField*> itemFields : {bookFields, discFields, patronFields})
-    {
-      for (TextField *field : itemFields)
-        {
-          field->setText("");
+    for (std::vector<TextField*> itemFields : {bookFields, discFields, patronFields}) {
+        for (TextField *field : itemFields) {
+            field->setText("");
         }
     }
 }
 
 void InfoWidget::setItem(QString itemKey)
 {
-  QSqlQuery getItemInfo(QSqlDatabase::database());
-  std::vector<TextField*> itemFields;
+    QSqlQuery getItemInfo(QSqlDatabase::database());
+    std::vector<TextField*> itemFields;
 
-  if (itemKey.endsWith("b"))
-    {
-      getItemInfo.prepare(getBookInfo);
-      itemFields = bookFields;
-    }
-  else if (itemKey.endsWith("d"))
-    {
-      getItemInfo.prepare(getDiscInfo);
-      itemFields = discFields;
-    }
-  else if (itemKey.endsWith("p"))
-    {
-      getItemInfo.prepare(getPatronInfo);
-      history->setPatron(itemKey);
-      itemFields = patronFields;
+    if (itemKey.endsWith("b")) {
+        getItemInfo.prepare(getBookInfo);
+        itemFields = bookFields;
+    } else if (itemKey.endsWith("d")) {
+        getItemInfo.prepare(getDiscInfo);
+        itemFields = discFields;
+    } else if (itemKey.endsWith("p")) {
+        getItemInfo.prepare(getPatronInfo);
+        history->setPatron(itemKey);
+        itemFields = patronFields;
     }
 
-  getItemInfo.bindValue(":key", itemKey);
-  getItemInfo.exec();
-  getItemInfo.next();
+    getItemInfo.bindValue(":key", itemKey);
+    getItemInfo.exec();
+    getItemInfo.next();
 
-  for (unsigned int i = 0; i < itemFields.size(); ++i)
-    {
-      itemFields[i]->setText(getItemInfo.value(i).toString());
+    for (unsigned int i = 0; i < itemFields.size(); ++i) {
+        itemFields[i]->setText(getItemInfo.value(i).toString());
     }
 }

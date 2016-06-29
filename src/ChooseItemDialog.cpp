@@ -26,107 +26,104 @@
 
 ChooseItemDialog::ChooseItemDialog(QString patron_key)
 {
-  loadItems();
-  patronKey = patron_key;
-  list = new QListWidget();
-  textBox = new QLineEdit();
-  completerItems = QStringList(itemMap.keys());
-  removeButton = new QPushButton(QIcon(":/remove-icon"), "");
-  QHBoxLayout* topHbox = new QHBoxLayout();
-  QVBoxLayout* mainVbox = new QVBoxLayout(this);
-  QCompleter* completer = new QCompleter(completerItems);
-  QPushButton* finishButton = new QPushButton("Finish");
+    loadItems();
+    patronKey = patron_key;
+    list = new QListWidget();
+    textBox = new QLineEdit();
+    completerItems = QStringList(itemMap.keys());
+    removeButton = new QPushButton(QIcon(":/remove-icon"), "");
+    QHBoxLayout* topHbox = new QHBoxLayout();
+    QVBoxLayout* mainVbox = new QVBoxLayout(this);
+    QCompleter* completer = new QCompleter(completerItems);
+    QPushButton* finishButton = new QPushButton("Finish");
 
-  completer->setCaseSensitivity(Qt::CaseInsensitive);
-  textBox->setCompleter(completer);
-  textBox->setPlaceholderText("Item Name");
-  removeButton->setDisabled(true);
-  finishButton->setDefault(true);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    textBox->setCompleter(completer);
+    textBox->setPlaceholderText("Item Name");
+    removeButton->setDisabled(true);
+    finishButton->setDefault(true);
 
-  // The Qt::QueuedConnection bit is to ensure that the textBox is cleared
-  connect(textBox->completer(), SIGNAL(activated(QString)), this,
-          SLOT(addToList(QString)), Qt::QueuedConnection);
-  connect(list, &QListWidget::itemSelectionChanged, [=] () { removeButton->setDisabled(false); });
-  connect(removeButton, SIGNAL(clicked()), this, SLOT(removeFromList()));
-  connect(finishButton, SIGNAL(clicked()), this, SLOT(applyItems()));
+    // The Qt::QueuedConnection bit is to ensure that the textBox is cleared
+    connect(textBox->completer(), SIGNAL(activated(QString)), this,
+            SLOT(addToList(QString)), Qt::QueuedConnection);
+    connect(list, &QListWidget::itemSelectionChanged, [=] () { removeButton->setDisabled(false); });
+    connect(removeButton, SIGNAL(clicked()), this, SLOT(removeFromList()));
+    connect(finishButton, SIGNAL(clicked()), this, SLOT(applyItems()));
 
-  topHbox->addWidget(textBox);
-  topHbox->addWidget(removeButton);
+    topHbox->addWidget(textBox);
+    topHbox->addWidget(removeButton);
 
-  mainVbox->addLayout(topHbox);
-  mainVbox->addWidget(list);
-  mainVbox->addWidget(finishButton);
+    mainVbox->addLayout(topHbox);
+    mainVbox->addWidget(list);
+    mainVbox->addWidget(finishButton);
 
-  setLayout(mainVbox);
-  setWindowTitle("Modify History");
+    setLayout(mainVbox);
+    setWindowTitle("Modify History");
 }
 
 /* Add the text in textBox as an item in the list, and remove from the list of
    completions */
 void ChooseItemDialog::addToList(QString item)
 {
-  if (completerItems.contains(item))
-    {
-      list->addItem(item);
-      completerItems.removeAll(item);
-      resetCompleter();
-      textBox->clear();
+    if (completerItems.contains(item)) {
+        list->addItem(item);
+        completerItems.removeAll(item);
+        resetCompleter();
+        textBox->clear();
     }
 }
 
 void ChooseItemDialog::applyItems()
 {
-  for (int i = 0; i < list->count(); ++i)
-    {
-      QString key = itemMap.value(list->item(i)->text());
-      QString table = key.endsWith("b") ? "books" : "discs";
+    for (int i = 0; i < list->count(); ++i) {
+        QString key = itemMap.value(list->item(i)->text());
+        QString table = key.endsWith("b") ? "books" : "discs";
 
-      // Update the items 'onLoan' status in its table
-      QSqlQuery updateStatus(QSqlDatabase::database());
-      updateStatus.prepare(QString("UPDATE %1 SET onLoan = 1 WHERE key = :key").arg(table));
-      updateStatus.bindValue(":key", key);
-      updateStatus.exec();
+        // Update the items 'onLoan' status in its table
+        QSqlQuery updateStatus(QSqlDatabase::database());
+        updateStatus.prepare(QString("UPDATE %1 SET onLoan = 1 WHERE key = :key").arg(table));
+        updateStatus.bindValue(":key", key);
+        updateStatus.exec();
 
-      // Create an entry for it in the borrowed table
-      QSqlQuery createRecord(QSqlDatabase::database());
-      createRecord.prepare("INSERT INTO currentBorrowed (Pkey, Ikey) "
-                           "VALUES (:pkey, :ikey);");
-      createRecord.bindValue(":pkey", patronKey);
-      createRecord.bindValue(":ikey", key);
-      createRecord.exec();
+        // Create an entry for it in the borrowed table
+        QSqlQuery createRecord(QSqlDatabase::database());
+        createRecord.prepare("INSERT INTO currentBorrowed (Pkey, Ikey) "
+                             "VALUES (:pkey, :ikey);");
+        createRecord.bindValue(":pkey", patronKey);
+        createRecord.bindValue(":ikey", key);
+        createRecord.exec();
     }
 
-  done(QDialog::Accepted);
+    done(QDialog::Accepted);
 }
 
 void ChooseItemDialog::loadItems()
 {
-  QSqlQuery getBooks("SELECT key, title FROM books WHERE onLoan = 0;", QSqlDatabase::database());
-  QSqlQuery getDiscs("SELECT key, title FROM discs WHERE onLoan = 0;", QSqlDatabase::database());
+    QSqlQuery getBooks("SELECT key, title FROM books WHERE onLoan = 0;", QSqlDatabase::database());
+    QSqlQuery getDiscs("SELECT key, title FROM discs WHERE onLoan = 0;", QSqlDatabase::database());
 
-  while (getBooks.next())
-    {
-      itemMap.insert(getBooks.value(1).toString(), getBooks.value(0).toString());
-    }
-  while (getDiscs.next())
-    {
-      itemMap.insert(getDiscs.value(1).toString(), getDiscs.value(0).toString());
+    while (getBooks.next()) {
+        itemMap.insert(getBooks.value(1).toString(), getBooks.value(0).toString());
     }
 
-  completerItems = QStringList(itemMap.keys());
+    while (getDiscs.next()) {
+        itemMap.insert(getDiscs.value(1).toString(), getDiscs.value(0).toString());
+    }
+
+    completerItems = QStringList(itemMap.keys());
 }
 
 void ChooseItemDialog::removeFromList()
 {
-  removeButton->setDisabled(false);
-  completerItems << list->currentItem()->text();
-  resetCompleter();
-  // We need to delete the item manually, since items removed from a QListWidget
-  // will not be managed by Qt.
-  delete list->takeItem(list->currentRow());
+    removeButton->setDisabled(false);
+    completerItems << list->currentItem()->text();
+    resetCompleter();
+    // We need to delete the item manually, since items removed from a QListWidget
+    // will not be managed by Qt.
+    delete list->takeItem(list->currentRow());
 }
 
 void ChooseItemDialog::resetCompleter()
 {
-  textBox->completer()->setModel(new QStringListModel(completerItems));
+    textBox->completer()->setModel(new QStringListModel(completerItems));
 }

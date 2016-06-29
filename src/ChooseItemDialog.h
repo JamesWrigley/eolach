@@ -30,24 +30,24 @@ class ChooseItemDialog : public QDialog
 {
   Q_OBJECT
 
- private slots:
-   void addToList(QString);
-   void applyItems();
-   void removeFromList();
+  private slots:
+      void addToList(QString);
+      void applyItems();
+      void removeFromList();
 
- public:
-  ChooseItemDialog(QString);
+  public:
+      ChooseItemDialog(QString);
 
- private:
-  void loadItems();
-  void resetCompleter();
+  private:
+      void loadItems();
+      void resetCompleter();
 
-  QString patronKey;
-  QListWidget* list;
-  QLineEdit* textBox;
-  QPushButton* removeButton;
-  QStringList completerItems;
-  QHash<QString, QString> itemMap;
+      QString patronKey;
+      QListWidget* list;
+      QLineEdit* textBox;
+      QPushButton* removeButton;
+      QStringList completerItems;
+      QHash<QString, QString> itemMap;
 };
 
 #endif // CHOOSEITEMDIALOG_H

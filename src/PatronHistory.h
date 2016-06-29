@@ -30,26 +30,26 @@ class PatronHistory : public QVBoxLayout
 {
   Q_OBJECT
 
- public slots:
-  void addItem();
-  void onTabChanged(int);
-  void setItemReturned();
+  public slots:
+      void addItem();
+      void onTabChanged(int);
+      void setItemReturned();
 
- public:
-  PatronHistory();
-  void reload();
-  void setPatron(QString);
+  public:
+      PatronHistory();
+      void reload();
+      void setPatron(QString);
 
- private:
-  QListWidgetItem* createListWidgetItem(QString);
+  private:
+      QListWidgetItem* createListWidgetItem(QString);
 
-  QToolBar* toolbar;
-  QString currentPatron;
-  QTabWidget* tabWidget;
-  QAction* addItemAction;
-  QAction* removeItemAction;
-  QListWidget* pastBorrowedList;
-  QListWidget* currentBorrowedList;
+      QToolBar* toolbar;
+      QString currentPatron;
+      QTabWidget* tabWidget;
+      QAction* addItemAction;
+      QAction* removeItemAction;
+      QListWidget* pastBorrowedList;
+      QListWidget* currentBorrowedList;
 };
 
 #endif // PATRONHISTORY_H

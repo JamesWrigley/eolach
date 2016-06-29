@@ -21,17 +21,22 @@
 
 #include <QLineEdit>
 #include <QCompleter>
+#include <QModelIndex>
 #include <QStringList>
 
 class DCompleter : public QCompleter
 {
   Q_OBJECT
 
+  // Inherit all the constructors
   using QCompleter::QCompleter;
 
- public:
-  QString pathFromIndex(const QModelIndex&) const;
-  QStringList splitPath(const QString&) const;
+  public slots:
+      void removeCompletion(QModelIndex);
+
+  public:
+      QString pathFromIndex(const QModelIndex&) const;
+      QStringList splitPath(const QString&) const;
 };
 
 #endif // DCOMPLETER_H

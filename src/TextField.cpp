@@ -24,70 +24,61 @@
 TextField::TextField(QString table, QString sqlField,
                      QString labelName, bool (*function)(QString))
 {
-  dbTable = table;
-  fieldName = sqlField;
-  checkFunction = function;
-  label = new QLabel(labelName);
-  icon = new QLabel();
-  icon->setPixmap(QIcon(":/invalid-icon").pixmap(20));
-  editBox = new CLineEdit();
-  connect(editBox, SIGNAL(doubleClicked()), this, SLOT(onDoubleClicked()));
-  connect(editBox, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));
-  connect(editBox, SIGNAL(textModified(QString)), this, SLOT(onTextModified(QString)));
+    dbTable = table;
+    fieldName = sqlField;
+    checkFunction = function;
+    label = new QLabel(labelName);
+    icon = new QLabel();
+    icon->setPixmap(QIcon(":/invalid-icon").pixmap(20));
+    editBox = new CLineEdit();
+    connect(editBox, SIGNAL(doubleClicked()), this, SLOT(onDoubleClicked()));
+    connect(editBox, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));
+    connect(editBox, SIGNAL(textModified(QString)), this, SLOT(onTextModified(QString)));
 
-  label->setMinimumWidth(120);
-  addWidget(label);
-  addWidget(editBox);
-  addWidget(icon);
+    label->setMinimumWidth(120);
+    addWidget(label);
+    addWidget(editBox);
+    addWidget(icon);
 }
 
 void TextField::enterEditMode()
 {
-  QMouseEvent doubleClick(QEvent::MouseButtonDblClick, QPointF(), Qt::LeftButton, 0, 0);
-  QApplication::sendEvent(editBox, &doubleClick);
+    QMouseEvent doubleClick(QEvent::MouseButtonDblClick, QPointF(), Qt::LeftButton, 0, 0);
+    QApplication::sendEvent(editBox, &doubleClick);
 }
 
 void TextField::onTextChanged(QString newText)
 {
-  if (checkFunction(newText))
-    {
-      icon->setPixmap(QIcon(":/valid-icon").pixmap(20));
-    }
-  else
-    {
-      icon->setPixmap(QIcon(":/invalid-icon").pixmap(20));
+    if (checkFunction(newText)) {
+        icon->setPixmap(QIcon(":/valid-icon").pixmap(20));
+    } else {
+        icon->setPixmap(QIcon(":/invalid-icon").pixmap(20));
     }
 }
 
 void TextField::onTextModified(QString newText)
 {
-  if (checkFunction(newText))
-    {
-      icon->hide();
-    }
-  else
-    {
-      icon->show();
+    if (checkFunction(newText)) {
+        icon->hide();
+    } else {
+        icon->show();
     }
 
-  emit fieldChanged(dbTable, fieldName, newText);
+    emit fieldChanged(dbTable, fieldName, newText);
 }
 
 void TextField::onDoubleClicked()
 {
-  icon->show();
+    icon->show();
 }
 
 void TextField::setText(QString newText)
 {
-  editBox->setText(newText);
-  onTextChanged(newText);
-  if (checkFunction(newText))
-    {
-      icon->hide();
-    }
-  else
-    {
-      icon->show();
+    editBox->setText(newText);
+    onTextChanged(newText);
+    if (checkFunction(newText)) {
+        icon->hide();
+    } else {
+        icon->show();
     }
 }
