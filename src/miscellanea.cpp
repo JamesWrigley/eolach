@@ -26,7 +26,7 @@ bool validateGenericField(QString fieldText)
 bool validateNumericField(QString fieldText)
 {
     bool success = false;
-    fieldText.toFloat(&success);
+    fieldText.simplified().replace(" ", "").toFloat(&success);
     return success;
 }
 
