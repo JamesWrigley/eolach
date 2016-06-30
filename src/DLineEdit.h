@@ -22,6 +22,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QHBoxLayout>
+
 #include "DCompleter.h"
 
 /* The layout that holds a QLineEdit and icon (in a QLabel) to use in an AddItemDialog.

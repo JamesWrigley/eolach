@@ -19,6 +19,7 @@
 #include <QVariant>
 #include <QSqlQuery>
 #include <QVBoxLayout>
+
 #include "InfoWidget.h"
 #include "miscellanea.h"
 
@@ -36,7 +37,6 @@ InfoWidget::InfoWidget(QWidget* mainWindow)
     TextField* author = new TextField("books", "author", "Author:", &validateGenericField);
     TextField* publicationDate = new TextField("books", "publication_date", "Publication Date:", &validateNumericField);
     for (TextField* field : {title, genre, author, publicationDate, isbn}) { // Careful here, order is important
-
         bookFields.push_back(field);
         bookLayout->addLayout(field);
         connect(field, SIGNAL(fieldChanged(QString, QString, QString)),
@@ -113,7 +113,7 @@ void InfoWidget::changeLayout(int index)
 
 void InfoWidget::clear()
 {
-    for (std::vector<TextField*> itemFields : {bookFields, discFields, patronFields}) {
+    for (auto &itemFields : {bookFields, discFields, patronFields}) {
         for (TextField *field : itemFields) {
             field->setText("");
         }
@@ -141,7 +141,7 @@ void InfoWidget::setItem(QString itemKey)
     getItemInfo.exec();
     getItemInfo.next();
 
-    for (unsigned int i = 0; i < itemFields.size(); ++i) {
+    for (auto i = 0u; i < itemFields.size(); ++i) {
         itemFields[i]->setText(getItemInfo.value(i).toString());
     }
 }

@@ -20,6 +20,7 @@
 #define KEYSWIDGET_H
 
 #include <utility>
+
 #include <QTableWidget>
 
 /* The QTableWidget subclass that displays a list of all the items in a

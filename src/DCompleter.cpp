@@ -17,6 +17,7 @@
  *********************************************************************************/
 
 #include <QStringListModel>
+
 #include "DCompleter.h"
 
 QString DCompleter::pathFromIndex(const QModelIndex& index) const

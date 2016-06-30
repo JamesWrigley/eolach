@@ -22,6 +22,7 @@
 #include <QStringList>
 #include <QVBoxLayout>
 #include <QStringListModel>
+
 #include "ChooseItemDialog.h"
 
 ChooseItemDialog::ChooseItemDialog(QString patron_key)

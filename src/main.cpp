@@ -19,6 +19,7 @@
 #include <QDir>
 #include <QSqlQuery>
 #include <QApplication>
+
 #include "MainWindow.h"
 
 int main(int argc, char *argv[])
@@ -28,7 +29,7 @@ int main(int argc, char *argv[])
     QString configDirPath = QDir().homePath() + "/.eolach/";
     QString dbPath = configDirPath + "bookstore.db";
 
-    if (QFile(dbPath).exists()){
+    if (QFile(dbPath).exists()) {
         bookstore = QSqlDatabase::addDatabase("QSQLITE");
         bookstore.setDatabaseName(dbPath);
         bookstore.open();

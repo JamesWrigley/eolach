@@ -19,6 +19,7 @@
 #include <QIcon>
 #include <QMouseEvent>
 #include <QApplication>
+
 #include "TextField.h"
 
 TextField::TextField(QString table, QString sqlField,

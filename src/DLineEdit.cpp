@@ -18,6 +18,7 @@
 
 #include <QIcon>
 #include <QStringListModel>
+
 #include "DLineEdit.h"
 
 DLineEdit::DLineEdit(QString placeholdertext, bool (*function)(QString))
@@ -43,7 +44,8 @@ void DLineEdit::enableCompletion(QStringList completion_list)
     lineedit->setCompleter(completer);
     completionEnabled = true;
 
-    connect(completer, SIGNAL(activated(QModelIndex)), completer, SLOT(removeCompletion(QModelIndex)));
+    connect(completer, SIGNAL(activated(QModelIndex)),
+            completer, SLOT(removeCompletion(QModelIndex)));
 }
 
 void DLineEdit::onTextChanged(QString fieldText)

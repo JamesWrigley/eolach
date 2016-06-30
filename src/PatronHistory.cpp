@@ -18,6 +18,7 @@
 
 #include <QSqlQuery>
 #include <QStringList>
+
 #include "PatronHistory.h"
 #include "ChooseItemDialog.h"
 

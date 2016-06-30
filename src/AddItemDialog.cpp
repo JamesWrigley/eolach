@@ -17,9 +17,11 @@
  *********************************************************************************/
 
 #include <random>
+
 #include <QRegExp>
 #include <QSqlQuery>
 #include <QMessageBox>
+
 #include "miscellanea.h"
 #include "AddItemDialog.h"
 
@@ -108,10 +110,10 @@ void AddItemDialog::addItem()
       
         // Sort the authors and genres
         QStringList authorsList = author->text().split(",", QString::SkipEmptyParts);
-        for (int i = 0; i < authorsList.size(); ++i) { authorsList[i] = authorsList[i].simplified(); }
-        authorsList.sort(Qt::CaseInsensitive);
         QStringList genresList = genre->text().split(",", QString::SkipEmptyParts);
+        for (int i = 0; i < authorsList.size(); ++i) { authorsList[i] = authorsList[i].simplified(); }
         for (int i = 0; i < genresList.size(); ++i) { genresList[i] = genresList[i].simplified(); }
+        authorsList.sort(Qt::CaseInsensitive);
         genresList.sort(Qt::CaseInsensitive);
 
         insert.prepare("INSERT INTO books (key, isbn, title, author, publication_date, genre, onLoan) "
@@ -175,8 +177,8 @@ void AddItemDialog::changeLayout(int index)
 void AddItemDialog::checkFields()
 {
     QStringList warnings;
-    std::vector<std::vector<DLineEdit*>> itemFields = {bookFields, discFields, patronFields};
-    for (DLineEdit *field : itemFields[stacker->currentIndex()]) {
+    auto itemFields = {bookFields, discFields, patronFields};
+    for (DLineEdit *field : *(itemFields.begin() + stacker->currentIndex())) {
         if (!field->valid) {
             warnings << field->placeholderText();
         }

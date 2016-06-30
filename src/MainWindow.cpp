@@ -22,6 +22,7 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QDesktopWidget>
+
 #include "MainWindow.h"
 #include "KeysWidget.h"
 #include "InfoWidget.h"
@@ -136,6 +137,7 @@ void MainWindow::onItemRemoved()
     if (1 == currentTab->rowCount()) {
         infoWidget->clear();
     }
+
     currentTab->removeRow(currentTab->currentRow());
     updateStatusbar();
 }

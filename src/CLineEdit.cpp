@@ -19,6 +19,7 @@
 #include <QSqlQuery>
 #include <QMouseEvent>
 #include <QSqlDatabase>
+
 #include "CLineEdit.h"
 
 CLineEdit::CLineEdit()

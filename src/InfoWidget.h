@@ -21,6 +21,7 @@
 
 #include <QFrame>
 #include <QStackedWidget>
+
 #include "TextField.h"
 #include "PatronHistory.h"
 

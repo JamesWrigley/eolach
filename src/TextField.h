@@ -23,6 +23,7 @@
 #include <QAction>
 #include <QLineEdit>
 #include <QHBoxLayout>
+
 #include "CLineEdit.h"
 
 /* A class that will represent each field displayed in the info widget */
