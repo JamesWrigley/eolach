@@ -27,7 +27,9 @@ PatronHistory::PatronHistory()
     // Set up the toolbar
     toolbar = new QToolBar();
     addItemAction = new QAction(QIcon(":/add-icon"), "", this);
+    addItemAction->setToolTip("Add borrowed item");
     removeItemAction = new QAction(QIcon(":/remove-icon"), "", this);
+    removeItemAction->setToolTip("Mark as returned");
     removeItemAction->setDisabled(true);
     toolbar->addAction(addItemAction);
     toolbar->addAction(removeItemAction);

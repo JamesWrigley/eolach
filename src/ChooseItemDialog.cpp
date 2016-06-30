@@ -42,6 +42,7 @@ ChooseItemDialog::ChooseItemDialog(QString patron_key)
     textBox->setCompleter(completer);
     textBox->setPlaceholderText("Item Name");
     removeButton->setDisabled(true);
+    removeButton->setToolTip("Remove");
     finishButton->setDefault(true);
 
     // The Qt::QueuedConnection bit is to ensure that the textBox is cleared
@@ -59,7 +60,7 @@ ChooseItemDialog::ChooseItemDialog(QString patron_key)
     mainVbox->addWidget(finishButton);
 
     setLayout(mainVbox);
-    setWindowTitle("Modify History");
+    setWindowTitle("Add to borrowed");
 }
 
 /* Add the text in textBox as an item in the list, and remove from the list of
