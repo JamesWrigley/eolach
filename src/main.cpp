@@ -39,12 +39,10 @@ int main(int argc, char *argv[])
         bookstore.setDatabaseName(dbPath);
         bookstore.open();
 
-        // QSqlQuery's can only handle one statement at a time, hence the split-up
         QSqlQuery createBooksTable(bookstore);
         QSqlQuery createDiscsTable(bookstore);
+        QSqlQuery createLoansTable(bookstore);
         QSqlQuery createPatronsTable(bookstore);
-        QSqlQuery createPastBorrowedTable(bookstore);
-        QSqlQuery createCurrentBorrowedTable(bookstore);
 
         createBooksTable.exec("CREATE TABLE books ("
                               "key TEXT PRIMARY KEY, "
@@ -69,20 +67,15 @@ int main(int argc, char *argv[])
                                 "name TEXT, "
                                 "address TEXT, "
                                 "mobile_num TEXT, "
-                                "landline_num TEXT);");
+                                "landline_num TEXT);");        
 
-        createPastBorrowedTable.exec("CREATE TABLE pastBorrowed ("
-                                     "Ikey TEXT, " // Item key
-                                     "Pkey TEXT, " // Patron key
-                                     "borrowedCount INTEGER(9), "
-                                     "PRIMARY KEY (Pkey, Ikey), "
-                                     // While Ikey is a foreign key, it could reference either books or discs
-                                     "FOREIGN KEY (Pkey) REFERENCES patrons (key));");
-
-        createCurrentBorrowedTable.exec("CREATE TABLE currentBorrowed ("
-                                        "Ikey TEXT PRIMARY KEY, "
-                                        "Pkey TEXT, "
-                                        "FOREIGN KEY (Pkey) REFERENCES patrons (key));");
+        createLoansTable.exec("CREATE TABLE loans ("
+                              "id INTEGER PRIMARY KEY, "
+                              "item TEXT, "
+                              "patron TEXT, "
+                              "loan_date TEXT, "
+                              "due_date TEXT, "
+                              "return_date TEXT);");
     }
 
     // Start the application

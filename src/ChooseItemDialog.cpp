@@ -16,6 +16,7 @@
  *                                                                                *
  *********************************************************************************/
 
+#include <QDateTime>
 #include <QSqlQuery>
 #include <QCompleter>
 #include <QHBoxLayout>
@@ -88,11 +89,15 @@ void ChooseItemDialog::applyItems()
         updateStatus.exec();
 
         // Create an entry for it in the borrowed table
+        QDateTime today = QDateTime::currentDateTime();
         QSqlQuery createRecord(QSqlDatabase::database());
-        createRecord.prepare("INSERT INTO currentBorrowed (Pkey, Ikey) "
-                             "VALUES (:pkey, :ikey);");
-        createRecord.bindValue(":pkey", patronKey);
-        createRecord.bindValue(":ikey", key);
+        createRecord.prepare("INSERT INTO loans (item, patron, loan_date, due_date, return_date) "
+                             "VALUES (:item, :patron, :ld, :dd, :rd);");
+        createRecord.bindValue(":item", key);
+        createRecord.bindValue(":patron", patronKey);
+        createRecord.bindValue(":ld", today.toString());
+        createRecord.bindValue(":dd", today.addDays(7).toString());
+        createRecord.bindValue(":rd", QDateTime().toString());
         createRecord.exec();
     }
 
