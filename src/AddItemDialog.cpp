@@ -22,7 +22,7 @@
 #include <QSqlQuery>
 #include <QMessageBox>
 
-#include "miscellanea.h"
+#include "utils.h"
 #include "AddItemDialog.h"
 
 AddItemDialog::AddItemDialog(int typeIndex)

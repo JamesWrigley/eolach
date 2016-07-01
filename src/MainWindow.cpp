@@ -23,10 +23,10 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
+#include "utils.h"
 #include "MainWindow.h"
 #include "KeysWidget.h"
 #include "InfoWidget.h"
-#include "miscellanea.h"
 #include "AddItemDialog.h"
 
 MainWindow::MainWindow()
@@ -154,7 +154,7 @@ void MainWindow::onFieldChanged(QString dbTable, QString sqlFieldName, QString n
     if (currentTab->currentRow() > -1) {
         QString itemKey = currentTab->currentItem()->data(Qt::UserRole).toString();
         QSqlQuery updateBookInfo(bookstore);
-        updateBookInfo.prepare(QString("UPDATE %1 SET %2=:newText WHERE key=:bookKey;").arg(dbTable, sqlFieldName));
+        updateBookInfo.prepare(QString("UPDATE %1 SET %2 = :newText WHERE key = :bookKey;").arg(dbTable, sqlFieldName));
         updateBookInfo.bindValue(":table", dbTable);
         updateBookInfo.bindValue(":newText", newText);
         updateBookInfo.bindValue(":bookKey", itemKey);

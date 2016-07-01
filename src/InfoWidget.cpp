@@ -20,8 +20,8 @@
 #include <QSqlQuery>
 #include <QVBoxLayout>
 
+#include "utils.h"
 #include "InfoWidget.h"
-#include "miscellanea.h"
 
 InfoWidget::InfoWidget(QWidget* mainWindow)
 {
@@ -36,7 +36,8 @@ InfoWidget::InfoWidget(QWidget* mainWindow)
     TextField* genre = new TextField("books", "genre", "Genre:", &validateGenericField);
     TextField* author = new TextField("books", "author", "Author:", &validateGenericField);
     TextField* publicationDate = new TextField("books", "publication_date", "Publication Date:", &validateNumericField);
-    for (TextField* field : {title, genre, author, publicationDate, isbn}) { // Careful here, order is important
+    // Careful here, order is important
+    for (TextField* field : {title, genre, author, publicationDate, isbn}) {
         bookFields.push_back(field);
         bookLayout->addLayout(field);
         connect(field, SIGNAL(fieldChanged(QString, QString, QString)),

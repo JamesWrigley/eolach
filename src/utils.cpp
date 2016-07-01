@@ -16,7 +16,7 @@
  *                                                                                *
  *********************************************************************************/
 
-#include "miscellanea.h"
+#include "utils.h"
 
 bool validateGenericField(QString fieldText)
 {

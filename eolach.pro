@@ -19,7 +19,7 @@ HEADERS += src/AddItemDialog.h \
            src/InfoWidget.h \
            src/KeysWidget.h \
            src/MainWindow.h \
-           src/miscellanea.h \
+           src/utils.h \
            src/PatronHistory.h \
            src/TextField.h
 SOURCES += src/AddItemDialog.cpp \
@@ -31,6 +31,6 @@ SOURCES += src/AddItemDialog.cpp \
            src/KeysWidget.cpp \
            src/main.cpp \
            src/MainWindow.cpp \
-           src/miscellanea.cpp \
+           src/utils.cpp \
            src/PatronHistory.cpp \
            src/TextField.cpp

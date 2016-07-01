@@ -26,7 +26,7 @@
 #include <QSqlDatabase>
 
 #include "KeysWidget.h"
-#include "miscellanea.h"
+#include "utils.h"
 
 KeysWidget::KeysWidget(QString table, QString get_item_info_query, QStringList header_list)
 {
