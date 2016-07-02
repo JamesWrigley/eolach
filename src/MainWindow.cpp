@@ -34,12 +34,9 @@ MainWindow::MainWindow()
     // Set up GUI
     keysTabwidget = new QTabWidget();
     infoWidget = new InfoWidget(this);
-    booksWidget = new KeysWidget("books", getBookInfo, (QStringList() << "Title" << "Author"
-                                                        << "Genre" << "Publication Date" << "ISBN"));
-    discsWidget = new KeysWidget("discs", getDiscInfo, (QStringList() << "Title" << "Director/Speaker"
-                                                        << "Length" << "Year" << "Type"));
-    patronsWidget = new KeysWidget("patrons", getPatronInfo, (QStringList() << "Name" << "Address" <<
-                                                              "Mobile No." << "Landline No."));
+    booksWidget = new KeysWidget("books", getBookInfo, {"Title", "Author", "Genre", "Publication Date", "ISBN"});
+    discsWidget = new KeysWidget("discs", getDiscInfo, {"Title", "Director/Speaker", "Length", "Year", "Type"});
+    patronsWidget = new KeysWidget("patrons", getPatronInfo, {"Name", "Address", "Mobile No.", "Landline No."});
     splitter = new QSplitter(this);
 
     keysTabwidget->addTab(booksWidget, "Books");
@@ -63,11 +60,13 @@ MainWindow::MainWindow()
     fileMenu->addAction(exitAction);
     toolbar->addAction(addItemAction);
 
-    connect(keysTabwidget, SIGNAL(currentChanged(int)), infoWidget, SLOT(changeLayout(int)));
+    connect(keysTabwidget, SIGNAL(currentChanged(int)),
+            infoWidget, SLOT(changeLayout(int)));
 
     for (KeysWidget *widget : {booksWidget, discsWidget, patronsWidget}) {
         connect(widget, SIGNAL(itemRemoved()), this, SLOT(onItemRemoved()));
-        connect(widget, SIGNAL(itemSelectionChanged()), this, SLOT(changeItem()), Qt::QueuedConnection);
+        connect(widget, SIGNAL(itemSelectionChanged()),
+                this, SLOT(changeItem()), Qt::QueuedConnection);
     }
 
     connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
