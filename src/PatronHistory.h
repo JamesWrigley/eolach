@@ -41,8 +41,6 @@ class PatronHistory : public QVBoxLayout
       void setPatron(QString);
 
   private:
-      QListWidgetItem* createListWidgetItem(QString);
-
       QToolBar* toolbar;
       QString currentPatron;
       QTabWidget* tabWidget;

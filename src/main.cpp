@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
                                 "name TEXT, "
                                 "address TEXT, "
                                 "mobile_num TEXT, "
-                                "landline_num TEXT);");        
+                                "landline_num TEXT);");
 
         createLoansTable.exec("CREATE TABLE loans ("
                               "id INTEGER PRIMARY KEY, "
