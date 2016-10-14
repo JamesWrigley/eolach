@@ -38,16 +38,16 @@ CLineEdit::CLineEdit()
 
 void CLineEdit::enterEvent(QEvent* event)
 {
-    // We check isReadOnly() because it will be true whenever the user isn't
-    // editing, and we don't want to change the background during the edit.
-    if (text().length() > 0 && isReadOnly()) {
+    // We check hasFocus() because we don't want to change the background during
+    // the edit.
+    if (text().length() > 0 && !hasFocus()) {
         setStyleSheet("QLineEdit { background: " + mouseOverColor + " }");
     }
 }
 
 void CLineEdit::leaveEvent(QEvent* event)
 {
-    if (text().length() > 0 && isReadOnly()) {
+    if (text().length() > 0 && !hasFocus()) {
         setStyleSheet("QLineEdit { background: " + backgroundColor + " }");
     }
 }
