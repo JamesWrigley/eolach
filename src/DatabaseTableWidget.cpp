@@ -16,52 +16,48 @@
  *                                                                                *
  *********************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#include <QHeaderView>
+#include <QSizePolicy>
 
-#include <QAction>
-#include <QToolBar>
-#include <QSplitter>
-#include <QTabWidget>
-#include <QMainWindow>
-#include <QSqlDatabase>
-
-#include "KeysWidget.h"
-#include "InfoWidget.h"
 #include "DatabaseTableWidget.h"
 
-class MainWindow : public QMainWindow
+DatabaseTableWidget::DatabaseTableWidget(QString table, std::unordered_map<int, QString> headers)
 {
-  Q_OBJECT
+    // Create model and set headers
+    model = new QSqlTableModel(this, QSqlDatabase::database());
+    model->setTable(table);
+    model->select();
+    for (auto& h : headers) {
+        model->setHeaderData(h.first, Qt::Horizontal, h.second);
+    }
 
-  private slots:
-      void changeItem();
-      void onItemRemoved();
-      void createAddItemDialog();
+    view = new QTableView(this);
+    view->setModel(model);
 
-  public slots:
-      void onFieldChanged(QString, QString, QString);
-   
-  public:
-      MainWindow();
-      ~MainWindow();
+    // Hide key, isbn, genre, and loan columns
+    view->hideColumn(0);
+    view->hideColumn(1);
+    view->hideColumn(5);
+    view->hideColumn(6);
 
-  private:
-      void centerWindow();
-      void updateStatusbar();
-      void createInfoWidget();
+    // Configure view
+    view->setSortingEnabled(true);
+    view->sortByColumn(2, Qt::AscendingOrder); // Sort by title
+    view->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    view->setSelectionBehavior(QAbstractItemView::SelectRows);
+    view->setSelectionMode(QAbstractItemView::SingleSelection);
+    view->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+    view->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-      QMenu *fileMenu;
-      QAction *addItemAction;
-      QAction *exitAction;
-      QToolBar *toolbar;
-      QSplitter *splitter;
-      DatabaseTableWidget *booksWidget;
-      KeysWidget *discsWidget;
-      KeysWidget *patronsWidget;
-      InfoWidget *infoWidget;
-      QTabWidget *keysTabwidget;
-      QSqlDatabase bookstore;
-};
+    // Create layout
+    layout = new QVBoxLayout();
+    layout->addWidget(view);
+    setLayout(layout);
+}
 
-#endif // MAINWINDOW_H
+void DatabaseTableWidget::addItem(QString itemKey) { }
+
+unsigned int DatabaseTableWidget::rowCount()
+{
+    return model->rowCount();
+}

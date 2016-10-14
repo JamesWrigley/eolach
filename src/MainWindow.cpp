@@ -28,20 +28,28 @@
 #include "KeysWidget.h"
 #include "InfoWidget.h"
 #include "AddItemDialog.h"
+#include "DatabaseTableWidget.h"
 
 MainWindow::MainWindow()
 {
     // Set up GUI
     keysTabwidget = new QTabWidget();
     infoWidget = new InfoWidget(this);
-    booksWidget = new KeysWidget("books", getBookInfo, {"Title", "Author", "Genre", "Publication Date", "ISBN"});
-    discsWidget = new KeysWidget("discs", getDiscInfo, {"Title", "Director/Speaker", "Length", "Year", "Type"});
-    patronsWidget = new KeysWidget("patrons", getPatronInfo, {"Name", "Address", "Mobile No.", "Landline No."});
+
+    booksWidget = new DatabaseTableWidget("books", {{2, "Title"}, {3, "Author"},
+                                                    {5, "Genre"}, {4, "Publication Date"},
+                                                    {1, "ISBN"}});
+    // booksWidget = new KeysWidget("books", getBookInfo, {"Title", "Author", "Genre", "Publication Date", "ISBN"});
+    discsWidget = new KeysWidget("discs", getDiscInfo, {"Title", "Director/Speaker",
+                                                        "Length", "Year", "Type"});
+    patronsWidget = new KeysWidget("patrons", getPatronInfo, {"Name", "Address",
+                                                              "Mobile No.", "Landline No."});
     splitter = new QSplitter(this);
 
     keysTabwidget->addTab(booksWidget, "Books");
     keysTabwidget->addTab(discsWidget, "Discs");
     keysTabwidget->addTab(patronsWidget, "Patrons");
+    booksWidget->show();
 
     splitter->addWidget(keysTabwidget);
     splitter->addWidget(infoWidget);
@@ -63,7 +71,7 @@ MainWindow::MainWindow()
     connect(keysTabwidget, SIGNAL(currentChanged(int)),
             infoWidget, SLOT(changeLayout(int)));
 
-    for (KeysWidget *widget : {booksWidget, discsWidget, patronsWidget}) {
+    for (KeysWidget *widget : {discsWidget, patronsWidget}) {
         connect(widget, SIGNAL(itemRemoved()), this, SLOT(onItemRemoved()));
         connect(widget, SIGNAL(itemSelectionChanged()),
                 this, SLOT(changeItem()), Qt::QueuedConnection);

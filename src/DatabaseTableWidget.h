@@ -16,52 +16,30 @@
  *                                                                                *
  *********************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef DATABASETABLEWIDGET_H
+#define DATABASETABLEWIDGET_H
 
-#include <QAction>
-#include <QToolBar>
-#include <QSplitter>
-#include <QTabWidget>
-#include <QMainWindow>
-#include <QSqlDatabase>
+#include <unordered_map>
 
-#include "KeysWidget.h"
-#include "InfoWidget.h"
-#include "DatabaseTableWidget.h"
+#include <QTableView>
+#include <QVBoxLayout>
+#include <QSqlTableModel>
 
-class MainWindow : public QMainWindow
+class DatabaseTableWidget : public QWidget
 {
   Q_OBJECT
 
-  private slots:
-      void changeItem();
-      void onItemRemoved();
-      void createAddItemDialog();
-
-  public slots:
-      void onFieldChanged(QString, QString, QString);
-   
   public:
-      MainWindow();
-      ~MainWindow();
+      DatabaseTableWidget(QString, std::unordered_map<int, QString>);
+      void addItem(QString);
+      unsigned int rowCount();
 
   private:
-      void centerWindow();
-      void updateStatusbar();
-      void createInfoWidget();
+      void setSort(int, Qt::SortOrder);
 
-      QMenu *fileMenu;
-      QAction *addItemAction;
-      QAction *exitAction;
-      QToolBar *toolbar;
-      QSplitter *splitter;
-      DatabaseTableWidget *booksWidget;
-      KeysWidget *discsWidget;
-      KeysWidget *patronsWidget;
-      InfoWidget *infoWidget;
-      QTabWidget *keysTabwidget;
-      QSqlDatabase bookstore;
+      QTableView* view;
+      QVBoxLayout* layout;
+      QSqlTableModel* model;
 };
 
-#endif // MAINWINDOW_H
+#endif
