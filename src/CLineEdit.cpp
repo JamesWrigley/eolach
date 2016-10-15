@@ -36,7 +36,7 @@ CLineEdit::CLineEdit()
     setStyleSheet("QLineEdit { background: " + backgroundColor + " }");
 }
 
-void CLineEdit::enterEvent(QEvent* event)
+void CLineEdit::enterEvent(QEvent*)
 {
     // We check hasFocus() because we don't want to change the background during
     // the edit.
@@ -45,7 +45,7 @@ void CLineEdit::enterEvent(QEvent* event)
     }
 }
 
-void CLineEdit::leaveEvent(QEvent* event)
+void CLineEdit::leaveEvent(QEvent*)
 {
     if (text().length() > 0 && !hasFocus()) {
         setStyleSheet("QLineEdit { background: " + backgroundColor + " }");
