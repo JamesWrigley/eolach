@@ -58,7 +58,7 @@ DatabaseTableWidget::DatabaseTableWidget(QString table, std::unordered_map<int, 
 
     // Set up cell context menus
     view->setContextMenuPolicy(Qt::CustomContextMenu);
-    view->connect(view, &DatabaseTableWidget::customContextMenuRequested,
+    view->connect(view, &QTableView::customContextMenuRequested,
                   this, &DatabaseTableWidget::createItemContextMenu);
 
     itemContextMenu = new QMenu(this);

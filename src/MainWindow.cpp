@@ -69,8 +69,7 @@ MainWindow::MainWindow()
     fileMenu->addAction(exitAction);
     toolbar->addAction(addItemAction);
 
-    connect(keysTabwidget, SIGNAL(currentChanged(int)),
-            infoWidget, SLOT(changeLayout(int)));
+    connect(keysTabwidget, &QTabWidget::currentChanged, infoWidget, &InfoWidget::changeLayout);
 
     connect(signaller, &SignalSingleton::itemSelected,
             [&] (QString s) {
@@ -78,13 +77,14 @@ MainWindow::MainWindow()
             });
 
     for (KeysWidget *widget : {discsWidget, patronsWidget}) {
-        connect(widget, SIGNAL(itemRemoved()), this, SLOT(onItemRemoved()));
-        connect(widget, SIGNAL(itemSelectionChanged()),
-                this, SLOT(changeItem()), Qt::QueuedConnection);
+        connect(widget, &KeysWidget::itemRemoved,
+                this, &MainWindow::onItemRemoved);
+        connect(widget, &KeysWidget::itemSelectionChanged,
+                this, &MainWindow::changeItem, Qt::QueuedConnection);
     }
 
-    connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
-    connect(addItemAction, SIGNAL(triggered()), this, SLOT(createAddItemDialog()));
+    connect(exitAction, &QAction::triggered, this, &MainWindow::close);
+    connect(addItemAction, &QAction::triggered, this, &MainWindow::createAddItemDialog);
 
     updateStatusbar();
     setCentralWidget(splitter);
