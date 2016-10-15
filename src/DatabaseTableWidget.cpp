@@ -19,6 +19,7 @@
 #include <QHeaderView>
 #include <QSizePolicy>
 
+#include "MainWindow.h"
 #include "DatabaseTableWidget.h"
 
 DatabaseTableWidget::DatabaseTableWidget(QString table, std::unordered_map<int, QString> headers)
@@ -34,7 +35,7 @@ DatabaseTableWidget::DatabaseTableWidget(QString table, std::unordered_map<int, 
     view = new QTableView(this);
     view->setModel(model);
 
-    // Hide key, isbn, genre, and loan columns
+    // Hide Key, ISBN, genre, and loan columns
     view->hideColumn(0);
     view->hideColumn(1);
     view->hideColumn(5);
@@ -49,11 +50,42 @@ DatabaseTableWidget::DatabaseTableWidget(QString table, std::unordered_map<int, 
     view->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
     view->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
+    connect(view->selectionModel(), &QItemSelectionModel::currentRowChanged,
+            [](const QModelIndex& current, const QModelIndex&) {
+                auto key = current.sibling(current.row(), 0);
+                emit MainWindow::signaller->itemSelected(key.data().toString());
+            });
+
+    // Set up cell context menus
+    view->setContextMenuPolicy(Qt::CustomContextMenu);
+    view->connect(view, &DatabaseTableWidget::customContextMenuRequested,
+                  this, &DatabaseTableWidget::createItemContextMenu);
+
+    itemContextMenu = new QMenu(this);
+    removeItemAction = new QAction("Remove", this);
+    itemContextMenu->addAction(removeItemAction);
+    view->connect(removeItemAction, &QAction::triggered,
+                  this, &DatabaseTableWidget::removeItem);
+
     // Create layout
     layout = new QVBoxLayout();
     layout->addWidget(view);
     setLayout(layout);
 }
+
+void DatabaseTableWidget::createItemContextMenu(QPoint pos)
+{
+    if (view->indexAt(pos).isValid()) {
+        itemContextMenu->popup(view->viewport()->mapToGlobal(pos));
+    }
+}
+
+void DatabaseTableWidget::createHeaderContextMenu(QPoint pos)
+{
+    headerContextMenu->popup(mapToGlobal(pos));
+}
+
+void DatabaseTableWidget::removeItem() { }
 
 void DatabaseTableWidget::addItem(QString itemKey) { }
 

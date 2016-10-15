@@ -16,55 +16,20 @@
  *                                                                                *
  *********************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef SIGNALSINGLETON_H
+#define SIGNALSINGLETON_H
 
-#include <QAction>
-#include <QToolBar>
-#include <QSplitter>
-#include <QTabWidget>
-#include <QMainWindow>
-#include <QSqlDatabase>
+#include <QObject>
 
-#include "KeysWidget.h"
-#include "InfoWidget.h"
-#include "SignalSingleton.h"
-#include "DatabaseTableWidget.h"
-
-class MainWindow : public QMainWindow
+class SignalSingleton : public QObject
 {
-  Q_OBJECT
+    Q_OBJECT
 
-  private slots:
-      void changeItem();
-      void onItemRemoved();
-      void createAddItemDialog();
-
-  public slots:
-      void onFieldChanged(QString, QString, QString);
-   
   public:
-      MainWindow();
-      ~MainWindow();
+    SignalSingleton() { }
 
-      static SignalSingleton* signaller;
-
-  private:
-      void centerWindow();
-      void updateStatusbar();
-      void createInfoWidget();
-
-      QMenu *fileMenu;
-      QAction *addItemAction;
-      QAction *exitAction;
-      QToolBar *toolbar;
-      QSplitter *splitter;
-      DatabaseTableWidget *booksWidget;
-      KeysWidget *discsWidget;
-      KeysWidget *patronsWidget;
-      InfoWidget *infoWidget;
-      QTabWidget *keysTabwidget;
-      QSqlDatabase bookstore;
+  signals:
+    void itemSelected(QString);
 };
 
-#endif // MAINWINDOW_H
+#endif

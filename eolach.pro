@@ -21,6 +21,7 @@ HEADERS += src/AddItemDialog.h \
            src/KeysWidget.h \
            src/MainWindow.h \
            src/PatronHistory.h \
+           src/SignalSingleton.h \
            src/TextField.h \
            src/utils.h
 SOURCES += src/AddItemDialog.cpp \

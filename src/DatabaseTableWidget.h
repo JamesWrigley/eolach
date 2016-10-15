@@ -21,6 +21,8 @@
 
 #include <unordered_map>
 
+#include <QMenu>
+#include <QAction>
 #include <QTableView>
 #include <QVBoxLayout>
 #include <QSqlTableModel>
@@ -34,12 +36,20 @@ class DatabaseTableWidget : public QWidget
       void addItem(QString);
       unsigned int rowCount();
 
+  private slots:
+      void removeItem();
+      void createItemContextMenu(QPoint);
+      void createHeaderContextMenu(QPoint);
+
   private:
       void setSort(int, Qt::SortOrder);
 
       QTableView* view;
       QVBoxLayout* layout;
       QSqlTableModel* model;
+      QMenu *itemContextMenu;
+      QMenu *headerContextMenu;
+      QAction *removeItemAction;
 };
 
 #endif

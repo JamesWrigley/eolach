@@ -30,6 +30,8 @@
 #include "AddItemDialog.h"
 #include "DatabaseTableWidget.h"
 
+SignalSingleton* MainWindow::signaller = new SignalSingleton();
+
 MainWindow::MainWindow()
 {
     // Set up GUI
@@ -39,7 +41,6 @@ MainWindow::MainWindow()
     booksWidget = new DatabaseTableWidget("books", {{2, "Title"}, {3, "Author"},
                                                     {5, "Genre"}, {4, "Publication Date"},
                                                     {1, "ISBN"}});
-    // booksWidget = new KeysWidget("books", getBookInfo, {"Title", "Author", "Genre", "Publication Date", "ISBN"});
     discsWidget = new KeysWidget("discs", getDiscInfo, {"Title", "Director/Speaker",
                                                         "Length", "Year", "Type"});
     patronsWidget = new KeysWidget("patrons", getPatronInfo, {"Name", "Address",
@@ -70,6 +71,11 @@ MainWindow::MainWindow()
 
     connect(keysTabwidget, SIGNAL(currentChanged(int)),
             infoWidget, SLOT(changeLayout(int)));
+
+    connect(signaller, &SignalSingleton::itemSelected,
+            [&] (QString s) {
+                infoWidget->setItem(s);
+            });
 
     for (KeysWidget *widget : {discsWidget, patronsWidget}) {
         connect(widget, SIGNAL(itemRemoved()), this, SLOT(onItemRemoved()));
