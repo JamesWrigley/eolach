@@ -44,6 +44,8 @@ class DatabaseTableWidget : public QWidget
   private:
       void setSort(int, Qt::SortOrder);
 
+      QString selected;
+
       QTableView* view;
       QVBoxLayout* layout;
       QSqlTableModel* model;

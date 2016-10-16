@@ -56,6 +56,27 @@ DatabaseTableWidget::DatabaseTableWidget(QString table, std::unordered_map<int, 
                 emit MainWindow::signaller->itemSelected(key.data().toString());
             });
 
+    // Preserve selection after sorting
+    connect(view->horizontalHeader(), &QHeaderView::sectionPressed,
+            [&] (int) {
+                auto selectedIndexes = view->selectionModel()->selectedIndexes();
+                if (!selectedIndexes.isEmpty()) {
+                    selected = selectedIndexes.first().data().toString();
+                }
+            });
+    connect(view->horizontalHeader(), &QHeaderView::sectionClicked,
+            [&] (int) {
+                if (!selected.isEmpty() && !view->selectionModel()->currentIndex().isValid()) {
+                    for (int row = 0; row < model->rowCount(); ++row) {
+                        auto key = model->index(row, 0);
+                        if (key.data().toString() == selected) {
+                            view->selectRow(row);
+                            break;
+                        }
+                    }
+                }
+            });
+
     // Set up cell context menus
     view->setContextMenuPolicy(Qt::CustomContextMenu);
     view->connect(view, &QTableView::customContextMenuRequested,
