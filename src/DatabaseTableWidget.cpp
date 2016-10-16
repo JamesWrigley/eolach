@@ -17,6 +17,7 @@
  *********************************************************************************/
 
 #include <QHeaderView>
+#include <QMessageBox>
 #include <QSizePolicy>
 
 #include "MainWindow.h"
@@ -122,10 +123,16 @@ void DatabaseTableWidget::createHeaderContextMenu(QPoint pos)
 
 void DatabaseTableWidget::removeItem()
 {
-    auto current = view->selectionModel()->currentIndex();
-    model->removeRow(current.row());
-    model->submitAll();
-    view->selectRow(std::max(current.row() - 1, 0));
+    int confirm = QMessageBox::question(this, "Confirm",
+                                        QString("Are you sure you wish to remove this item?"),
+                                        QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+
+    if (QMessageBox::Yes == confirm) {
+        auto current = view->selectionModel()->currentIndex();
+        model->removeRow(current.row());
+        model->submitAll();
+        view->selectRow(std::max(current.row() - 1, 0));
+    }
 }
 
 void DatabaseTableWidget::addItem(QString itemKey) { }
