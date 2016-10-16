@@ -23,6 +23,7 @@
 #include <QMessageBox>
 
 #include "utils.h"
+#include "MainWindow.h"
 #include "AddItemDialog.h"
 
 AddItemDialog::AddItemDialog(int typeIndex)
@@ -152,6 +153,7 @@ void AddItemDialog::addItem()
         insert.exec();
     }
 
+    emit MainWindow::signaller->itemAdded(itemKey);
     done(QDialog::Accepted);
 }
 

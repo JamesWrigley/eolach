@@ -26,6 +26,7 @@ DatabaseTableWidget::DatabaseTableWidget(QString table, std::unordered_map<int, 
 {
     // Create model and set headers
     model = new QSqlTableModel(this, QSqlDatabase::database());
+    model->setEditStrategy(QSqlTableModel::OnManualSubmit);
     model->setTable(table);
     model->select();
     for (auto& h : headers) {
@@ -58,23 +59,16 @@ DatabaseTableWidget::DatabaseTableWidget(QString table, std::unordered_map<int, 
 
     // Preserve selection after sorting
     connect(view->horizontalHeader(), &QHeaderView::sectionPressed,
-            [&] (int) {
-                auto selectedIndexes = view->selectionModel()->selectedIndexes();
-                if (!selectedIndexes.isEmpty()) {
-                    selected = selectedIndexes.first().data().toString();
-                }
-            });
+            this, &DatabaseTableWidget::storeSelection);
     connect(view->horizontalHeader(), &QHeaderView::sectionClicked,
-            [&] (int) {
-                if (!selected.isEmpty() && !view->selectionModel()->currentIndex().isValid()) {
-                    for (int row = 0; row < model->rowCount(); ++row) {
-                        auto key = model->index(row, 0);
-                        if (key.data().toString() == selected) {
-                            view->selectRow(row);
-                            break;
-                        }
-                    }
-                }
+            this, &DatabaseTableWidget::restoreSelection);
+
+    // Select newly added items
+    connect(MainWindow::signaller, &SignalSingleton::itemAdded,
+            [&] (QString key) {
+                selected = key;
+                model->select();
+                restoreSelection(-1);
             });
 
     // Set up cell context menus
@@ -85,13 +79,33 @@ DatabaseTableWidget::DatabaseTableWidget(QString table, std::unordered_map<int, 
     itemContextMenu = new QMenu(this);
     removeItemAction = new QAction("Remove", this);
     itemContextMenu->addAction(removeItemAction);
-    view->connect(removeItemAction, &QAction::triggered,
-                  this, &DatabaseTableWidget::removeItem);
+    connect(removeItemAction, &QAction::triggered, this, &DatabaseTableWidget::removeItem);
 
     // Create layout
     layout = new QVBoxLayout();
     layout->addWidget(view);
     setLayout(layout);
+}
+
+void DatabaseTableWidget::storeSelection(int)
+{
+    auto selectedIndexes = view->selectionModel()->selectedIndexes();
+    if (!selectedIndexes.isEmpty()) {
+        selected = selectedIndexes.first().data().toString();
+    }    
+}
+
+void DatabaseTableWidget::restoreSelection(int)
+{
+    if (!selected.isEmpty() && !view->selectionModel()->currentIndex().isValid()) {
+        for (int row = 0; row < model->rowCount(); ++row) {
+            auto key = model->index(row, 0);
+            if (key.data().toString() == selected) {
+                view->selectRow(row);
+                break;
+            }
+        }
+    }    
 }
 
 void DatabaseTableWidget::createItemContextMenu(QPoint pos)
@@ -106,7 +120,13 @@ void DatabaseTableWidget::createHeaderContextMenu(QPoint pos)
     headerContextMenu->popup(mapToGlobal(pos));
 }
 
-void DatabaseTableWidget::removeItem() { }
+void DatabaseTableWidget::removeItem()
+{
+    auto current = view->selectionModel()->currentIndex();
+    model->removeRow(current.row());
+    model->submitAll();
+    view->selectRow(std::max(current.row() - 1, 0));
+}
 
 void DatabaseTableWidget::addItem(QString itemKey) { }
 

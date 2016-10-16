@@ -38,6 +38,8 @@ class DatabaseTableWidget : public QWidget
 
   private slots:
       void removeItem();
+      void storeSelection(int);
+      void restoreSelection(int);
       void createItemContextMenu(QPoint);
       void createHeaderContextMenu(QPoint);
 

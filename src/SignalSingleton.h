@@ -29,6 +29,7 @@ class SignalSingleton : public QObject
     SignalSingleton() { }
 
   signals:
+    void itemAdded(QString);
     void itemSelected(QString);
 };
 
