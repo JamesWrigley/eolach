@@ -21,20 +21,25 @@
 #include <QApplication>
 
 #include "TextField.h"
+#include "MainWindow.h"
 
-TextField::TextField(QString table, QString sqlField,
-                     QString labelName, bool (*function)(QString))
+TextField::TextField(QString sqlField, QString labelName, bool (*function)(QString))
 {
-    dbTable = table;
     fieldName = sqlField;
     checkFunction = function;
     label = new QLabel(labelName);
     icon = new QLabel();
     icon->setPixmap(QIcon(":/invalid-icon").pixmap(20));
     editBox = new CLineEdit();
-    connect(editBox, SIGNAL(doubleClicked()), this, SLOT(onDoubleClicked()));
-    connect(editBox, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));
-    connect(editBox, SIGNAL(textModified(QString)), this, SLOT(onTextModified(QString)));
+    connect(editBox, &CLineEdit::doubleClicked, this, &TextField::onDoubleClicked);
+    connect(editBox, &CLineEdit::textChanged, this, &TextField::onTextChanged);
+    connect(editBox, &CLineEdit::textModified, this, &TextField::onTextModified);
+
+    // Keep track of the current selection
+    connect(MainWindow::signaller, &SignalSingleton::itemSelected,
+            [&] (QString key) {
+                this->key = key;
+            });
 
     label->setMinimumWidth(120);
     addWidget(label);
@@ -65,7 +70,7 @@ void TextField::onTextModified(QString newText)
         icon->show();
     }
 
-    emit fieldChanged(dbTable, fieldName, newText);
+    emit MainWindow::signaller->itemChanged(dbTable);
 }
 
 void TextField::onDoubleClicked()

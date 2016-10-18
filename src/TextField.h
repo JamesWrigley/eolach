@@ -51,7 +51,7 @@ class TextField : public QHBoxLayout
 
       QLabel *icon;
       QLabel *label;
-      QString dbTable;
+      QString key;
       QString fieldName;
       QAction *editText;
       CLineEdit *editBox;

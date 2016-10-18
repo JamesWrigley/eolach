@@ -132,6 +132,8 @@ void DatabaseTableWidget::removeItem()
         model->removeRow(current.row());
         model->submitAll();
         view->selectRow(std::max(current.row() - 1, 0));
+
+        emit MainWindow::signaller->itemRemoved();
     }
 }
 

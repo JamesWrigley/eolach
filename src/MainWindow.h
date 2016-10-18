@@ -36,7 +36,6 @@ class MainWindow : public QMainWindow
   Q_OBJECT
 
   private slots:
-      void changeItem();
       void onItemRemoved();
       void createAddItemDialog();
 
@@ -54,17 +53,18 @@ class MainWindow : public QMainWindow
       void updateStatusbar();
       void createInfoWidget();
 
+      QSqlDatabase bookstore;
+
       QMenu *fileMenu;
       QAction *addItemAction;
       QAction *exitAction;
       QToolBar *toolbar;
       QSplitter *splitter;
-      DatabaseTableWidget *booksWidget;
       KeysWidget *discsWidget;
       KeysWidget *patronsWidget;
       InfoWidget *infoWidget;
       QTabWidget *keysTabwidget;
-      QSqlDatabase bookstore;
+      DatabaseTableWidget *booksWidget;
 };
 
 #endif // MAINWINDOW_H

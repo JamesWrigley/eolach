@@ -123,6 +123,7 @@ void InfoWidget::clear()
 
 void InfoWidget::setItem(QString itemKey)
 {
+    currentItemKey = itemKey;
     QSqlQuery getItemInfo(QSqlDatabase::database());
     std::vector<TextField*> itemFields;
 

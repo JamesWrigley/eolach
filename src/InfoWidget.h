@@ -20,6 +20,7 @@
 #define INFOWIDGET_H
 
 #include <QFrame>
+#include <QScopedPointer>
 #include <QStackedWidget>
 
 #include "TextField.h"
@@ -38,6 +39,8 @@ class InfoWidget : public QFrame
       InfoWidget(QWidget*);
       void clear();
       void setItem(QString);
+
+      QScopedPointer<QString> currentItemKey;
 
   private:
       QStackedWidget* stacker;
