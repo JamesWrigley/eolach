@@ -30,13 +30,13 @@
 #include "AddItemDialog.h"
 #include "DatabaseTableWidget.h"
 
-SignalSingleton* MainWindow::signaller = new SignalSingleton();
+SignalSingleton MainWindow::signaller;
 
 MainWindow::MainWindow()
 {
     // Set up GUI
     keysTabwidget = new QTabWidget();
-    infoWidget = new InfoWidget(this);
+    infoWidget = new InfoWidget();
 
     booksWidget = new DatabaseTableWidget("books", {{2, "Title"}, {3, "Author"},
                                                     {5, "Genre"}, {4, "Publication Date"},
@@ -71,14 +71,8 @@ MainWindow::MainWindow()
 
     connect(keysTabwidget, &QTabWidget::currentChanged, infoWidget, &InfoWidget::changeLayout);
 
-    connect(signaller, &SignalSingleton::itemSelected,
-            [&] (QString s) {
-                infoWidget->setItem(s);
-            });
-    connect(signaller, &SignalSingleton::itemRemoved, this, &MainWindow::onItemRemoved);
-
-    connect(signaller, &SignalSingleton::itemRemoved,
-            this, &MainWindow::onItemRemoved);
+    connect(&signaller, &SignalSingleton::itemRemoved, this, &MainWindow::onItemRemoved);
+    connect(&signaller, &SignalSingleton::itemChanged, this, &MainWindow::onFieldChanged);
 
     connect(exitAction, &QAction::triggered, this, &MainWindow::close);
     connect(addItemAction, &QAction::triggered, this, &MainWindow::createAddItemDialog);
@@ -145,24 +139,22 @@ void MainWindow::onItemRemoved()
 }
 
 /* Called when an items data is changed from the InfoWidget */
-void MainWindow::onFieldChanged(QString dbTable, QString sqlFieldName, QString newText)
+void MainWindow::onFieldChanged(QSqlRecord record)
 {
-    // KeysWidget* currentTab = static_cast<KeysWidget*>(keysTabwidget->currentWidget());
+    DatabaseTableWidget* widget = NULL;
+    QString tableIdentifier = record.value("key").toString().right(1);
 
-    // Well, it's supposed to only be called when item data is changed. It also
-    // seems to be called when switching tabs, and if they're empty then
-    // currentRow() will be -1, causing a segfault when we try to get itemKey
-    // later on. Hence the check.
-    // if (currentTab->currentRow() > -1) {
-    //     QString itemKey = currentTab->currentItem()->data(Qt::UserRole).toString();
-    //     QSqlQuery updateBookInfo(bookstore);
-    //     updateBookInfo.prepare(QString("UPDATE %1 SET %2 = :newText WHERE key = :bookKey;").arg(dbTable, sqlFieldName));
-    //     updateBookInfo.bindValue(":table", dbTable);
-    //     updateBookInfo.bindValue(":newText", newText);
-    //     updateBookInfo.bindValue(":bookKey", itemKey);
-    //     updateBookInfo.exec();
+    if (tableIdentifier == "b") { // Book record
+        widget = booksWidget;
+    } /* else if (tableIdentifier == "d") { // Disc record
+        widget = discsWidget;
+    } else if (tableIdentifier == "p") { // Patron record
+        widget = patronWidget;
+    } */
 
-    // infoWidget->setItem(itemKey);
-    // currentTab->updateItem(currentTab->currentRow(), itemKey);
-    // }
+    int row = widget->getCurrentRow();
+    widget->getModel()->setRecord(row, record);
+    widget->getModel()->submitAll();
+    // We need to manually reselect the row because the model will reload
+    widget->selectRow(row);
 }

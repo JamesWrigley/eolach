@@ -34,11 +34,17 @@ TextField::TextField(QString sqlField, QString labelName, bool (*function)(QStri
     connect(editBox, &CLineEdit::doubleClicked, this, &TextField::onDoubleClicked);
     connect(editBox, &CLineEdit::textChanged, this, &TextField::onTextChanged);
     connect(editBox, &CLineEdit::textModified, this, &TextField::onTextModified);
+    connect(&MainWindow::signaller, &SignalSingleton::itemSelected,
+            [&] (QSqlRecord record) {
+                if (!record.isNull(fieldName)) {
+                    setText(record.value(fieldName).toString());
+                }
+            });
 
     // Keep track of the current selection
-    connect(MainWindow::signaller, &SignalSingleton::itemSelected,
-            [&] (QString key) {
-                this->key = key;
+    connect(&MainWindow::signaller, &SignalSingleton::itemSelected,
+            [&] (QSqlRecord record) {
+                this->key = record.value("key").toString();
             });
 
     label->setMinimumWidth(120);
@@ -70,7 +76,8 @@ void TextField::onTextModified(QString newText)
         icon->show();
     }
 
-    emit MainWindow::signaller->itemChanged(dbTable);
+    InfoWidget::currentRecord.setValue(fieldName, newText);
+    emit MainWindow::signaller.itemChanged(InfoWidget::currentRecord);
 }
 
 void TextField::onDoubleClicked()

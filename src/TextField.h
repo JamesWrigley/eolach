@@ -42,7 +42,7 @@ class TextField : public QHBoxLayout
 
   public:
       // Constructor arguments: the SQL field name and the text to display in editBox
-      TextField(QString, QString, QString, bool (*)(QString));
+      TextField(QString, QString, bool (*)(QString));
       void enterEditMode();
       void setText(QString);
 

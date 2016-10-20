@@ -53,9 +53,9 @@ DatabaseTableWidget::DatabaseTableWidget(QString table, std::unordered_map<int, 
     view->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     connect(view->selectionModel(), &QItemSelectionModel::currentRowChanged,
-            [](const QModelIndex& current, const QModelIndex&) {
-                auto key = current.sibling(current.row(), 0);
-                emit MainWindow::signaller->itemSelected(key.data().toString());
+            [&](const QModelIndex& current, const QModelIndex&) {
+                auto record = model->record(current.row());
+                emit MainWindow::signaller.itemSelected(record);
             });
 
     // Preserve selection after sorting
@@ -65,7 +65,7 @@ DatabaseTableWidget::DatabaseTableWidget(QString table, std::unordered_map<int, 
             this, &DatabaseTableWidget::restoreSelection);
 
     // Select newly added items
-    connect(MainWindow::signaller, &SignalSingleton::itemAdded,
+    connect(&MainWindow::signaller, &SignalSingleton::itemAdded,
             [&] (QString key) {
                 selected = key;
                 model->select();
@@ -109,6 +109,11 @@ void DatabaseTableWidget::restoreSelection(int)
     }    
 }
 
+void DatabaseTableWidget::selectRow(int row)
+{
+    view->selectRow(row);
+}
+
 void DatabaseTableWidget::createItemContextMenu(QPoint pos)
 {
     if (view->indexAt(pos).isValid()) {
@@ -133,7 +138,7 @@ void DatabaseTableWidget::removeItem()
         model->submitAll();
         view->selectRow(std::max(current.row() - 1, 0));
 
-        emit MainWindow::signaller->itemRemoved();
+        emit MainWindow::signaller.itemRemoved();
     }
 }
 
@@ -142,4 +147,14 @@ void DatabaseTableWidget::addItem(QString itemKey) { }
 unsigned int DatabaseTableWidget::rowCount()
 {
     return model->rowCount();
+}
+
+QSqlTableModel* DatabaseTableWidget::getModel()
+{
+    return model;
+}
+
+int DatabaseTableWidget::getCurrentRow()
+{
+    return view->selectionModel()->currentIndex().row();
 }

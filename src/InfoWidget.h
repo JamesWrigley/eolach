@@ -19,8 +19,10 @@
 #ifndef INFOWIDGET_H
 #define INFOWIDGET_H
 
+#include <vector>
+
 #include <QFrame>
-#include <QScopedPointer>
+#include <QSqlRecord>
 #include <QStackedWidget>
 
 #include "TextField.h"
@@ -36,18 +38,36 @@ class InfoWidget : public QFrame
       void changeLayout(int);
   
   public:
-      InfoWidget(QWidget*);
+      InfoWidget();
       void clear();
-      void setItem(QString);
 
-      QScopedPointer<QString> currentItemKey;
+      static QSqlRecord currentRecord;
 
   private:
       QStackedWidget* stacker;
       PatronHistory* history;
 
+      // Book fields
+      TextField* bookIsbn;
+      TextField* bookGenre;
+      TextField* bookAuthor;
+      TextField* bookTitle;
+      TextField* bookYear;
       std::vector<TextField*> bookFields;
+
+      // Disc fields
+      TextField* discType;
+      TextField* discYear;
+      TextField* discLength;
+      TextField* discTitle;
+      TextField* discDirectorOrSpeaker;
       std::vector<TextField*> discFields;
+
+      // Patron fields
+      TextField* patronName;
+      TextField* patronAddress;
+      TextField* patronMobile;
+      TextField* patronLandline;
       std::vector<TextField*> patronFields;
 };
 

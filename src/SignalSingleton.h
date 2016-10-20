@@ -20,6 +20,7 @@
 #define SIGNALSINGLETON_H
 
 #include <QObject>
+#include <QSqlRecord>
 
 class SignalSingleton : public QObject
 {
@@ -31,8 +32,8 @@ class SignalSingleton : public QObject
   signals:
     void itemRemoved();
     void itemAdded(QString);
-    void itemChanged(QString);
-    void itemSelected(QString);
+    void itemChanged(QSqlRecord);
+    void itemSelected(QSqlRecord);
 };
 
 #endif

@@ -22,6 +22,7 @@
 #include <QAction>
 #include <QToolBar>
 #include <QSplitter>
+#include <QSqlRecord>
 #include <QTabWidget>
 #include <QMainWindow>
 #include <QSqlDatabase>
@@ -40,13 +41,13 @@ class MainWindow : public QMainWindow
       void createAddItemDialog();
 
   public slots:
-      void onFieldChanged(QString, QString, QString);
+      void onFieldChanged(QSqlRecord);
    
   public:
       MainWindow();
       ~MainWindow();
 
-      static SignalSingleton* signaller;
+      static SignalSingleton signaller;
 
   private:
       void centerWindow();
