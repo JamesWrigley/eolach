@@ -142,8 +142,6 @@ void DatabaseTableWidget::removeItem()
     }
 }
 
-void DatabaseTableWidget::addItem(QString itemKey) { }
-
 unsigned int DatabaseTableWidget::rowCount()
 {
     return model->rowCount();

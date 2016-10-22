@@ -153,7 +153,7 @@ void AddItemDialog::addItem()
         insert.exec();
     }
 
-    emit MainWindow::signaller->itemAdded(itemKey);
+    emit MainWindow::signaller.itemAdded(itemKey);
     done(QDialog::Accepted);
 }
 

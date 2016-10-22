@@ -34,7 +34,6 @@ class DatabaseTableWidget : public QWidget
   public:
       DatabaseTableWidget(QString, std::unordered_map<int, QString>);
       int getCurrentRow();
-      void addItem(QString);
       unsigned int rowCount();
       QSqlTableModel* getModel();
       void selectRow(int);

@@ -95,13 +95,6 @@ void MainWindow::createAddItemDialog()
 {
     AddItemDialog addItemDialog(keysTabwidget->currentIndex());
     if (QDialog::Accepted == addItemDialog.exec()) {
-        if (addItemDialog.getItemKey().endsWith("b")) {
-            booksWidget->addItem(addItemDialog.getItemKey());
-	} else if (addItemDialog.getItemKey().endsWith("d")) {
-            discsWidget->addItem(addItemDialog.getItemKey());
-	} else if (addItemDialog.getItemKey().endsWith("p")) {
-            patronsWidget->addItem(addItemDialog.getItemKey());
-	}
         updateStatusbar();
     }
 }
