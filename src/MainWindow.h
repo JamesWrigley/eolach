@@ -27,7 +27,6 @@
 #include <QMainWindow>
 #include <QSqlDatabase>
 
-#include "KeysWidget.h"
 #include "InfoWidget.h"
 #include "SignalSingleton.h"
 #include "DatabaseTableWidget.h"
@@ -37,7 +36,6 @@ class MainWindow : public QMainWindow
   Q_OBJECT
 
   private slots:
-      void onItemRemoved();
       void createAddItemDialog();
 
   public slots:
@@ -61,11 +59,11 @@ class MainWindow : public QMainWindow
       QAction *exitAction;
       QToolBar *toolbar;
       QSplitter *splitter;
-      KeysWidget *discsWidget;
-      KeysWidget *patronsWidget;
       InfoWidget *infoWidget;
       QTabWidget *keysTabwidget;
       DatabaseTableWidget *booksWidget;
+      DatabaseTableWidget *discsWidget;
+      DatabaseTableWidget *patronsWidget;
 };
 
 #endif // MAINWINDOW_H

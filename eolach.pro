@@ -18,7 +18,6 @@ HEADERS += src/AddItemDialog.h \
            src/DCompleter.h \
            src/DLineEdit.h \
            src/InfoWidget.h \
-           src/KeysWidget.h \
            src/MainWindow.h \
            src/PatronHistory.h \
            src/SignalSingleton.h \
@@ -31,7 +30,6 @@ SOURCES += src/AddItemDialog.cpp \
            src/DCompleter.cpp \
            src/DLineEdit.cpp \
            src/InfoWidget.cpp \
-           src/KeysWidget.cpp \
            src/main.cpp \
            src/MainWindow.cpp \
            src/PatronHistory.cpp \

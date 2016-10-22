@@ -25,7 +25,6 @@
 
 #include "utils.h"
 #include "MainWindow.h"
-#include "KeysWidget.h"
 #include "InfoWidget.h"
 #include "AddItemDialog.h"
 #include "DatabaseTableWidget.h"
@@ -38,13 +37,20 @@ MainWindow::MainWindow()
     keysTabwidget = new QTabWidget();
     infoWidget = new InfoWidget();
 
-    booksWidget = new DatabaseTableWidget("books", {{2, "Title"}, {3, "Author"},
-                                                    {5, "Genre"}, {4, "Publication Date"},
+    booksWidget = new DatabaseTableWidget("books", {{2, "Title"},
+                                                    {3, "Author"},
+                                                    {5, "Genre"},
+                                                    {4, "Publication Date"},
                                                     {1, "ISBN"}});
-    discsWidget = new KeysWidget("discs", getDiscInfo, {"Title", "Director/Speaker",
-                                                        "Length", "Year", "Type"});
-    patronsWidget = new KeysWidget("patrons", getPatronInfo, {"Name", "Address",
-                                                              "Mobile No.", "Landline No."});
+    discsWidget = new DatabaseTableWidget("discs", {{1, "Title"},
+                                                    {2, "Director/Speaker"},
+                                                    {3, "Length"},
+                                                    {4, "Year"}, 
+                                                    {5, "Type"}});
+    patronsWidget = new DatabaseTableWidget("patrons", {{1, "Name"},
+                                                        {2, "Address"},
+                                                        {3, "Mobile No."},
+                                                        {4, "Landline No."}});
     splitter = new QSplitter(this);
 
     keysTabwidget->addTab(booksWidget, "Books");
@@ -71,7 +77,8 @@ MainWindow::MainWindow()
 
     connect(keysTabwidget, &QTabWidget::currentChanged, infoWidget, &InfoWidget::changeLayout);
 
-    connect(&signaller, &SignalSingleton::itemRemoved, this, &MainWindow::onItemRemoved);
+    connect(&signaller, &SignalSingleton::itemAdded, this, &MainWindow::updateStatusbar);
+    connect(&signaller, &SignalSingleton::itemRemoved, this, &MainWindow::updateStatusbar);
     connect(&signaller, &SignalSingleton::itemChanged, this, &MainWindow::onFieldChanged);
 
     connect(exitAction, &QAction::triggered, this, &MainWindow::close);
@@ -119,17 +126,6 @@ void MainWindow::updateStatusbar()
 }
 
 /* Slots */
-
-void MainWindow::onItemRemoved()
-{
-    // KeysWidget* currentTab = static_cast<KeysWidget*>(keysTabwidget->currentWidget());
-    // if (1 == currentTab->rowCount()) {
-    //     infoWidget->clear();
-    // }
-
-    // currentTab->removeRow(currentTab->currentRow());
-    updateStatusbar();
-}
 
 /* Called when an items data is changed from the InfoWidget */
 void MainWindow::onFieldChanged(QSqlRecord record)
