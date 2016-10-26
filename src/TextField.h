@@ -22,6 +22,7 @@
 #include <QLabel>
 #include <QAction>
 #include <QLineEdit>
+#include <QSqlRecord>
 #include <QHBoxLayout>
 
 #include "CLineEdit.h"
@@ -35,14 +36,16 @@ class TextField : public QHBoxLayout
       void onDoubleClicked();
       void onTextChanged(QString);
       void onTextModified(QString);
+      void onItemSelected(QSqlRecord);
 
   signals:
       // Arguments: the SQL field name and the changed text (from editBox)
       void fieldChanged(QString, QString, QString);
 
   public:
-      // Constructor arguments: the SQL field name and the text to display in editBox
-      TextField(QString, QString, bool (*)(QString));
+      // Constructor arguments: the database table identifier, the field name
+      // the text to display in editBox, and a validator function.
+      TextField(QString, QString, QString, bool (*)(QString));
       void enterEditMode();
       void setText(QString);
 
@@ -51,10 +54,10 @@ class TextField : public QHBoxLayout
 
       QLabel *icon;
       QLabel *label;
-      QString key;
       QString fieldName;
       QAction *editText;
       CLineEdit *editBox;
+      QString tableIdentifier;
 };
 
 #endif // TEXTFIELD_H

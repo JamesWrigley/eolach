@@ -23,11 +23,14 @@
 #include "TextField.h"
 #include "MainWindow.h"
 
-TextField::TextField(QString sqlField, QString labelName, bool (*function)(QString))
+TextField::TextField(QString tableIdentifier, QString sqlField,
+                     QString labelName, bool (*function)(QString))
 {
     fieldName = sqlField;
     checkFunction = function;
     label = new QLabel(labelName);
+    this->tableIdentifier = tableIdentifier;
+
     icon = new QLabel();
     icon->setPixmap(QIcon(":/invalid-icon").pixmap(20));
     editBox = new CLineEdit();
@@ -35,17 +38,7 @@ TextField::TextField(QString sqlField, QString labelName, bool (*function)(QStri
     connect(editBox, &CLineEdit::textChanged, this, &TextField::onTextChanged);
     connect(editBox, &CLineEdit::textModified, this, &TextField::onTextModified);
     connect(&MainWindow::signaller, &SignalSingleton::itemSelected,
-            [&] (QSqlRecord record) {
-                if (!record.isNull(fieldName)) {
-                    setText(record.value(fieldName).toString());
-                }
-            });
-
-    // Keep track of the current selection
-    connect(&MainWindow::signaller, &SignalSingleton::itemSelected,
-            [&] (QSqlRecord record) {
-                this->key = record.value("key").toString();
-            });
+            this, &TextField::onItemSelected);
 
     label->setMinimumWidth(120);
     addWidget(label);
@@ -57,6 +50,15 @@ void TextField::enterEditMode()
 {
     QMouseEvent doubleClick(QEvent::MouseButtonDblClick, QPointF(), Qt::LeftButton, 0, 0);
     QApplication::sendEvent(editBox, &doubleClick);
+}
+
+void TextField::onItemSelected(QSqlRecord record)
+{
+    QString tableIdentifier = record.value("key").toString().right(1);
+
+    if (!record.isNull(fieldName) && tableIdentifier == this->tableIdentifier) {
+        setText(record.value(fieldName).toString());
+    }    
 }
 
 void TextField::onTextChanged(QString newText)

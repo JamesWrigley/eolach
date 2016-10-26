@@ -34,11 +34,11 @@ InfoWidget::InfoWidget()
     // Book fields widget
     QVBoxLayout* bookLayout = new QVBoxLayout();
     QWidget* bookWidget = new QWidget();
-    bookIsbn = new TextField("isbn", "ISBN:", &validateIsbn);
-    bookTitle = new TextField("title", "Title:", &validateGenericField);
-    bookGenre = new TextField("genre", "Genre:", &validateGenericField);
-    bookAuthor = new TextField("author", "Author:", &validateGenericField);
-    bookYear = new TextField("publication_date", "Publication Date:", &validateNumericField);
+    bookIsbn = new TextField("b", "isbn", "ISBN:", &validateIsbn);
+    bookTitle = new TextField("b", "title", "Title:", &validateGenericField);
+    bookGenre = new TextField("b", "genre", "Genre:", &validateGenericField);
+    bookAuthor = new TextField("b", "author", "Author:", &validateGenericField);
+    bookYear = new TextField("b", "publication_date", "Publication Date:", &validateNumericField);
     // Careful here, order is important
     for (TextField* field : {bookTitle, bookGenre, bookAuthor, bookYear, bookIsbn}) {
         bookFields.push_back(field);
@@ -51,11 +51,11 @@ InfoWidget::InfoWidget()
     // Disc fields widget
     QVBoxLayout* discLayout = new QVBoxLayout();
     QWidget* discWidget = new QWidget();
-    discTitle = new TextField("title", "Title:", &validateGenericField);
-    discDirectorOrSpeaker = new TextField("directorOrSpeaker", "Director/Speaker:", &validateGenericField);
-    discLength = new TextField("length", "Length:", &validateGenericField);
-    discYear = new TextField("year", "Year:", &validateNumericField);
-    discType = new TextField("type", "Type:", &validateGenericField);
+    discTitle = new TextField("d", "title", "Title:", &validateGenericField);
+    discDirectorOrSpeaker = new TextField("d", "directorOrSpeaker", "Director/Speaker:", &validateGenericField);
+    discLength = new TextField("d", "length", "Length:", &validateGenericField);
+    discYear = new TextField("d", "year", "Year:", &validateNumericField);
+    discType = new TextField("d", "type", "Type:", &validateGenericField);
     for (TextField* field : {discTitle, discDirectorOrSpeaker, discLength, discYear, discType}) {
         discFields.push_back(field);
         discLayout->addLayout(field);
@@ -67,10 +67,10 @@ InfoWidget::InfoWidget()
     // Patron fields widget
     QVBoxLayout* patronLayout = new QVBoxLayout();
     QWidget* patronWidget = new QWidget();
-    patronName = new TextField("name", "Name:", &validateGenericField);
-    patronAddress = new TextField("address", "Address:", &validateGenericField);
-    patronMobile = new TextField("mobile_num", "Mobile No.", &validateNumericField);
-    patronLandline = new TextField("landline_num", "Landline No.", &validateNumericField);
+    patronName = new TextField("p", "name", "Name:", &validateGenericField);
+    patronAddress = new TextField("p", "address", "Address:", &validateGenericField);
+    patronMobile = new TextField("p", "mobile_num", "Mobile No.", &validateNumericField);
+    patronLandline = new TextField("p", "landline_num", "Landline No.", &validateNumericField);
     for (TextField* field : {patronName, patronAddress, patronMobile, patronLandline}) {
         patronFields.push_back(field);
         patronLayout->addLayout(field);
