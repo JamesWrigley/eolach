@@ -135,11 +135,11 @@ void MainWindow::onFieldChanged(QSqlRecord record)
 
     if (tableIdentifier == "b") { // Book record
         widget = booksWidget;
-    } /* else if (tableIdentifier == "d") { // Disc record
+    } else if (tableIdentifier == "d") { // Disc record
         widget = discsWidget;
     } else if (tableIdentifier == "p") { // Patron record
-        widget = patronWidget;
-    } */
+        widget = patronsWidget;
+    }
 
     int row = widget->getCurrentRow();
     widget->getModel()->setRecord(row, record);
