@@ -79,7 +79,7 @@ MainWindow::MainWindow()
 
     connect(&signaller, &SignalSingleton::itemAdded, this, &MainWindow::updateStatusbar);
     connect(&signaller, &SignalSingleton::itemRemoved, this, &MainWindow::updateStatusbar);
-    connect(&signaller, &SignalSingleton::itemChanged, this, &MainWindow::onFieldChanged);
+    connect(&signaller, &SignalSingleton::itemChanged, this, &MainWindow::onItemChanged);
 
     connect(exitAction, &QAction::triggered, this, &MainWindow::close);
     connect(addItemAction, &QAction::triggered, this, &MainWindow::createAddItemDialog);
@@ -128,7 +128,7 @@ void MainWindow::updateStatusbar()
 /* Slots */
 
 /* Called when an items data is changed from the InfoWidget */
-void MainWindow::onFieldChanged(QSqlRecord record)
+void MainWindow::onItemChanged(QSqlRecord record)
 {
     DatabaseTableWidget* widget = NULL;
     QString tableIdentifier = record.value("key").toString().right(1);

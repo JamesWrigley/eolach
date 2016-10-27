@@ -39,7 +39,7 @@ class MainWindow : public QMainWindow
       void createAddItemDialog();
 
   public slots:
-      void onFieldChanged(QSqlRecord);
+      void onItemChanged(QSqlRecord);
    
   public:
       MainWindow();
