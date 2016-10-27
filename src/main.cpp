@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
                                 "landline_num TEXT);");
 
         createLoansTable.exec("CREATE TABLE loans ("
-                              "id INTEGER PRIMARY KEY, "
+                              "key INTEGER PRIMARY KEY, "
                               "item TEXT, "
                               "patron TEXT, "
                               "loan_date TEXT, "

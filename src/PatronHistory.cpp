@@ -87,7 +87,7 @@ void PatronHistory::reload()
 
         // Get the keys of all items borrowed by the patron (past and present)
         QSqlQuery getLoans(QSqlDatabase::database());
-        getLoans.prepare("SELECT id, item, return_date FROM loans "
+        getLoans.prepare("SELECT key, item, return_date FROM loans "
                          "WHERE patron = :patron;");
         getLoans.bindValue(":patron", currentPatron);
         getLoans.exec();
@@ -102,7 +102,7 @@ void PatronHistory::reload()
             getItemTitle.next();
 
             QListWidgetItem* item = new QListWidgetItem(getItemTitle.value(0).toString());
-            // Set the user role to be the loan id
+            // Set the user role to be the loan key
             item->setData(Qt::UserRole, QVariant(getLoans.value(0).toString()));
 
             if (getLoans.value(2).toString().isEmpty()) { // Open loan
@@ -117,20 +117,20 @@ void PatronHistory::reload()
 void PatronHistory::setItemReturned()
 {
     QListWidgetItem* item = currentBorrowedList->takeItem(currentBorrowedList->currentRow());
-    QString loan_id = item->data(Qt::UserRole).toString();
+    QString loan_key = item->data(Qt::UserRole).toString();
 
     // Set return date on loan record
     QSqlQuery updateLoan(QSqlDatabase::database());
     updateLoan.prepare(QString("UPDATE loans SET return_date = :rd "
-                               "WHERE id = :lid;"));
+                               "WHERE key = :lkey;"));
     updateLoan.bindValue(":rd", QDateTime::currentDateTime());
-    updateLoan.bindValue(":lid", loan_id);
+    updateLoan.bindValue(":lkey", loan_key);
     updateLoan.exec();
 
     // Mark the item as available in it's table
     QSqlQuery getItemKey(QSqlDatabase::database());
-    getItemKey.prepare(QString("SELECT item FROM loans WHERE id = :lid;"));
-    getItemKey.bindValue(":lid", loan_id);
+    getItemKey.prepare(QString("SELECT item FROM loans WHERE key = :lkey;"));
+    getItemKey.bindValue(":lkey", loan_key);
     getItemKey.exec();
     getItemKey.next();
 
