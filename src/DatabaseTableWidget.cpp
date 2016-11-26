@@ -15,7 +15,7 @@
  * Eolach. If not, see <http://www.gnu.org/licenses/>.                            *
  *                                                                                *
  *********************************************************************************/
-
+#include <iostream>
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QSizePolicy>
@@ -86,6 +86,11 @@ DatabaseTableWidget::DatabaseTableWidget(QString table, std::unordered_map<int, 
     layout = new QVBoxLayout();
     layout->addWidget(view);
     setLayout(layout);
+
+    connect(model, &QSqlTableModel::beforeUpdate,
+            [&] (int row, QSqlRecord record) {
+                std::cout << row << std::endl;
+            });
 }
 
 void DatabaseTableWidget::storeSelection(int)
