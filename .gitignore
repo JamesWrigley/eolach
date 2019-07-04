@@ -1,23 +1,5 @@
-### Emacs ###
 *~
-\#*\#
-/.emacs.desktop
-/.emacs.desktop.lock
-.elc
-auto-save-list
-tramp
-.\#*
-
-# Org-mode
-.org-id-locations
-*_archive
-
-## Qt ##
-moc_*
-
-## Eolach ##
-*.ep
-Makefile
-
-### C++ ###
-*.o
+.terraform
+*.tfstate*
+deploy/
+elm-stuff/

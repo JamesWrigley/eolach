@@ -1,9 +1,0 @@
-<!DOCTYPE RCC><RCC version="1.0">
-  <qresource>
-    <file alias="add-icon">icons/list-add.png</file>
-    <file alias="remove-icon">icons/list-remove.png</file>
-    <file alias="new-item-icon">icons/journal-new.png</file>
-    <file alias="valid-icon">icons/dialog-ok-apply.png</file>
-    <file alias="invalid-icon">icons/dialog-cancel.png</file>
-  </qresource>
-</RCC>
