@@ -29,14 +29,24 @@ resource "aws_iam_role" "eolach_lambda_role" {
 EOF
 }
 
-resource "aws_lambda_function" "eolach_auth" {
+resource "aws_lambda_function" "eolach_login" {
   runtime = "python3.7"
-  handler = "auth.login"
-  function_name = "EolachAuth"
+  handler = "authenticate.login"
+  function_name = "EolachAuthenticate"
   role = "${aws_iam_role.eolach_lambda_role.arn}"
 
-  filename = "deploy/auth.zip"
-  source_code_hash = "${filebase64sha256("deploy/auth.zip")}"
+  filename = "deploy/authenticate.zip"
+  source_code_hash = "${filebase64sha256("deploy/authenticate.zip")}"
+}
+
+resource "aws_lambda_function" "eolach_authorize" {
+  runtime = "python3.7"
+  handler = "authorize.authorize"
+  function_name = "EolachAuthorize"
+  role = "${aws_iam_role.eolach_lambda_role.arn}"
+
+  filename = "deploy/authorize.zip"
+  source_code_hash = "${filebase64sha256("deploy/authorize.zip")}"
 }
 
 // API's
@@ -64,13 +74,13 @@ resource "aws_api_gateway_integration" "auth_integration" {
   http_method = "${aws_api_gateway_method.auth_method.http_method}"
   integration_http_method = "POST"
   type = "AWS_PROXY"
-  uri = "${aws_lambda_function.eolach_auth.invoke_arn}"
+  uri = "${aws_lambda_function.eolach_login.invoke_arn}"
 }
 
 resource "aws_lambda_permission" "login_from_gateway" {
   statement_id = "AllowEolachPublicInvoke"
   action = "lambda:InvokeFunction"
-  function_name = "${aws_lambda_function.eolach_auth.function_name}"
+  function_name = "${aws_lambda_function.eolach_login.function_name}"
   principal = "apigateway.amazonaws.com"
   source_arn = "${aws_api_gateway_rest_api.eolach_public_api.execution_arn}/*"
 }
