@@ -1,12 +1,23 @@
 import Url
+import Url.Builder
+import Http
 import Regex
+import Debug
 import Browser
 import Browser.Navigation as Nav
+import Json.Encode as JE
+import Json.Decode as JD
 
 import Css exposing (..)
-import Html.Styled exposing (..)
+import Html.Styled as Html exposing (..)
 import Html.Styled.Events exposing (onInput, onSubmit)
 import Html.Styled.Attributes exposing (..)
+
+import FontAwesome.Icon as FAIcon
+import FontAwesome.Solid as FASolid
+import FontAwesome.Styles as FAStyles
+
+import Api
 
 -- Main
 
@@ -23,16 +34,22 @@ main =
 
 -- Model
 
+type LoginState = LoggedIn String    -- This holds the token
+                | LogInFailed String -- This holds the login error
+                | LoggingIn
+                | LoggedOut
+
 type alias Model =
     { key : Nav.Key,
       url : Url.Url,
       email : String,
-      password : String
+      password : String,
+      loginState : LoginState
     }
 
 init : () -> Url.Url -> Nav.Key -> (Model, Cmd Msg)
 init flags url key =
-    (Model key url "" "", Cmd.none)
+    (Model key url "" "" LoggedOut, Cmd.none)
 
 validateEmail : String -> Bool
 validateEmail email =
@@ -49,6 +66,7 @@ type Credentials = Email
 type Msg = LinkClicked Browser.UrlRequest
          | UrlChanged Url.Url
          | Login
+         | LoginResponse (Result Http.Error String)
          | SetCredentials Credentials String
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -61,12 +79,45 @@ update msg model =
         UrlChanged url ->
             ({ model | url = url }, Cmd.none)
         Login ->
-            -- Call API to login
-            (model, Cmd.none)
+            let
+                authCmd = Http.post
+                          { url = getEndpoint "auth",
+                            body = Http.jsonBody (JE.object
+                                   [ ("email", JE.string model.email),
+                                     ("password", JE.string model.password)
+                                   ]),
+                            expect = Http.expectJson LoginResponse (decodeStrField "token")
+                          }
+            in
+                ({ model | loginState = LoggingIn }, authCmd)
+        LoginResponse result ->
+            case result of
+                Ok token ->
+                    ({ model | loginState = LoggedIn token }, Cmd.none)
+                Err error ->
+                    let failMessage = case error of
+                                          Http.BadUrl url ->
+                                              "Bad URL: " ++ url
+                                          Http.Timeout ->
+                                              "Request timed out"
+                                          Http.NetworkError ->
+                                              "Network error"
+                                          Http.BadStatus status ->
+                                              "Request failed: " ++ (String.fromInt status)
+                                          Http.BadBody bodyError ->
+                                              "Unexpected body: " ++ bodyError
+                    in
+                        ({ model | loginState = LogInFailed failMessage }, Cmd.none)
         SetCredentials Email email ->
             ({ model | email = email }, Cmd.none)
         SetCredentials Password password ->
             ({ model | password = password }, Cmd.none)
+
+getEndpoint : String -> String
+getEndpoint endpoint = Url.Builder.crossOrigin Api.url [ endpoint ] []
+
+decodeStrField : String -> JD.Decoder String
+decodeStrField fieldName = JD.field fieldName JD.string
 
 -- Subscriptions
 
@@ -85,31 +136,48 @@ theme = { fgColor = hex "55AF6A",
 view : Model -> Browser.Document Msg
 view model =
     let
+        -- Settings
         validEmail = validateEmail model.email
-        emailColor = if validEmail || String.isEmpty model.email then theme.textColor else theme.errColor
         loginDisabled = not validEmail || String.isEmpty model.password
 
+        -- CSS styles
+        loginCss = css [ textAlign center,
+                         fontFamily sansSerif,
+                         color theme.fgColor,
+                         fontSize (px 50) ]
+        formCss = css [ textAlign center ]
+        emailCss = css [ color (if validEmail || String.isEmpty model.email then theme.textColor else theme.errColor) ]
+        marginCss = css [ marginTop theme.defaultMargin ]
+
+        -- Page views
         login = div []
-                [ div [ css [ textAlign center,
-                              fontFamily sansSerif,
-                              color theme.fgColor,
-                              fontSize (px 50) ] ]
+                [ div [ loginCss ]
                       [ text "Eolach V2" ],
                   br [] [],
-                  Html.Styled.form [ onSubmit Login, css [ textAlign center ] ]
-                      [ input [ type_ "text", placeholder "Email", onInput (SetCredentials Email),
-                                css [ color emailColor ] ] [],
+                  Html.form [ onSubmit Login, formCss ]
+                      [ input [ type_ "text", placeholder "Email", onInput (SetCredentials Email), emailCss ] [],
                         br [] [],
-                        input [ type_ "password", placeholder "Password", onInput (SetCredentials Password),
-                                css [ marginTop theme.defaultMargin ] ] [],
+                        input [ type_ "password", placeholder "Password", onInput (SetCredentials Password), marginCss ] [],
                         br [] [],
-                        button [ Html.Styled.Attributes.disabled loginDisabled,
-                                 css [ marginTop theme.defaultMargin ] ]
+                        button [ Html.Styled.Attributes.disabled loginDisabled, marginCss ]
                             [ text "Login" ]
                       ]
                 ]
+        loading = div []
+                  [ Html.fromUnstyled FAStyles.css,
+                    Html.fromUnstyled (FASolid.spinner |> FAIcon.present |> FAIcon.view) ]
         home = div [] [ text "Welcome!" ]
+
+        body = case model.loginState of
+                   LoggedOut ->
+                       login
+                   LoggingIn ->
+                       loading
+                   LoggedIn _ ->
+                       home
+                   LogInFailed error ->
+                       text error
     in
         { title = "Eolach V2",
-          body = [ Html.Styled.toUnstyled login ]
+          body = [ Html.toUnstyled body ]
         }

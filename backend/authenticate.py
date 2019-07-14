@@ -6,5 +6,8 @@ def login(event: dict, context: dict) -> dict:
     return {
         "statusCode": 200,
         "isBase64Encoded": False,
-        "body": json.dumps({ "token": "yes" if authenticated else "no" })
+        "body": json.dumps({ "token": "yes" if authenticated else "no" }),
+        "headers": {
+            "Access-Control-Allow-Origin": "*"
+        }
     }
