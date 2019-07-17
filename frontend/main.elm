@@ -13,10 +13,6 @@ import Html.Styled as Html exposing (..)
 import Html.Styled.Events exposing (onInput, onSubmit)
 import Html.Styled.Attributes exposing (..)
 
-import FontAwesome.Icon as FAIcon
-import FontAwesome.Solid as FASolid
-import FontAwesome.Styles as FAStyles
-
 import Api
 
 -- Main
@@ -130,6 +126,7 @@ theme = { fgColor = hex "55AF6A",
           bgColor = hex "DBDBDB",
           errColor = hex "B84949",
           textColor = hex "494949",
+          overlayColor = hex "000000D0",
           defaultMargin = px 5
         }
 
@@ -149,6 +146,27 @@ view model =
         emailCss = css [ color (if validEmail || String.isEmpty model.email then theme.textColor else theme.errColor) ]
         marginCss = css [ marginTop theme.defaultMargin ]
 
+        overlayDisplay = case model.loginState of
+                             LoggingIn -> block
+                             _         -> { value = none.value, display = none.display }
+        overlayCss = css [ position fixed,
+                           display overlayDisplay,
+                           Css.width (pct 100),
+                           Css.height (pct 100),
+                           backgroundColor theme.overlayColor,
+                           zIndex (int 2),
+                           top (px 0),
+                           bottom (px 0),
+                           left (px 0),
+                           right (px 0) ]
+        overlayTextCss = css [ position absolute,
+                               fontFamily sansSerif,
+                               fontSize (px 25),
+                               color theme.fgColor,
+                               top (pct 50),
+                               left (pct 50),
+                               transform (translate2 (pct -50) (pct -50)) ]
+
         -- Page views
         login = div []
                 [ div [ loginCss ]
@@ -161,18 +179,19 @@ view model =
                         br [] [],
                         button [ Html.Styled.Attributes.disabled loginDisabled, marginCss ]
                             [ text "Login" ]
+                      ],
+                  div [ overlayCss ]
+                      [ div [ overlayTextCss ]
+                            [ text "Logging in..." ]
                       ]
                 ]
-        loading = div []
-                  [ Html.fromUnstyled FAStyles.css,
-                    Html.fromUnstyled (FASolid.spinner |> FAIcon.present |> FAIcon.view) ]
         home = div [] [ text "Welcome!" ]
 
         body = case model.loginState of
                    LoggedOut ->
                        login
                    LoggingIn ->
-                       loading
+                       login
                    LoggedIn _ ->
                        home
                    LogInFailed error ->
