@@ -14,6 +14,7 @@ import Html.Styled.Events exposing (onInput, onSubmit)
 import Html.Styled.Attributes exposing (..)
 
 import Api
+import Ports
 
 -- Main
 
@@ -30,10 +31,11 @@ main =
 
 -- Model
 
-type LoginState = LoggedIn String    -- This holds the token
-                | LogInFailed String -- This holds the login error
+type LoginState = LoggedIn
+                | LoginFailed String -- This holds the login error
                 | LoggingIn
                 | LoggedOut
+                | NeedsNewPassword
 
 type alias Model =
     { key : Nav.Key,
@@ -62,8 +64,10 @@ type Credentials = Email
 type Msg = LinkClicked Browser.UrlRequest
          | UrlChanged Url.Url
          | Login
-         | LoginResponse (Result Http.Error String)
+         | LoginResult JE.Value
          | SetCredentials Credentials String
+         | RequestNewUserPassword
+         | SetNewUserPassword
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -76,34 +80,29 @@ update msg model =
             ({ model | url = url }, Cmd.none)
         Login ->
             let
-                authCmd = Http.post
-                          { url = getEndpoint "auth",
-                            body = Http.jsonBody (JE.object
-                                   [ ("email", JE.string model.email),
-                                     ("password", JE.string model.password)
-                                   ]),
-                            expect = Http.expectJson LoginResponse (decodeStrField "token")
-                          }
+                params = { email = model.email, password = model.password }
             in
-                ({ model | loginState = LoggingIn }, authCmd)
-        LoginResponse result ->
-            case result of
-                Ok token ->
-                    ({ model | loginState = LoggedIn token }, Cmd.none)
-                Err error ->
-                    let failMessage = case error of
-                                          Http.BadUrl url ->
-                                              "Bad URL: " ++ url
-                                          Http.Timeout ->
-                                              "Request timed out"
-                                          Http.NetworkError ->
-                                              "Network error"
-                                          Http.BadStatus status ->
-                                              "Request failed: " ++ (String.fromInt status)
-                                          Http.BadBody bodyError ->
-                                              "Unexpected body: " ++ bodyError
-                    in
-                        ({ model | loginState = LogInFailed failMessage }, Cmd.none)
+                ({ model | loginState = LoggingIn }, Ports.login params)
+        LoginResult json ->
+            let
+                successResult = JD.decodeValue (JD.field "success" JD.bool) json
+                errorResult = JD.decodeValue (JD.maybe <| JD.field "error" JD.string) json
+                errorMsg = case errorResult of
+                               Ok (Just error) ->
+                                   error
+                               _ -> ""
+            in
+                case successResult of
+                    Ok True ->
+                        ({ model | loginState = LoggedIn }, Cmd.none)
+                    Ok False ->
+                        ({ model | loginState = LoginFailed errorMsg }, Cmd.none)
+                    _ ->
+                        ({ model | loginState = LoginFailed "Invalid JSON"}, Cmd.none)
+        RequestNewUserPassword ->
+            ({ model | loginState = NeedsNewPassword }, Cmd.none)
+        SetNewUserPassword ->
+            ({ model | loginState = LoggingIn }, Ports.completeUserSignup model.password)
         SetCredentials Email email ->
             ({ model | email = email }, Cmd.none)
         SetCredentials Password password ->
@@ -112,14 +111,12 @@ update msg model =
 getEndpoint : String -> String
 getEndpoint endpoint = Url.Builder.crossOrigin Api.url [ endpoint ] []
 
-decodeStrField : String -> JD.Decoder String
-decodeStrField fieldName = JD.field fieldName JD.string
-
 -- Subscriptions
 
 subscriptions : Model -> Sub Msg
-subscriptions _ = Sub.none
-                  
+subscriptions _ = Sub.batch [ Ports.loginResult LoginResult,
+                              Ports.requestNewUserPassword (always RequestNewUserPassword) ]
+
 -- View
 
 theme = { fgColor = hex "55AF6A",
@@ -129,6 +126,27 @@ theme = { fgColor = hex "55AF6A",
           overlayColor = hex "000000D0",
           defaultMargin = px 5
         }
+
+getOverlayCss : Display compatible -> Attribute Msg
+getOverlayCss overlayDisplay =
+    css [ position fixed,
+          display overlayDisplay,
+          Css.width (pct 100),
+          Css.height (pct 100),
+          backgroundColor theme.overlayColor,
+          zIndex (int 1),
+          top (px 0),
+          bottom (px 0),
+          left (px 0),
+          right (px 0) ]
+
+getDisplayFromLoginState : Bool -> Display {}
+getDisplayFromLoginState state =
+    case state of
+        True ->
+            block
+        False ->
+            { value = none.value, display = none.display }
 
 view : Model -> Browser.Document Msg
 view model =
@@ -146,26 +164,20 @@ view model =
         emailCss = css [ color (if validEmail || String.isEmpty model.email then theme.textColor else theme.errColor) ]
         marginCss = css [ marginTop theme.defaultMargin ]
 
-        overlayDisplay = case model.loginState of
-                             LoggingIn -> block
-                             _         -> { value = none.value, display = none.display }
-        overlayCss = css [ position fixed,
-                           display overlayDisplay,
-                           Css.width (pct 100),
-                           Css.height (pct 100),
-                           backgroundColor theme.overlayColor,
-                           zIndex (int 2),
-                           top (px 0),
-                           bottom (px 0),
-                           left (px 0),
-                           right (px 0) ]
-        overlayTextCss = css [ position absolute,
-                               fontFamily sansSerif,
-                               fontSize (px 25),
-                               color theme.fgColor,
-                               top (pct 50),
-                               left (pct 50),
-                               transform (translate2 (pct -50) (pct -50)) ]
+        loginMsgDisplay = getDisplayFromLoginState (model.loginState == LoggingIn)
+        loginMsgCss = css [ position absolute,
+                            fontFamily sansSerif,
+                            fontSize (px 25),
+                            color theme.fgColor,
+                            top (pct 50),
+                            left (pct 50),
+                            transform (translate2 (pct -50) (pct -50)) ]
+
+        newUserPasswordDisplay = getDisplayFromLoginState (model.loginState == NeedsNewPassword)
+        newUserPasswordCss = css [ backgroundColor theme.bgColor,
+                                   margin2 (pct 25) auto,
+                                   padding (px 20),
+                                   Css.width (pct 40) ]
 
         -- Page views
         login = div []
@@ -180,9 +192,19 @@ view model =
                         button [ Html.Styled.Attributes.disabled loginDisabled, marginCss ]
                             [ text "Login" ]
                       ],
-                  div [ overlayCss ]
-                      [ div [ overlayTextCss ]
+                  div [ getOverlayCss loginMsgDisplay ]
+                      [ div [ loginMsgCss ]
                             [ text "Logging in..." ]
+                      ],
+                  Html.form [ onSubmit SetNewUserPassword,
+                              getOverlayCss newUserPasswordDisplay ]
+                      [ div [ newUserPasswordCss ]
+                            [ text "New password",
+                              br [] [],
+                              input [ type_ "password",
+                                      placeholder "New password",
+                                      onInput (SetCredentials Password) ] []
+                            ]
                       ]
                 ]
         home = div [] [ text "Welcome!" ]
@@ -192,9 +214,11 @@ view model =
                        login
                    LoggingIn ->
                        login
-                   LoggedIn _ ->
+                   NeedsNewPassword ->
+                       login
+                   LoggedIn ->
                        home
-                   LogInFailed error ->
+                   LoginFailed error ->
                        text error
     in
         { title = "Eolach V2",

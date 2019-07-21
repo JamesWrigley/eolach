@@ -4,8 +4,26 @@ provider "aws" {
   version = "~> 2.17"
 }
 
+data "aws_region" "current" {}
+
 output "public_api_url" {
   value = aws_api_gateway_deployment.eolach_public_api_deployment.invoke_url
+}
+
+output "cognito_client_id" {
+  value = aws_cognito_user_pool_client.eolach.id
+}
+
+output "cognito_user_pool_id" {
+  value = aws_cognito_user_pool.librarians.id
+}
+
+output "cognito_identity_pool_id" {
+  value = aws_cognito_identity_pool.eolach.id
+}
+
+output "aws_region" {
+  value = data.aws_region.current.name
 }
 
 // Lambda's
@@ -131,4 +149,51 @@ resource "aws_api_gateway_deployment" "eolach_public_api_deployment" {
 
   rest_api_id = "${aws_api_gateway_rest_api.eolach_public_api.id}"
   stage_name = "prod"
+}
+
+// DynamoDB tables
+
+
+// Cognito
+
+resource "aws_cognito_user_pool" "librarians" {
+  name = "EolachLibrarians"
+  mfa_configuration = "OFF"
+
+  device_configuration {
+    challenge_required_on_new_device = true
+  }
+
+  password_policy {
+    minimum_length = 10
+    require_lowercase = false
+    require_numbers = false
+    require_symbols = false
+    require_uppercase = false
+  }
+
+  verification_message_template {
+    default_email_option = "CONFIRM_WITH_CODE"
+    email_message = "Your verification code is: {####}"
+    email_subject = "Eolach verification code"
+  }
+}
+
+resource "aws_cognito_identity_pool" "eolach" {
+  identity_pool_name = "Eolach"
+  allow_unauthenticated_identities = false
+
+  cognito_identity_providers {
+    client_id = "${aws_cognito_user_pool_client.eolach.id}"
+    provider_name = "cognito-idp.${data.aws_region.current.name}.amazonaws.com/${aws_cognito_user_pool.librarians.id}"
+  }
+}
+
+resource "aws_cognito_user_pool_client" "eolach" {
+  name = "Eolach"
+  user_pool_id = "${aws_cognito_user_pool.librarians.id}"
+  read_attributes = ["email", "email_verified"]
+  write_attributes = ["email"]
+  generate_secret = false
+  refresh_token_validity = 1
 }
