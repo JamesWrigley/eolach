@@ -42,12 +42,13 @@ type alias Model =
       url : Url.Url,
       email : String,
       password : String,
+      passwordConfirm : String,
       loginState : LoginState
     }
 
 init : () -> Url.Url -> Nav.Key -> (Model, Cmd Msg)
 init flags url key =
-    (Model key url "" "" LoggedOut, Cmd.none)
+    (Model key url "" "" "" LoggedOut, Cmd.none)
 
 validateEmail : String -> Bool
 validateEmail email =
@@ -60,6 +61,7 @@ validateEmail email =
 
 type Credentials = Email
                  | Password
+                 | PasswordConfirm
 
 type Msg = LinkClicked Browser.UrlRequest
          | UrlChanged Url.Url
@@ -100,13 +102,15 @@ update msg model =
                     _ ->
                         ({ model | loginState = LoginFailed "Invalid JSON"}, Cmd.none)
         RequestNewUserPassword ->
-            ({ model | loginState = NeedsNewPassword }, Cmd.none)
+            ({ model | password = "", loginState = NeedsNewPassword }, Cmd.none)
         SetNewUserPassword ->
             ({ model | loginState = LoggingIn }, Ports.completeUserSignup model.password)
         SetCredentials Email email ->
             ({ model | email = email }, Cmd.none)
         SetCredentials Password password ->
             ({ model | password = password }, Cmd.none)
+        SetCredentials PasswordConfirm passwordConfirm ->
+            ({ model | passwordConfirm = passwordConfirm}, Cmd.none)
 
 getEndpoint : String -> String
 getEndpoint endpoint = Url.Builder.crossOrigin Api.url [ endpoint ] []
@@ -148,12 +152,24 @@ getDisplayFromLoginState state =
         False ->
             { value = none.value, display = none.display }
 
+passwordDiv : List (Attribute Msg) -> Html Msg
+passwordDiv attributes =
+    input ([ type_ "password"] ++ attributes) []
+
 view : Model -> Browser.Document Msg
 view model =
     let
         -- Settings
         validEmail = validateEmail model.email
-        loginDisabled = not validEmail || String.isEmpty model.password
+        loginDisabled =
+            let
+                baseCondition = not validEmail || String.isEmpty model.password
+            in
+                case model.loginState of
+                    NeedsNewPassword ->
+                        baseCondition || model.password /= model.passwordConfirm
+                    _ ->
+                        baseCondition
 
         -- CSS styles
         loginCss = css [ textAlign center,
@@ -161,7 +177,12 @@ view model =
                          color theme.fgColor,
                          fontSize (px 50) ]
         formCss = css [ textAlign center ]
-        emailCss = css [ color (if validEmail || String.isEmpty model.email then theme.textColor else theme.errColor) ]
+        emailCss = css [ color (if validEmail || String.isEmpty model.email
+                                then theme.textColor
+                                else theme.errColor) ]
+        confirmPasswordCss = css [ color (if model.password == model.passwordConfirm
+                                          then theme.textColor
+                                          else theme.errColor) ]
         marginCss = css [ marginTop theme.defaultMargin ]
 
         loginMsgDisplay = getDisplayFromLoginState (model.loginState == LoggingIn)
@@ -171,40 +192,56 @@ view model =
                             color theme.fgColor,
                             top (pct 50),
                             left (pct 50),
-                            transform (translate2 (pct -50) (pct -50)) ]
+                            transform <| translate2 (pct -50) (pct -50) ]
 
-        newUserPasswordDisplay = getDisplayFromLoginState (model.loginState == NeedsNewPassword)
-        newUserPasswordCss = css [ backgroundColor theme.bgColor,
-                                   margin2 (pct 25) auto,
-                                   padding (px 20),
-                                   Css.width (pct 40) ]
+        passwordField =
+            let
+                passwordHelper str = passwordDiv [ value model.password,
+                                                   onInput (SetCredentials Password),
+                                                   placeholder str,
+                                                   marginCss ]
+            in
+                case model.loginState of
+                    NeedsNewPassword ->
+                        passwordHelper "New password"
+                    _ ->
+                        passwordHelper "Password"
+        confirmPasswordField = case model.loginState of
+                                   NeedsNewPassword ->
+                                       div [ marginCss ]
+                                           [ passwordDiv [ value model.passwordConfirm,
+                                                           placeholder "Confirm password",
+                                                           onInput (SetCredentials PasswordConfirm),
+                                                           confirmPasswordCss ],
+                                             br [] []
+                                           ]
+                                   _ ->
+                                       div [] []
+        submitCommand = if model.loginState == NeedsNewPassword
+                        then SetNewUserPassword
+                        else Login
 
         -- Page views
         login = div []
                 [ div [ loginCss ]
                       [ text "Eolach V2" ],
                   br [] [],
-                  Html.form [ onSubmit Login, formCss ]
-                      [ input [ type_ "text", placeholder "Email", onInput (SetCredentials Email), emailCss ] [],
+                  Html.form [ onSubmit submitCommand, formCss ]
+                      [ input [ type_ "text",
+                                placeholder "Email",
+                                onInput (SetCredentials Email),
+                                emailCss ] [],
                         br [] [],
-                        input [ type_ "password", placeholder "Password", onInput (SetCredentials Password), marginCss ] [],
+                        passwordField,
                         br [] [],
-                        button [ Html.Styled.Attributes.disabled loginDisabled, marginCss ]
+                        confirmPasswordField,
+                        button [ Html.Styled.Attributes.disabled loginDisabled,
+                                 marginCss]
                             [ text "Login" ]
                       ],
                   div [ getOverlayCss loginMsgDisplay ]
                       [ div [ loginMsgCss ]
                             [ text "Logging in..." ]
-                      ],
-                  Html.form [ onSubmit SetNewUserPassword,
-                              getOverlayCss newUserPasswordDisplay ]
-                      [ div [ newUserPasswordCss ]
-                            [ text "New password",
-                              br [] [],
-                              input [ type_ "password",
-                                      placeholder "New password",
-                                      onInput (SetCredentials Password) ] []
-                            ]
                       ]
                 ]
         home = div [] [ text "Welcome!" ]
