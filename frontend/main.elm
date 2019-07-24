@@ -10,7 +10,7 @@ import Json.Decode as JD
 
 import Css exposing (..)
 import Html.Styled as Html exposing (..)
-import Html.Styled.Events exposing (onInput, onSubmit)
+import Html.Styled.Events exposing (onClick, onInput, onSubmit)
 import Html.Styled.Attributes exposing (..)
 
 import Api
@@ -65,6 +65,7 @@ type Credentials = Email
 
 type Msg = LinkClicked Browser.UrlRequest
          | UrlChanged Url.Url
+         | Logout
          | Login
          | LoginResult JE.Value
          | SetCredentials Credentials String
@@ -80,6 +81,8 @@ update msg model =
                 Browser.External href -> (model, Nav.load href)
         UrlChanged url ->
             ({ model | url = url }, Cmd.none)
+        Logout ->
+            ({ model | loginState = LoggedOut }, Cmd.none)
         Login ->
             let
                 params = { email = model.email, password = model.password }
@@ -92,7 +95,7 @@ update msg model =
                 errorMsg = case errorResult of
                                Ok (Just error) ->
                                    error
-                               _ -> ""
+                               _ -> "No error message received"
             in
                 case successResult of
                     Ok True ->
@@ -131,8 +134,8 @@ theme = { fgColor = hex "55AF6A",
           defaultMargin = px 5
         }
 
-getOverlayCss : Display compatible -> Attribute Msg
-getOverlayCss overlayDisplay =
+getOverlayCss : Display compatible -> Cursor {} -> Attribute Msg
+getOverlayCss overlayDisplay overlayCursor =
     css [ position fixed,
           display overlayDisplay,
           Css.width (pct 100),
@@ -142,7 +145,8 @@ getOverlayCss overlayDisplay =
           top (px 0),
           bottom (px 0),
           left (px 0),
-          right (px 0) ]
+          right (px 0),
+          cursor overlayCursor ]
 
 getDisplayFromLoginState : Bool -> Display {}
 getDisplayFromLoginState state =
@@ -184,16 +188,20 @@ view model =
                                           then theme.textColor
                                           else theme.errColor) ]
         marginCss = css [ marginTop theme.defaultMargin ]
+        overlayMsgCss = css [ position absolute,
+                              fontFamily sansSerif,
+                              fontSize (px 25),
+                              color theme.fgColor,
+                              top (pct 50),
+                              left (pct 50),
+                              transform <| translate2 (pct -50) (pct -50) ]
 
         loginMsgDisplay = getDisplayFromLoginState (model.loginState == LoggingIn)
-        loginMsgCss = css [ position absolute,
-                            fontFamily sansSerif,
-                            fontSize (px 25),
-                            color theme.fgColor,
-                            top (pct 50),
-                            left (pct 50),
-                            transform <| translate2 (pct -50) (pct -50) ]
 
+        {- If this is a normal login, then we just need the one password field,
+        but if this is the first time, we need another to confirm the new
+        password.
+         -}
         passwordField =
             let
                 passwordHelper str = passwordDiv [ value model.password,
@@ -217,6 +225,19 @@ view model =
                                            ]
                                    _ ->
                                        div [] []
+
+        -- In case login failed
+        errorMsg = case model.loginState of
+                       LoginFailed msg ->
+                           msg
+                       _ ->
+                           ""
+        errorMsgDisplay = getDisplayFromLoginState (case model.loginState of
+                                                        LoginFailed _ -> True
+                                                        _ -> False)
+
+        -- If this is the first time logging in, then we'll need to get a new
+        -- password from the user.
         submitCommand = if model.loginState == NeedsNewPassword
                         then SetNewUserPassword
                         else Login
@@ -239,9 +260,14 @@ view model =
                                  marginCss]
                             [ text "Login" ]
                       ],
-                  div [ getOverlayCss loginMsgDisplay ]
-                      [ div [ loginMsgCss ]
+                  div [ getOverlayCss loginMsgDisplay wait ]
+                      [ div [ overlayMsgCss ]
                             [ text "Logging in..." ]
+                      ],
+                  div [ getOverlayCss errorMsgDisplay pointer,
+                        onClick Logout ]
+                      [ div [ overlayMsgCss ]
+                            [ text errorMsg ]
                       ]
                 ]
         home = div [] [ text "Welcome!" ]
@@ -253,10 +279,10 @@ view model =
                        login
                    NeedsNewPassword ->
                        login
+                   LoginFailed error ->
+                       login
                    LoggedIn ->
                        home
-                   LoginFailed error ->
-                       text error
     in
         { title = "Eolach V2",
           body = [ Html.toUnstyled body ]

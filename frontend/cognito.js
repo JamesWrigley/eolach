@@ -21,7 +21,7 @@ var app = Elm.Main.init({
 
 function handleLoginFailure(error) {
     app.ports.loginResult.send({"success" : false,
-                                "error" : error})
+                                "error" : error.message});
 }
 
 function handleLoginSuccess(result) {
