@@ -1,6 +1,6 @@
 #! /bin/bash
 
-URL=$(terraform output public_api_url)
+URL=$(terraform output api_url)
 
 cat <<EOF
 module Api exposing (url)
