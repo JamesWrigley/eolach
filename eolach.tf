@@ -151,7 +151,7 @@ resource "aws_dynamodb_table_item" "mere_christianity" {
 {
     "author": {"S": "C.S. Lewis"},
     "title": {"S": "Mere Christianity"},
-    "genre": {"L": [{"S": "Apologetics"}, {"S": "Theology"}]},
+    "subjects": {"L": [{"S": "Apologetics"}, {"S": "Theology"}]},
     "section": {"S": "204"}
 }
 ITEM
@@ -166,7 +166,7 @@ resource "aws_dynamodb_table_item" "screwtape" {
 {
     "author": {"S": "C.S. Lewis"},
     "title": {"S": "The Screwtape Letters"},
-    "genre": {"L": [{"S": "Theology"}, {"S": "Fiction"}, {"S": "Satire"}]},
+    "subjects": {"L": [{"S": "Theology"}, {"S": "Fiction"}, {"S": "Satire"}]},
     "section": {"S": "248.2"}
 }
 ITEM
