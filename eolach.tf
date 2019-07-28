@@ -18,12 +18,12 @@ output "cognito_user_pool_id" {
   value = aws_cognito_user_pool.librarians.id
 }
 
-// output "cognito_identity_pool_id" {
-//   value = aws_cognito_identity_pool.eolach.id
-// }
-
 output "aws_region" {
   value = data.aws_region.current.name
+}
+
+output "frontend_s3_bucket" {
+  value = aws_s3_bucket.eolach_frontend.bucket
 }
 
 // Lambda's
@@ -63,21 +63,11 @@ resource "aws_lambda_function" "eolach_query_books" {
   function_name = "EolachQueryBooks"
   role = "${aws_iam_role.eolach_lambda_role.arn}"
 
-  filename = "backend/query.zip"
-  source_code_hash = "${filebase64sha256("backend/query.zip")}"
+  filename = "deploy/query.zip"
+  source_code_hash = "${filebase64sha256("deploy/query.zip")}"
 
   depends_on = ["aws_iam_role_policy_attachment.basic_execution"]
 }
-
-// resource "aws_lambda_function" "eolach_cors" {
-//   runtime = "python3.7"
-//   handler = "cors.allow"
-//   function_name = "EolachCORS"
-//   role = "${aws_iam_role.eolach_lambda_role.arn}"
-// 
-//   filename = "deploy/cors.zip"
-//   source_code_hash = "${filebase64sha256("deploy/cors.zip")}"
-// }
 
 // API's
 
@@ -116,15 +106,6 @@ resource "aws_api_gateway_integration" "books_get" {
   uri = "${aws_lambda_function.eolach_query_books.invoke_arn}"
 }
 
-// resource "aws_api_gateway_integration" "auth_options_integration" {
-//   rest_api_id = "${aws_api_gateway_rest_api.eolach_internal_api.id}"
-//   resource_id = "${aws_api_gateway_resource.auth_resource.id}"
-//   http_method = "${aws_api_gateway_method.auth_options.http_method}"
-//   integration_http_method = "POST"
-//   type = "AWS_PROXY"
-//   uri = "${aws_lambda_function.eolach_cors.invoke_arn}"
-// }
-
 resource "aws_lambda_permission" "invoke_from_gateway" {
   statement_id = "AllowEolachPublicInvoke"
   action = "lambda:InvokeFunction"
@@ -132,14 +113,6 @@ resource "aws_lambda_permission" "invoke_from_gateway" {
   principal = "apigateway.amazonaws.com"
   source_arn = "${aws_api_gateway_rest_api.eolach_internal_api.execution_arn}/*"
 }
-
-// resource "aws_lambda_permission" "cors_from_gateway" {
-//   statement_id = "AllowEolachPublicCORS"
-//   action = "lambda:InvokeFunction"
-//   function_name = "${aws_lambda_function.eolach_cors.function_name}"
-//   principal = "apigateway.amazonaws.com"
-//   source_arn = "${aws_api_gateway_rest_api.eolach_internal_api.execution_arn}/*"
-// }
 
 resource "aws_api_gateway_deployment" "eolach_internal_api_deployment" {
   depends_on = ["aws_api_gateway_integration.books_get"]
@@ -243,46 +216,6 @@ resource "aws_cognito_user_pool_client" "eolach" {
   refresh_token_validity = 1
 }
 
-// S3
-
-resource "aws_s3_bucket" "eolach_frontend" {
-  bucket_prefix = "eolach-frontend"
-  acl = "public-read"
-
-  cors_rule {
-    allowed_headers = ["*"]
-    allowed_methods = ["GET", "HEAD"]
-    allowed_origins = ["*"]
-  }
-}
-
-resource "aws_s3_bucket_object" "index_html" {
-  bucket = "${aws_s3_bucket.eolach_frontend.bucket}"
-  key = "index.html"
-  source = "./frontend/index.html"
-  acl = "public-read"
-  etag = "${filemd5("./frontend/index.html")}"
-  content_type = "text/html"
-}
-
-resource "aws_s3_bucket_object" "elm_min_js" {
-  bucket = "${aws_s3_bucket.eolach_frontend.bucket}"
-  key = "elm.min.js"
-  source = "./frontend/elm.min.js"
-  acl = "public-read"
-  etag = "${filemd5("./frontend/elm.min.js")}"
-  content_type = "text/javascript"
-}
-
-resource "aws_s3_bucket_object" "eolach_js" {
-  bucket = "${aws_s3_bucket.eolach_frontend.bucket}"
-  key = "eolach.js"
-  source = "./frontend/eolach.js"
-  acl = "public-read"
-  etag = "${filemd5("./frontend/eolach.js")}"
-  content_type = "text/javascript"
-}
-
 // Route53
 
 resource "aws_route53_zone" "eolach_website_zone" {
@@ -326,11 +259,24 @@ resource "aws_acm_certificate_validation" "website" {
   validation_record_fqdns = ["${aws_route53_record.eolach_cert_validation.fqdn}"]
 }
 
-// Cloudfront
+// S3
 
 locals {
   eolach_s3_origin_id = "eolachS3"
 }
+
+resource "aws_s3_bucket" "eolach_frontend" {
+  bucket_prefix = "eolach-frontend"
+  acl = "public-read"
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "HEAD"]
+    allowed_origins = ["*"]
+  }
+}
+
+// Cloudfront
 
 resource "aws_cloudfront_distribution" "eolach" {
   enabled = true
