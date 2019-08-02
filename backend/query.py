@@ -29,10 +29,19 @@ def dynamodb_metadecorator(table_name: str) -> Callable:
 
 @dynamodb_metadecorator("Books")
 def get_books(books_table, parameters: str, _) -> QueryResult:
-    attributes = parameters["attributes"].split(",")
-    if any(len(attr) == 0 for attr in attributes):
-        return (400, "Invalid attributes format")
+    attributes = None
+    if parameters:
+        try:
+            attributes = parameters["attributes"].split(",")
+        except KeyError:
+            pass
 
-    response = books_table.scan(AttributesToGet=attributes)
+        if any(len(attr) == 0 for attr in attributes):
+            return (400, "Invalid attributes format")
+
+    if attributes:
+        response = books_table.scan(AttributesToGet=attributes)
+    else:
+        response = books_table.scan()
 
     return (200, response["Items"])
