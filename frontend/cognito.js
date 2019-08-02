@@ -20,25 +20,12 @@ var app = Elm.Main.init({
 });
 
 function handleLoginFailure(error) {
-    app.ports.loginResult.send({"success" : false,
-                                "error" : error.message});
+    app.ports.onLoginFailed.send(error.message);
 }
 
 function handleLoginSuccess(result) {
-    // var accessToken = result.getAccessToken().getJwtToken();
-    // var pool_url = `cognito-idp.${cognitoConfig.region}.amazonaws.com/${cognitoConfig.userPoolId}`
-
-    // AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-    //     IdentityPoolId : cognitoConfig.identityPoolId,
-    //     Logins : {
-    //         pool_url : result.getIdToken().getJwtToken()
-    //     }
-    // });
-    // AWS.config.credentials.refresh((error) => {
-    //     if (error) { }
-    // });
-
-    app.ports.loginResult.send({ "success" : true });
+    var idToken = result.getIdToken().getJwtToken()
+    app.ports.onLoginSucceeded.send(idToken);
 }
 
 app.ports.login.subscribe(function (data) {
@@ -61,7 +48,7 @@ app.ports.login.subscribe(function (data) {
         newPasswordRequired: function (userAttributes, requiredAttributes) {
             delete userAttributes.email_verified;
             sessionUserAttributes = userAttributes;
-            app.ports.requestNewUserPassword.send(null);
+            app.ports.onRequestNewUserPassword.send(null);
         },
     });
 });
