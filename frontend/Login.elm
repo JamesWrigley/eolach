@@ -39,7 +39,6 @@ type Credentials = Email
 
 type Msg = Login
          | LoginFailedMsg String    -- This holds the error message
-         | CloseErrorOverlay
          | LoginSucceeded String    -- This holds the ID token
          | SetCredentials Credentials String
          | RequestNewUserPassword
@@ -55,16 +54,14 @@ validateCredentials email password =
             InvalidCredentials "Please enter your email address."
         (_, "") ->
             InvalidCredentials "Please enter your password."
-        (em, _) ->
-            if validateEmail em
+        (_, _) ->
+            if validateEmail email
             then ValidCredentials
             else InvalidCredentials "Invalid email address."
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
-        CloseErrorOverlay ->
-            ({ model | loginState = LoggedOut }, Cmd.none)
         Login ->
             case validateCredentials model.email model.password of
                 InvalidCredentials error ->
@@ -74,8 +71,8 @@ update msg model =
                         creds = Ports.Credentials model.email model.password
                     in
                         ({ model | loginState = LoggingIn }, Ports.login creds)
-        LoginFailedMsg errorMsg ->
-            ({ model | loginState = LoginFailed errorMsg }, Cmd.none)
+        LoginFailedMsg error ->
+            ({ model | loginState = LoginFailed error }, Cmd.none)
         LoginSucceeded idToken ->
             ({ model | loginState = LoggedIn idToken }, Cmd.none)
         RequestNewUserPassword ->
