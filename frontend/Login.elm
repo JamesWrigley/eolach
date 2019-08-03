@@ -1,12 +1,12 @@
 module Login exposing (Model, Msg, update, view, init, subscriptions)
 
-import Http
 import Regex
 
-import Css exposing (..)
-import Html.Styled as Html exposing (..)
-import Html.Styled.Events exposing (onClick, onInput, onSubmit)
-import Html.Styled.Attributes exposing (..)
+import Element exposing (..)
+import Element.Font as Font
+import Element.Input as Input
+import Element.Border as Border
+import Element.Background as Background
 
 import Ports
 
@@ -58,7 +58,7 @@ update msg model =
         LoginSucceeded idToken ->
             ({ model | loginState = LoggedIn idToken }, Cmd.none)
         RequestNewUserPassword ->
-            ({ model | password = "", loginState = NeedsNewPassword }, Cmd.none)
+            ({ model | password = "", passwordConfirm = "", loginState = NeedsNewPassword }, Cmd.none)
         SetNewUserPassword ->
             ({ model | loginState = LoggingIn }, Ports.completeUserSignup model.password)
         SetCredentials Email email ->
@@ -69,6 +69,7 @@ update msg model =
             ({ model | passwordConfirm = passwordConfirm}, Cmd.none)
 
 {- Subscriptions -}
+
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch [ Ports.onLoginFailed LoginFailedMsg,
@@ -78,6 +79,27 @@ subscriptions _ =
 
 {- View -}
 
+colorTheme = { logo = rgb255 85 175 106,
+               bg = rgb255 214 213 218,
+               error = rgb255 239 92 110,
+               darkGrey = rgb255 100 100 100,
+               black = rgb255 0 0 0
+             }
+
+styleMessage : String -> Element Msg
+styleMessage msg =
+    el [ Font.family [ Font.monospace ],
+         Font.size 15
+       ] (text msg)
+
+styleError : String -> Element Msg
+styleError error =
+    el [ Font.family [ Font.monospace ],
+         Font.size 15,
+         Font.bold,
+         Font.color colorTheme.error
+       ] (text error)
+
 validateEmail : String -> Bool
 validateEmail email =
     let
@@ -85,160 +107,77 @@ validateEmail email =
     in
         Regex.contains re email
 
-getOverlayCss : Display compatible -> Cursor {} -> Attribute Msg
-getOverlayCss overlayDisplay overlayCursor =
-    css [ position fixed,
-          display overlayDisplay,
-          Css.width (pct 100),
-          Css.height (pct 100),
-          backgroundColor theme.overlayColor,
-          zIndex (int 1),
-          top (px 0),
-          bottom (px 0),
-          left (px 0),
-          right (px 0),
-          cursor overlayCursor ]
+baseLayout : Model -> Element Msg -> Element Msg -> Element Msg -> Element Msg
+baseLayout model aboveLogin loginElement belowLogin =
+    row [ width fill,
+          height fill,
+          Background.color colorTheme.bg
+        ]
+        [ el [ width (fillPortion 2) ] none,
+          --Spacer
 
-getDisplayFromLoginState : Bool -> Display {}
-getDisplayFromLoginState state =
-    case state of
-        True ->
-            block
-        False ->
-            { value = none.value, display = none.display }
+          column [ centerX, centerY, spacing 10, width (fillPortion 1) ]
+              [ el [ centerX,
+                     Font.size 50,
+                     Font.color colorTheme.logo
+                   ] (text "Eolach V2"),
+                Input.text [] { onChange = (SetCredentials Email),
+                                text = model.email,
+                                placeholder = Just <| Input.placeholder [] (text "Email"),
+                                label = Input.labelHidden "Email"
+                              },
+                Input.newPassword [] { onChange = (SetCredentials Password),
+                                       text = model.password,
+                                       placeholder = Just <| Input.placeholder [] (text "Password"),
+                                       label = Input.labelHidden "Password",
+                                       show = False
+                                     },
+                aboveLogin,
+                loginElement,
+                el [ paddingXY 0 3] none,
+                paragraph [] [ belowLogin ]
+              ],
 
-passwordDiv : List (Attribute Msg) -> Html Msg
-passwordDiv attributes =
-    input ([ type_ "password"] ++ attributes) []
+          -- Spacer
+          el [ width (fillPortion 2) ] none
+        ]
 
-theme = { fgColor = hex "55AF6A",
-          bgColor = hex "DBDBDB",
-          errColor = hex "B84949",
-          textColor = hex "494949",
-          overlayColor = hex "000000D0",
-          defaultMargin = px 5
-        }
-
-view : Model -> Html Msg
+view : Model -> Element Msg
 view model =
     let
-        -- Settings
-        validEmail = validateEmail model.email
-        loginDisabled =
-            let
-                baseCondition = not validEmail || String.isEmpty model.password
-            in
-                case model.loginState of
-                    NeedsNewPassword ->
-                        baseCondition || model.password /= model.passwordConfirm
-                    _ ->
-                        baseCondition
-
-        -- CSS styles
-        loginCss = css [ textAlign center,
-                         fontFamily sansSerif,
-                         color theme.fgColor,
-                         fontSize (px 50) ]
-        formCss = css [ textAlign center ]
-        emailCss = css [ color (if validEmail || String.isEmpty model.email
-                                then theme.textColor
-                                else theme.errColor) ]
-        confirmPasswordCss = css [ color (if model.password == model.passwordConfirm
-                                          then theme.textColor
-                                          else theme.errColor) ]
-        marginCss = css [ marginTop theme.defaultMargin ]
-        overlayMsgCss = css [ position absolute,
-                              fontFamily sansSerif,
-                              fontSize (px 25),
-                              color theme.fgColor,
-                              top (pct 50),
-                              left (pct 50),
-                              transform <| translate2 (pct -50) (pct -50) ]
-
-        loginMsgDisplay = getDisplayFromLoginState (model.loginState == LoggingIn)
-
-        {- If this is a normal login, then we just need the one password field,
-        but if this is the first time, we need another to confirm the new
-        password.
-         -}
-        passwordField =
-            let
-                passwordHelper str = passwordDiv [ value model.password,
-                                                   onInput (SetCredentials Password),
-                                                   placeholder str,
-                                                   marginCss ]
-            in
-                case model.loginState of
-                    NeedsNewPassword ->
-                        passwordHelper "New password"
-                    _ ->
-                        passwordHelper "Password"
-        confirmPasswordField = case model.loginState of
-                                   NeedsNewPassword ->
-                                       div [ marginCss ]
-                                           [ passwordDiv [ value model.passwordConfirm,
-                                                           placeholder "Confirm password",
-                                                           onInput (SetCredentials PasswordConfirm),
-                                                           confirmPasswordCss ],
-                                             br [] []
-                                           ]
-                                   _ ->
-                                       div [] []
-
-        -- In case login failed
-        errorMsg = case model.loginState of
-                       LoginFailed msg ->
-                           msg
-                       _ ->
-                           ""
-        errorMsgDisplay = getDisplayFromLoginState (case model.loginState of
-                                                        LoginFailed _ -> True
-                                                        _ -> False)
-
-        -- If this is the first time logging in, then we'll need to get a new
-        -- password from the user.
-        submitCommand = if model.loginState == NeedsNewPassword
-                        then SetNewUserPassword
-                        else Login
-
-        -- Page views
-        login = div []
-                [ div [ loginCss ]
-                      [ text "Eolach V2" ],
-                  br [] [],
-                  Html.form [ onSubmit submitCommand, formCss ]
-                      [ input [ type_ "text",
-                                placeholder "Email",
-                                onInput (SetCredentials Email),
-                                emailCss ] [],
-                        br [] [],
-                        passwordField,
-                        br [] [],
-                        confirmPasswordField,
-                        button [ Html.Styled.Attributes.disabled loginDisabled,
-                                 marginCss]
-                            [ text "Login" ]
-                      ],
-                  div [ getOverlayCss loginMsgDisplay wait ]
-                      [ div [ overlayMsgCss ]
-                            [ text "Logging in..." ]
-                      ],
-                  div [ getOverlayCss errorMsgDisplay pointer,
-                        onClick CloseErrorOverlay ]
-                      [ div [ overlayMsgCss ]
-                            [ text errorMsg ]
-                      ]
-                ]
-        home = text "Welcome!"
+        makeLoginButton label loginMsg = Input.button [ centerX,
+                                                        centerY,
+                                                        paddingXY 30 7,
+                                                        Border.solid,
+                                                        Border.width 2,
+                                                        Border.color colorTheme.darkGrey
+                                                      ] { onPress = loginMsg,
+                                                          label = text label
+                                                        }
+        defaultLoginButton = makeLoginButton "Login" (Just Login)
+        layoutHelper = baseLayout model
     in
         case model.loginState of
             LoggedOut ->
-                login
-            LoggingIn ->
-                login
-            NeedsNewPassword ->
-                login
+                layoutHelper none defaultLoginButton none
             LoginFailed error ->
-                login
-            LoggedIn _ ->
-                home
+                layoutHelper none defaultLoginButton (styleError error)
+            NeedsNewPassword ->
+                let
+                    confirmationColor = if model.password == model.passwordConfirm
+                                        then colorTheme.black
+                                        else colorTheme.error
+                    confirmPassword = Input.newPassword [ Font.color confirmationColor ]
+                                      { onChange = (SetCredentials PasswordConfirm),
+                                                             text = model.passwordConfirm,
+                                                             placeholder = Just <| Input.placeholder [] (text "Confirm password"),
+                                                             label = Input.labelHidden "Confirm password",
+                                                             show = False
+                                                           }
+                    welcomeMessage = styleMessage "Welcome to Eolach! You're a new user, so you'll have to set a new password."
+                in
+                    layoutHelper confirmPassword (makeLoginButton "Set password" (Just SetNewUserPassword)) welcomeMessage
+            LoggingIn ->
+                layoutHelper none (el [ centerX ] <| styleMessage "Logging in...") none
+            LoggedIn token ->
+                text ("Welcome! Your token is: " ++ token)

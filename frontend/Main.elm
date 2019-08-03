@@ -4,7 +4,7 @@ import Browser
 import Html exposing (Html)
 import Browser.Navigation as Nav
 
-import Html.Styled
+import Element
 
 import Api
 import Login
@@ -84,9 +84,9 @@ view model =
     let
         body = case model.page of
                    LoginPage loginModel ->
-                       Html.Styled.toUnstyled <| Login.view loginModel
+                       Element.layout [] <| Login.view loginModel
                    _ ->
-                       Html.Styled.toUnstyled <| Login.view Login.init
+                       Element.layout [] <| Element.text "Not implemented yet."
     in
         { title = "Eolach V2",
           body = List.map (Html.map LoginMsg) [ body ]
