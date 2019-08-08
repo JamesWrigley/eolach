@@ -35,18 +35,6 @@ pathToRoute path =
         _ ->
             None
 
-urlTrim : Url.Url -> String
-urlTrim url =
-    let
-        urlStr = Url.toString url
-    in
-        case String.endsWith "/" urlStr of
-            True ->
-                String.dropRight 1 urlStr
-            False ->
-                urlStr
-
 replaceUrl : Nav.Key -> String -> Cmd msg
 replaceUrl key path =
-    Nav.replaceUrl key path-- <|
-        --UB.crossOrigin (urlTrim url) [ path ] []
+    Nav.replaceUrl key path
