@@ -1,8 +1,10 @@
 module Login exposing (Model, Msg, update, view, init, subscriptions)
 
+import Url
 import Regex
 import Html.Events
 import Json.Decode as JD
+import Browser.Navigation as Nav
 
 import Element exposing (..)
 import Element.Font as Font
@@ -11,6 +13,7 @@ import Element.Border as Border
 import Element.Background as Background
 
 import Ports
+import Routing exposing (Route(..), Session, routeToPath, replaceUrl)
 
 {- Model -}
 
@@ -21,15 +24,16 @@ type LoginState = LoggedIn String    -- ID token
                 | NeedsNewPassword
 
 type alias Model =
-    { email : String,
+    { session : Session,
+      email : String,
       password : String,
       passwordConfirm : String,
       loginState : LoginState
     }
 
-init : Model
-init =
-    Model "" "" "" LoggedOut
+init : Nav.Key -> Model
+init key =
+    Model (Session key "") "" "" "" LoggedOut
 
 {- Update -}
 
@@ -74,7 +78,7 @@ update msg model =
         LoginFailedMsg error ->
             ({ model | loginState = LoginFailed error }, Cmd.none)
         LoginSucceeded idToken ->
-            ({ model | loginState = LoggedIn idToken }, Cmd.none)
+            ({ model | loginState = LoggedIn idToken }, replaceUrl model.session.key (routeToPath Routing.Items))
         RequestNewUserPassword ->
             ({ model | password = "", passwordConfirm = "", loginState = NeedsNewPassword }, Cmd.none)
         SetNewUserPassword ->
@@ -156,10 +160,10 @@ baseLayout model aboveLogin loginElement belowLogin =
                          Font.size 50,
                          Font.color colorTheme.logo
                        ] (text "Eolach V2"),
-                    Input.text [ Input.focusedOnLoad,
-                                 Font.color emailColor,
-                                 onEnter Login
-                               ]
+                    Input.email [ Input.focusedOnLoad,
+                                  Font.color emailColor,
+                                  onEnter Login
+                                ]
                         { onChange = (SetCredentials Email),
                           text = model.email,
                           placeholder = Just <| Input.placeholder [] (text "Email"),
@@ -204,7 +208,8 @@ view model =
                 layoutHelper none defaultLoginButton (styleError error)
             NeedsNewPassword ->
                 let
-                    confirmationColor = if model.password == model.passwordConfirm
+                    confirmationColor = if (String.length model.passwordConfirm == 0 ||
+                                                model.password == model.passwordConfirm)
                                         then colorTheme.black
                                         else colorTheme.error
                     confirmPassword = Input.newPassword [ Font.color confirmationColor ]
@@ -220,4 +225,4 @@ view model =
             LoggingIn ->
                 layoutHelper none (el [ centerX ] <| styleMessage "Logging in...") none
             LoggedIn token ->
-                text ("Welcome! Your token is: " ++ token)
+                layoutHelper none (el [ centerX ] <| styleMessage "Success!") none

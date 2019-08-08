@@ -4,10 +4,12 @@ import Browser
 import Html exposing (Html)
 import Browser.Navigation as Nav
 
-import Element
+import Element as E
+import Element.Font as EF
 
 import Api
 import Login
+import Routing exposing (Route(..), Session, pathToRoute)
 
 -- Main
 
@@ -25,8 +27,9 @@ main =
 -- Model
 
 type Page = LoginPage Login.Model
-          | BooksPage -- String (Book -> Html msg) (List Book)
+          | ItemsPage
           | KioskPage
+          | FourOhFour
 
 type alias Model =
     { key : Nav.Key,
@@ -36,15 +39,21 @@ type alias Model =
 
 init : () -> Url.Url -> Nav.Key -> (Model, Cmd Msg)
 init flags url key =
-    (Model key url (LoginPage Login.init), Cmd.none)
+    (Model key url (LoginPage <| Login.init key), Cmd.none)
 
 -- Update
 
 type Msg = LinkClicked Browser.UrlRequest
          | UrlChanged Url.Url
          | LoginMsg Login.Msg
-         | GetBooks
-         | ReceivedBooks (Result Http.Error (List Api.Book))
+
+getSession : Model -> Session
+getSession model =
+    case model.page of
+        LoginPage loginModel ->
+            loginModel.session
+        _ ->
+            Session model.key ""
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -54,16 +63,18 @@ update msg model =
                 Browser.Internal url -> (model, Nav.pushUrl model.key (Url.toString url))
                 Browser.External href -> (model, Nav.load href)
         (UrlChanged url, _) ->
-            ({ model | url = url }, Cmd.none)
+            case pathToRoute url of
+                Routing.Login ->
+                    ({ model | page = LoginPage (Login.init model.key) }, Cmd.none)
+                Routing.Items ->
+                    ({ model | page = ItemsPage (Items.init <| getSession model) }, Cmd.none)
+                Routing.None ->
+                    ({ model | page = FourOhFour }, Cmd.none)
         (LoginMsg loginMsg, LoginPage loginModel) ->
             let
                 (newModel, newCmd) = Login.update loginMsg loginModel
             in
                 ({ model | page = LoginPage newModel}, Cmd.map LoginMsg newCmd)
-        (GetBooks, _) ->
-            (model, Api.getBooks ReceivedBooks)
-        (ReceivedBooks _, _) ->
-            (model, Cmd.none)
         (_, _) ->
             (model, Cmd.none)
 
@@ -84,10 +95,18 @@ view model =
     let
         body = case model.page of
                    LoginPage loginModel ->
-                       Element.layout [] <| Login.view loginModel
-                   _ ->
-                       Element.layout [] <| Element.text "Not implemented yet."
+                       Login.view loginModel
+                   ItemsPage _ ->
+                       E.text "Items: not implemented yet"
+                   KioskPage ->
+                       E.text "Kiosk: not implemented yet"
+                   FourOhFour ->
+                       E.el [ E.centerX,
+                              E.centerY,
+                              EF.size 100
+                            ]
+                           (E.text "404")
     in
         { title = "Eolach V2",
-          body = List.map (Html.map LoginMsg) [ body ]
+          body = List.map (Html.map LoginMsg) [ E.layout [] body ]
         }
