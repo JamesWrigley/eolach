@@ -9,6 +9,7 @@ import Element.Font as EF
 
 import Api
 import Login
+import Items
 import Routing exposing (Route(..), Session, pathToRoute)
 
 -- Main
@@ -27,7 +28,7 @@ main =
 -- Model
 
 type Page = LoginPage Login.Model
-          | ItemsPage
+          | ItemsPage Items.Model
           | KioskPage
           | FourOhFour
 
@@ -52,6 +53,8 @@ getSession model =
     case model.page of
         LoginPage loginModel ->
             loginModel.session
+        ItemsPage itemsModel ->
+            itemsModel.session
         _ ->
             Session model.key ""
 
