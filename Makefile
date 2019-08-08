@@ -11,12 +11,15 @@ frontend: elm
 infra: bundle eolach.tf
 	terraform apply
 
+push:
+	aws s3 cp ./frontend/index.html s3://`terraform output frontend_s3_bucket` --acl 'public-read' --content-type 'text/html'
+	aws s3 cp ./frontend/elm.min.js s3://`terraform output frontend_s3_bucket` --acl 'public-read' --content-type 'text/javascript'
+	aws s3 cp ./frontend/eolach.js s3://`terraform output frontend_s3_bucket`  --acl 'public-read' --content-type 'text/javascript'
+
 deploy: infra frontend/index.html frontend/cognito.js frontend/Api.template.elm
 	make frontend # Need to do this after terraform runs so we get the right API URL
 	./frontend/cognito_config.sh > ./frontend/cognito_config.js
-	aws s3 cp ./frontend/index.html s3://`terraform output frontend_s3_bucket` --content-type 'text/html'
-	aws s3 cp ./frontend/elm.min.js s3://`terraform output frontend_s3_bucket` --content-type 'text/javascript'
-	aws s3 cp ./frontend/eolach.js s3://`terraform output frontend_s3_bucket` --content-type 'text/javascript'
+	make push
 
 bundle: backend/query.py
 	-zip -ju deploy/query.zip backend/query.py
