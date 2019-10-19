@@ -1,4 +1,4 @@
-module Routing exposing (Route(..), Session, routeToPath, pathToRoute, replaceUrl)
+module Routing exposing (Route(..), Session, routeToPath, pathToRoute, changeRoute)
 
 import Url
 import Url.Parser as UP
@@ -7,34 +7,31 @@ import Dict exposing (Dict)
 import Browser.Navigation as Nav
 
 type Route = Login
-           | Items
+           | Admin
+           | Kiosk
            | None
 
 type alias Session =
     { key : Nav.Key,
-      idToken : String
+      idToken : Maybe String
     }
 
 routeToPath : Route -> String
 routeToPath route =
     case route of
-        Login ->
-            "login"
-        Items ->
-            "items"
-        None ->
-            ""
+        Login -> "login"
+        Admin -> "admin"
+        Kiosk -> "kiosk"
+        None  -> ""
 
 pathToRoute : Url.Url -> Route
 pathToRoute path =
     case UP.parse UP.string path of
-        Just "login" ->
-            Login
-        Just "items" ->
-            Items
-        _ ->
-            None
+        Just "login" -> Login
+        Just "admin" -> Admin
+        Just "kiosk" -> Kiosk
+        _            -> None
 
-replaceUrl : Nav.Key -> String -> Cmd msg
-replaceUrl key path =
-    Nav.replaceUrl key path
+changeRoute : Nav.Key -> Route -> Cmd msg
+changeRoute key route =
+    Nav.replaceUrl key (routeToPath route)

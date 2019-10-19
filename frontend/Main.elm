@@ -5,11 +5,13 @@ import Html exposing (Html)
 import Browser.Navigation as Nav
 
 import Element as E
-import Element.Font as EF
+import Element.Font as Font
+import Element.Input as Input
 
 import Api
 import Login
-import Items
+import Admin
+import Kiosk
 import Routing exposing (Route(..), Session, pathToRoute)
 
 -- Main
@@ -28,8 +30,8 @@ main =
 -- Model
 
 type Page = LoginPage Login.Model
-          | ItemsPage Items.Model
-          | KioskPage
+          | KioskPage Kiosk.Model
+          | AdminPage Admin.Model
           | FourOhFour
 
 type alias Model =
@@ -47,16 +49,19 @@ init flags url key =
 type Msg = LinkClicked Browser.UrlRequest
          | UrlChanged Url.Url
          | LoginMsg Login.Msg
+         | AdminMsg Admin.Msg
 
 getSession : Model -> Session
 getSession model =
     case model.page of
         LoginPage loginModel ->
             loginModel.session
-        ItemsPage itemsModel ->
-            itemsModel.session
-        _ ->
-            Session model.key ""
+        AdminPage adminModel ->
+            adminModel.session
+        KioskPage kioskModel ->
+            kioskModel.session
+        FourOhFour ->
+            Session model.key Nothing
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -69,15 +74,22 @@ update msg model =
             case pathToRoute url of
                 Routing.Login ->
                     ({ model | page = LoginPage (Login.init model.key) }, Cmd.none)
-                Routing.Items ->
-                    ({ model | page = ItemsPage (Items.init <| getSession model) }, Cmd.none)
+                Routing.Admin ->
+                    ({ model | page = AdminPage (Admin.init <| getSession model) }, Cmd.none)
+                Routing.Kiosk ->
+                    ({ model | page = KioskPage (Kiosk.init <| getSession model) }, Cmd.none)
                 Routing.None ->
                     ({ model | page = FourOhFour }, Cmd.none)
         (LoginMsg loginMsg, LoginPage loginModel) ->
             let
                 (newModel, newCmd) = Login.update loginMsg loginModel
             in
-                ({ model | page = LoginPage newModel}, Cmd.map LoginMsg newCmd)
+                ({ model | page = LoginPage newModel }, Cmd.map LoginMsg newCmd)
+        (AdminMsg adminMsg, AdminPage adminModel) ->
+            let
+                (newModel, newCmd) = Admin.update adminMsg adminModel
+            in
+                ({ model | page = AdminPage newModel }, Cmd.map AdminMsg newCmd)
         (_, _) ->
             (model, Cmd.none)
 
@@ -93,23 +105,28 @@ subscriptions model =
 
 -- View
 
+centerMessage : E.Element msg -> Int -> E.Element msg
+centerMessage content fontSize =
+    E.el [ E.centerX,
+           E.centerY,
+           Font.size fontSize,
+           Font.family [ Font.monospace ]
+         ]
+        content
+
 view : Model -> Browser.Document Msg
 view model =
     let
-        body = case model.page of
-                   LoginPage loginModel ->
-                       Login.view loginModel
-                   ItemsPage _ ->
-                       E.text "Items: not implemented yet"
-                   KioskPage ->
-                       E.text "Kiosk: not implemented yet"
-                   FourOhFour ->
-                       E.el [ E.centerX,
-                              E.centerY,
-                              EF.size 100
-                            ]
-                           (E.text "404")
+        (body, msg) = case model.page of
+                          LoginPage loginModel ->
+                              (Login.view loginModel, Html.map LoginMsg)
+                          AdminPage adminModel ->
+                              (Admin.view adminModel, Html.map AdminMsg)
+                          KioskPage kioskModel ->
+                              (centerMessage (E.text "Kiosk: not implemented yet") 25, Html.map LoginMsg)
+                          FourOhFour ->
+                              (centerMessage (E.text "404") 100, Html.map LoginMsg)
     in
         { title = "Eolach V2",
-          body = List.map (Html.map LoginMsg) [ E.layout [] body ]
+          body = List.map msg [ E.layout [] body ]
         }

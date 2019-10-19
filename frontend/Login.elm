@@ -13,7 +13,7 @@ import Element.Border as Border
 import Element.Background as Background
 
 import Ports
-import Routing exposing (Route(..), Session, routeToPath, replaceUrl)
+import Routing exposing (Route(..), Session, routeToPath, changeRoute)
 
 {- Model -}
 
@@ -33,7 +33,7 @@ type alias Model =
 
 init : Nav.Key -> Model
 init key =
-    Model (Session key "") "" "" "" LoggedOut
+    Model (Session key Nothing) "" "" "" LoggedOut
 
 {- Update -}
 
@@ -78,7 +78,11 @@ update msg model =
         LoginFailedMsg error ->
             ({ model | loginState = LoginFailed error }, Cmd.none)
         LoginSucceeded idToken ->
-            ({ model | loginState = LoggedIn idToken }, replaceUrl model.session.key (routeToPath Routing.Items))
+            let
+                newSession = Session model.session.key (Just idToken)
+            in
+                ({ model | session = newSession, loginState = LoggedIn idToken },
+                 changeRoute newSession.key Routing.Admin)
         RequestNewUserPassword ->
             ({ model | password = "", passwordConfirm = "", loginState = NeedsNewPassword }, Cmd.none)
         SetNewUserPassword ->

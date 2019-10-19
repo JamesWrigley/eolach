@@ -1,4 +1,4 @@
-module Items exposing (..)
+module Kiosk exposing (Model, init)
 
 import Set exposing (Set)
 import Dict exposing (Dict)
@@ -12,15 +12,18 @@ type Filter = Book
             | Dvd
             | Cd
 
+type alias FilterList = List (Filter, Bool)
+
 type alias Model =
     { session : Session,
       page : Dict Int String,
-      filters : List Filter
+      filters : FilterList,
+      lastEvaluatedKeys : Maybe String
     }
 
 init : Session -> Model
 init session =
-    Model session Dict.empty [ Book, Dvd, Cd ]
+    Model session Dict.empty [ (Book, True), (Dvd, True), (Cd, True) ] Nothing
 
 {- Update -}
 

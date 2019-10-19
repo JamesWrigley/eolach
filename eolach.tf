@@ -123,53 +123,21 @@ resource "aws_api_gateway_deployment" "eolach_internal_api_deployment" {
 
 // DynamoDB tables
 
-resource "aws_dynamodb_table" "books" {
-  name = "Books"
+resource "aws_dynamodb_table" "eolach" {
+  name = "eolach"
   billing_mode = "PAY_PER_REQUEST"
-  hash_key = "author"
-  range_key = "title"
+  hash_key = "type"
+  range_key = "identifier"
 
   attribute {
-    name = "author"
+    name = "type"
     type = "S"
   }
 
   attribute {
-    name = "title"
+    name = "identifier"
     type = "S"
   }
-}
-
-// Testing items
-
-resource "aws_dynamodb_table_item" "mere_christianity" {
-  table_name = "${aws_dynamodb_table.books.name}"
-  hash_key = "${aws_dynamodb_table.books.hash_key}"
-  range_key = "${aws_dynamodb_table.books.range_key}"
-
-  item = <<ITEM
-{
-    "author": {"S": "C.S. Lewis"},
-    "title": {"S": "Mere Christianity"},
-    "subjects": {"L": [{"S": "Apologetics"}, {"S": "Theology"}]},
-    "section": {"S": "204"}
-}
-ITEM
-}
-
-resource "aws_dynamodb_table_item" "screwtape" {
-  table_name = "${aws_dynamodb_table.books.name}"
-  hash_key = "${aws_dynamodb_table.books.hash_key}"
-  range_key = "${aws_dynamodb_table.books.range_key}"
-
-  item = <<ITEM
-{
-    "author": {"S": "C.S. Lewis"},
-    "title": {"S": "The Screwtape Letters"},
-    "subjects": {"L": [{"S": "Theology"}, {"S": "Fiction"}, {"S": "Satire"}]},
-    "section": {"S": "248.2"}
-}
-ITEM
 }
 
 // Cognito
@@ -317,4 +285,122 @@ resource "aws_cloudfront_distribution" "eolach" {
     minimum_protocol_version = "TLSv1.2_2018"
     ssl_support_method = "sni-only"
   }
+}
+
+// Testing items
+
+resource "aws_dynamodb_table_item" "book_mere_christianity" {
+  table_name = "${aws_dynamodb_table.eolach.name}"
+  hash_key = "${aws_dynamodb_table.eolach.hash_key}"
+  range_key = "${aws_dynamodb_table.eolach.range_key}"
+
+  item = <<ITEM
+{
+    "type": {"S": "item"},
+    "identifier": {"S": "book_c_s_lewis_mere_christianity" },
+    "author": {"S": "C.S. Lewis"},
+    "title": {"S": "Mere Christianity"},
+    "subjects": {"L": [{"S": "Apologetics"}, {"S": "Theology"}]},
+    "code": {"S": "204 LEW"}
+}
+ITEM
+}
+
+resource "aws_dynamodb_table_item" "book_screwtape" {
+  table_name = "${aws_dynamodb_table.eolach.name}"
+  hash_key = "${aws_dynamodb_table.eolach.hash_key}"
+  range_key = "${aws_dynamodb_table.eolach.range_key}"
+
+  item = <<ITEM
+{
+    "type": {"S": "item"},
+    "identifier": {"S": "book_c_s_lewis_the_screwtape_letters"},
+    "author": {"S": "C.S. Lewis"},
+    "title": {"S": "The Screwtape Letters"},
+    "subjects": {"L": [{"S": "Theology"}, {"S": "Fiction"}, {"S": "Satire"}]},
+    "code": {"S": "248.2 LEW"}
+}
+ITEM
+}
+
+resource "aws_dynamodb_table_item" "dvd_scarlet" {
+  table_name = "${aws_dynamodb_table.eolach.name}"
+  hash_key = "${aws_dynamodb_table.eolach.hash_key}"
+  range_key = "${aws_dynamodb_table.eolach.range_key}"
+
+  item = <<ITEM
+{
+    "type": {"S": "item"},
+    "identifier": {"S": "dvd_g_the_scarlet_and_the_black"},
+    "title": {"S": "The Scarlet and the Black"},
+    "subjects": {"L": [{"S": "Historical Fiction"}, {"S": "Drama"}, {"S": "Action"}]},
+    "code": {"S": "G 87"}
+}
+ITEM
+}
+
+resource "aws_dynamodb_table_item" "dvd_bible_illustrations" {
+  table_name = "${aws_dynamodb_table.eolach.name}"
+  hash_key = "${aws_dynamodb_table.eolach.hash_key}"
+  range_key = "${aws_dynamodb_table.eolach.range_key}"
+
+  item = <<ITEM
+{
+    "type": {"S": "item"},
+    "identifier": {"S": "dvd_t_humorous_bible_illustrations"},
+    "title": {"S": "Humorous Bible Illustrations"},
+    "speaker": {"S": "Joseph Prince"},
+    "subjects": {"L": [{"S": "Humor"}, {"S": "Christian Teaching"}]},
+    "code": {"S": "90"}
+}
+ITEM
+}
+
+resource "aws_dynamodb_table_item" "cd_manifest_presence" {
+  table_name = "${aws_dynamodb_table.eolach.name}"
+  hash_key = "${aws_dynamodb_table.eolach.hash_key}"
+  range_key = "${aws_dynamodb_table.eolach.range_key}"
+
+  item = <<ITEM
+{
+    "type": {"S": "item"},
+    "identifier": {"S": "cd_manifest_presence"},
+    "title": {"S": "Manifest Presence 2008: Part 3"},
+    "speaker": {"S": "Bill Johnson"},
+    "subjects": {"L": [{"S": "Christian Teaching"}, {"S": "Theology"}]},
+    "code": {"S": "42"}
+}
+ITEM
+}
+
+resource "aws_dynamodb_table_item" "patron_john" {
+  table_name = "${aws_dynamodb_table.eolach.name}"
+  hash_key = "${aws_dynamodb_table.eolach.hash_key}"
+  range_key = "${aws_dynamodb_table.eolach.range_key}"
+
+  item = <<ITEM
+{
+    "type": {"S": "patron"},
+    "identifier": {"S": "patron_john_doe"},
+    "name": {"S": "John Doe"},
+    "number": {"S": "+64 1234 56789"},
+    "email": {"S": "john@doe.com"}
+}
+ITEM
+}
+
+resource "aws_dynamodb_table_item" "loan_screwtape" {
+  table_name = "${aws_dynamodb_table.eolach.name}"
+  hash_key = "${aws_dynamodb_table.eolach.hash_key}"
+  range_key = "${aws_dynamodb_table.eolach.range_key}"
+
+  item = <<ITEM
+{
+    "type": {"S": "loan"},
+    "identifier": {"S": "loan_the_screwtape_letters_john_doe_12345"},
+    "patron_id": {"S": "patron_james_wrigley"},
+    "item_id": {"S": "book_c_s_lewis_the_screwtape_letters"},
+    "loan_date": {"N": "1570358046"}
+}
+ITEM
 }
